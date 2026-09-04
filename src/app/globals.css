@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+:root {
+  /* Backgrounds */
+  --bg-primary: #08090d;
+  --bg-secondary: #0f1117;
+  --bg-tertiary: #161822;
+  --bg-elevated: #1c1e2a;
+  --bg-glass: rgba(15, 17, 23, 0.8);
+  
+  /* Logo Colors */
+  --blue-primary: #1a73e8;
+  --blue-light: #4a9eff;
+  --blue-dark: #0d47a1;
+  --blue-glow: rgba(26, 115, 232, 0.3);
+  --blue-subtle: rgba(26, 115, 232, 0.1);
+  
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #8b8fa3;
+  --text-tertiary: #5a5e73;
+  --text-blue: #4a9eff;
+  
+  /* Risk Colors */
+  --risk-critical: #ff2d55;
+  --risk-high: #ff6b6b;
+  --risk-medium: #ffb800;
+  --risk-low: #34c759;
+  --risk-safe: #00e676;
+  
+  /* Status */
+  --success: #00e676;
+  --warning: #ffb800;
+  --error: #ff2d55;
+  --pending: #8b8fa3;
+  
+  /* Borders */
+  --border: #1c1e2a;
+  --border-hover: #2a2d3e;
+  --border-active: #1a73e8;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px rgba(26, 115, 232, 0.3);
+  --shadow-glow-lg: 0 0 40px rgba(26, 115, 232, 0.4);
+  
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(26, 115, 232, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(26, 115, 232, 0.6); }
+}
+
+@keyframes wave-load {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-glow {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-wave {
+  animation: wave-load 1s ease-in-out infinite;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+/* Wave Divider */
+.wave-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--blue-primary), transparent);
+  border-radius: 1px;
+}
+
+/* Glass Effect */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Risk Badge Colors */
+.badge-critical { background: rgba(255, 45, 85, 0.15); color: var(--risk-critical); }
+.badge-high { background: rgba(255, 107, 107, 0.15); color: var(--risk-high); }
+.badge-medium { background: rgba(255, 184, 0, 0.15); color: var(--risk-medium); }
+.badge-low { background: rgba(52, 199, 89, 0.15); color: var(--risk-low); }
+.badge-safe { background: rgba(0, 230, 118, 0.15); color: var(--risk-safe); }
