@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 const features = [
   {
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
       </svg>
     ),
@@ -16,7 +16,7 @@ const features = [
   },
   {
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
       </svg>
     ),
@@ -25,7 +25,7 @@ const features = [
   },
   {
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
       </svg>
     ),
@@ -34,7 +34,7 @@ const features = [
   },
   {
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
       </svg>
     ),
@@ -43,7 +43,7 @@ const features = [
   },
   {
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
         <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
       </svg>
@@ -53,7 +53,7 @@ const features = [
   },
   {
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0055ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <line x1="12" y1="1" x2="12" y2="23"/>
         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
       </svg>
@@ -91,37 +91,38 @@ export default function Home() {
   return (
     <div>
       {/* Nav */}
-      <nav style={{ position: 'fixed', top: 0, width: '100%', zIndex: 50, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--border)' }}>
+      <nav style={{ position: 'fixed', top: 0, width: '100%', zIndex: 50, background: 'rgba(255,255,255,0.96)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border)' }}>
         <div className="nav-container">
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img src="/logo.png" alt="Anchrion" style={{ width: 30, height: 30, borderRadius: 7 }} />
-            <span style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>Anchrion</span>
+            <img src="/logo.png" alt="Anchrion" style={{ width: 28, height: 28, borderRadius: 6 }} />
+            <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.02em' }}>Anchrion</span>
           </a>
           <div className="nav-links">
             <a href="#features">Features</a>
             <a href="#how">How It Works</a>
-            <a href="https://github.com/thesithunyein/anchrion" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <a href="/dashboard" className="btn-primary">Open App</a>
+            <a href="https://github.com/thesithunyein/anchrion" target="_blank" rel="noopener noreferrer">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                527
+              </span>
+            </a>
+            <a href="/dashboard" className="btn-outline">Get started</a>
           </div>
         </div>
       </nav>
 
-      {/* Hero */}
+      {/* Hero - Left aligned like zoneless */}
       <section className="hero">
-        <p className="eyebrow" style={{ marginBottom: 20 }}>Wallet Security, Reimagined</p>
-        <h1 className="heading-lg" style={{ maxWidth: 720 }}>
-          Your Wallet Never Sleeps.<br />
-          <span style={{ color: 'var(--blue)' }}>Neither Does Anchrion.</span>
+        <p className="eyebrow">Wallet Security, Reimagined</p>
+        <h1 className="heading-xl" style={{ marginBottom: 20 }}>
+          Your wallet&apos;s AI bodyguard.
         </h1>
-        <p className="subheading" style={{ maxWidth: 520 }}>
-          AI-powered guardian that monitors, explains, and protects your wallet approvals. Catch dangerous contracts before they drain your funds.
+        <p className="subheading" style={{ marginBottom: 36 }}>
+          Monitor, explain, and protect your token approvals. Catch dangerous contracts before they drain your funds.
         </p>
-        <button onClick={() => router.push('/dashboard')} className="btn-primary" style={{ padding: '14px 32px', fontSize: 15 }}>
-          Connect Wallet
+        <button onClick={() => router.push('/dashboard')} className="btn-outline" style={{ padding: '14px 32px', fontSize: 15 }}>
+          Get started
         </button>
-        <p style={{ marginTop: 24, fontSize: 13, color: 'var(--text-tertiary)', fontWeight: 450 }}>
-          Ethereum · Base · Arbitrum · Optimism
-        </p>
       </section>
 
       {/* Stats */}
@@ -140,18 +141,20 @@ export default function Home() {
 
       {/* Features */}
       <section id="features" className="section">
-        <div className="section-inner" style={{ textAlign: 'center' }}>
-          <p className="eyebrow">Features</p>
-          <h2 className="heading-md">Why Anchrion?</h2>
-          <p className="subheading" style={{ marginBottom: 56 }}>
-            Not a scanner. Not a reporter. A bodyguard that catches threats before they happen.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16, textAlign: 'left' }}>
+        <div className="section-inner">
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p className="eyebrow">Features</p>
+            <h2 className="heading-lg">Why Anchrion?</h2>
+            <p className="subheading" style={{ margin: '0 auto' }}>
+              Not a scanner. Not a reporter. A bodyguard that catches threats before they happen.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16, textAlign: 'left' }}>
             {features.map(f => (
               <div key={f.title} className="card">
-                <div style={{ marginBottom: 16 }}>{f.icon}</div>
-                <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 6, letterSpacing: '-0.01em' }}>{f.title}</h3>
-                <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>{f.desc}</p>
+                <div style={{ marginBottom: 14 }}>{f.icon}</div>
+                <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 6, letterSpacing: '-0.01em' }}>{f.title}</h3>
+                <p style={{ fontSize: 14, lineHeight: 1.65, color: 'var(--text-secondary)' }}>{f.desc}</p>
               </div>
             ))}
           </div>
@@ -159,10 +162,10 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section id="how" className="section" style={{ background: 'var(--bg-alt)', borderTop: '1px solid var(--border)' }}>
-        <div className="section-inner" style={{ maxWidth: 640 }}>
+      <section id="how" className="section" style={{ background: 'var(--bg-alt)' }}>
+        <div className="section-inner" style={{ maxWidth: 580, margin: '0 auto' }}>
           <p className="eyebrow" style={{ textAlign: 'center' }}>How It Works</p>
-          <h2 className="heading-md" style={{ textAlign: 'center', marginBottom: 56 }}>Four steps to safety</h2>
+          <h2 className="heading-lg" style={{ textAlign: 'center', marginBottom: 56 }}>Four steps to safety</h2>
           {steps.map(s => (
             <div key={s.n} className="step">
               <div className="step-num">{s.n}</div>
@@ -177,9 +180,9 @@ export default function Home() {
 
       {/* CTA */}
       <section className="section" style={{ textAlign: 'center' }}>
-        <h2 className="heading-md" style={{ marginBottom: 12 }}>Ready to protect your wallet?</h2>
+        <h2 className="heading-lg" style={{ marginBottom: 12 }}>Ready to protect your wallet?</h2>
         <p style={{ fontSize: 15, marginBottom: 32, color: 'var(--text-secondary)' }}>Connect your wallet in seconds. No signup required.</p>
-        <button onClick={() => router.push('/dashboard')} className="btn-primary" style={{ padding: '14px 32px', fontSize: 15 }}>Get Started</button>
+        <button onClick={() => router.push('/dashboard')} className="btn-outline" style={{ padding: '14px 32px', fontSize: 15 }}>Get started</button>
       </section>
 
       {/* Footer */}
@@ -188,7 +191,7 @@ export default function Home() {
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 48, marginBottom: 40 }}>
             <div style={{ maxWidth: 260 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <img src="/logo.png" alt="Anchrion" style={{ width: 26, height: 26, borderRadius: 6 }} />
+                <img src="/logo.png" alt="Anchrion" style={{ width: 24, height: 24, borderRadius: 5 }} />
                 <span style={{ fontSize: 15, fontWeight: 600 }}>Anchrion</span>
               </div>
               <p style={{ fontSize: 13, lineHeight: 1.65, color: 'var(--text-secondary)' }}>
@@ -198,11 +201,11 @@ export default function Home() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 56 }}>
               {footerLinks.map(col => (
                 <div key={col.title}>
-                  <h4 style={{ fontSize: 11, fontWeight: 600, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>{col.title}</h4>
+                  <h4 style={{ fontSize: 11, fontWeight: 500, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>{col.title}</h4>
                   <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {col.links.map(l => (
                       <li key={l.label}>
-                        <a href={l.href} target={l.href.startsWith('http') ? '_blank' : undefined} rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined} style={{ fontSize: 13, color: 'var(--text-secondary)', transition: 'color 0.2s' }}>
+                        <a href={l.href} target={l.href.startsWith('http') ? '_blank' : undefined} rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined} style={{ fontSize: 13, color: 'var(--text-secondary)', transition: 'color 0.15s' }}>
                           {l.label}
                         </a>
                       </li>
