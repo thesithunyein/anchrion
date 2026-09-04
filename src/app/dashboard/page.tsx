@@ -55,54 +55,53 @@ export default function Dashboard() {
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       {/* Header */}
-      <header className="sticky top-0 z-50 h-14 flex items-center px-6 justify-between" style={{ background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}>
-        <a href="/" className="flex items-center gap-2.5">
-          <img src="/logo.png" alt="Anchrion" className="w-7 h-7 rounded-lg" />
-          <span className="text-[15px] font-semibold">Anchrion</span>
+      <header style={{ position: 'sticky', top: 0, zIndex: 50, height: 56, display: 'flex', alignItems: 'center', padding: '0 24px', justifyContent: 'space-between', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}>
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <img src="/logo.png" alt="Anchrion" style={{ width: 28, height: 28, borderRadius: 7 }} />
+          <span style={{ fontSize: 15, fontWeight: 600 }}>Anchrion</span>
         </a>
-        <div className="flex items-center gap-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {chain && (
-            <span className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px]" style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--risk-safe)]" />{chain.name}
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 20, fontSize: 13, background: 'var(--bg-alt)', border: '1px solid var(--border)' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--risk-safe)' }} />
+              {chain.name}
             </span>
           )}
-          <span className="px-3 py-1 rounded-full text-[13px] font-mono" style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)' }}>
+          <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 13, fontFamily: 'monospace', background: 'var(--bg-alt)', border: '1px solid var(--border)' }}>
             {address?.slice(0, 6)}...{address?.slice(-4)}
           </span>
-          <button onClick={() => disconnect()} className="px-3 py-1.5 rounded-lg text-[13px] transition-colors" style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
+          <button onClick={() => disconnect()} style={{ padding: '6px 14px', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)', border: '1px solid var(--border)', background: 'transparent' }}>
             Disconnect
           </button>
         </div>
       </header>
 
-      <main className="max-w-[1200px] mx-auto px-6 py-8">
+      <main style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
           {[
             { label: 'Total Approvals', value: stats.totalApprovals },
             { label: 'Risky', value: stats.riskyApprovals, color: 'var(--risk-high)' },
             { label: 'At Risk', value: `$${stats.valueAtRisk.toLocaleString()}`, color: 'var(--risk-medium)' },
             { label: 'Health', value: `${stats.healthScore}%`, color: stats.healthScore >= 70 ? 'var(--risk-safe)' : 'var(--risk-high)' },
           ].map(s => (
-            <div key={s.label} className="p-4 rounded-xl" style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)' }}>
-              <p className="text-[12px] font-medium mb-1 uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{s.label}</p>
-              <p className="text-[22px] font-bold" style={{ color: s.color || 'var(--text)' }}>{s.value}</p>
+            <div key={s.label} style={{ padding: 16, borderRadius: 12, background: 'var(--bg-alt)', border: '1px solid var(--border)' }}>
+              <p style={{ fontSize: 12, fontWeight: 500, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-tertiary)' }}>{s.label}</p>
+              <p style={{ fontSize: 22, fontWeight: 700, color: s.color || 'var(--text)' }}>{s.value}</p>
             </div>
           ))}
         </div>
 
         {/* Search + Filter */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
           <input
             type="text" placeholder="Search approvals..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 px-4 py-2.5 rounded-lg text-[14px] outline-none transition-colors"
-            style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text)' }}
+            style={{ flex: 1, padding: '10px 16px', borderRadius: 8, fontSize: 14, outline: 'none', background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text)' }}
           />
-          <div className="flex gap-1.5">
+          <div style={{ display: 'flex', gap: 6 }}>
             {['all', 'critical', 'high', 'medium', 'low'].map(f => (
               <button key={f} onClick={() => setFilter(f)}
-                className="px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all"
-                style={filter === f ? { background: 'var(--blue)', color: 'white' } : { background: 'var(--bg-alt)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
+                style={{ padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 500, ...(filter === f ? { background: 'var(--blue)', color: 'white' } : { background: 'var(--bg-alt)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }) }}>
                 {f.charAt(0).toUpperCase() + f.slice(1)}
               </button>
             ))}
@@ -111,18 +110,20 @@ export default function Dashboard() {
 
         {/* List */}
         {loading ? (
-          <div className="space-y-2">{[1, 2, 3, 4].map(i => <div key={i} className="h-[68px] rounded-xl animate-pulse" style={{ background: 'var(--bg-alt)' }} />)}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {[1, 2, 3, 4].map(i => <div key={i} style={{ height: 68, borderRadius: 12, background: 'var(--bg-alt)', animation: 'pulse 2s infinite' }} />)}
+          </div>
         ) : error ? (
-          <div className="text-center py-16">
-            <p className="mb-4" style={{ color: 'var(--risk-critical)' }}>{error}</p>
-            <button onClick={loadApprovals} className="px-5 py-2 rounded-lg text-[14px] font-medium text-white" style={{ background: 'var(--blue)' }}>Try Again</button>
+          <div style={{ textAlign: 'center', padding: '64px 0' }}>
+            <p style={{ marginBottom: 16, color: 'var(--risk-critical)' }}>{error}</p>
+            <button onClick={loadApprovals} className="btn-primary">Try Again</button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16" style={{ color: 'var(--text-secondary)' }}>
+          <div style={{ textAlign: 'center', padding: '64px 0', color: 'var(--text-secondary)' }}>
             {approvals.length === 0 ? 'No approvals found for this wallet.' : 'No approvals match your search.'}
           </div>
         ) : (
-          <div className="space-y-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {filtered.map(a => <ApprovalRow key={a.id} approval={a} />)}
           </div>
         )}
@@ -134,26 +135,26 @@ export default function Dashboard() {
 function ApprovalRow({ approval: a }: { approval: Approval }) {
   const [open, setOpen] = useState(false);
   const borderColor = a.riskScore >= 70 ? 'var(--risk-critical)' : a.riskScore >= 50 ? 'var(--risk-high)' : a.riskScore >= 30 ? 'var(--risk-medium)' : 'var(--border)';
-  const bgColor = a.riskScore >= 70 ? 'rgba(239,68,68,0.05)' : 'var(--bg)';
+  const bgColor = a.riskScore >= 70 ? 'rgba(239,68,68,0.03)' : 'var(--bg)';
 
   return (
-    <div className="rounded-xl overflow-hidden transition-all" style={{ background: bgColor, border: `1px solid ${borderColor}` }}>
-      <div className="flex items-center justify-between p-4 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setOpen(!open)}>
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-[13px] font-bold" style={{ background: 'var(--bg-alt)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
+    <div style={{ borderRadius: 12, overflow: 'hidden', background: bgColor, border: `1px solid ${borderColor}` }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', cursor: 'pointer' }} onClick={() => setOpen(!open)}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, background: 'var(--bg-alt)', color: 'var(--text-secondary)', border: '1px solid var(--border)', flexShrink: 0 }}>
             {a.tokenSymbol.slice(0, 2)}
           </div>
-          <div className="min-w-0">
-            <p className="text-[14px] font-semibold truncate">{a.tokenName}</p>
-            <p className="text-[12px] truncate" style={{ color: 'var(--text-tertiary)' }}>{a.spenderLabel || a.spenderAddress.slice(0, 14) + '…'}</p>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.tokenName}</p>
+            <p style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-tertiary)' }}>{a.spenderLabel || a.spenderAddress.slice(0, 14) + '…'}</p>
           </div>
         </div>
-        <div className="flex items-center gap-4 flex-shrink-0">
-          <div className="text-right">
-            <p className="text-[14px] font-semibold">${a.allowanceUsd.toLocaleString()}</p>
-            <p className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>{a.allowanceFormatted} {a.tokenSymbol}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0, marginLeft: 16 }}>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: 14, fontWeight: 600 }}>${a.allowanceUsd.toLocaleString()}</p>
+            <p style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{a.allowanceFormatted} {a.tokenSymbol}</p>
           </div>
-          <span className="px-2.5 py-0.5 rounded-full text-[12px] font-semibold" style={{ background: a.riskScore >= 70 ? 'rgba(239,68,68,0.1)' : a.riskScore >= 50 ? 'rgba(249,115,22,0.1)' : a.riskScore >= 30 ? 'rgba(234,179,8,0.1)' : 'rgba(34,197,94,0.1)', color: borderColor }}>
+          <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: a.riskScore >= 70 ? 'rgba(239,68,68,0.1)' : a.riskScore >= 50 ? 'rgba(249,115,22,0.1)' : a.riskScore >= 30 ? 'rgba(234,179,8,0.1)' : 'rgba(34,197,94,0.1)', color: borderColor }}>
             {getRiskLabel(a.riskLevel)}
           </span>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s', color: 'var(--text-tertiary)' }}>
@@ -163,15 +164,15 @@ function ApprovalRow({ approval: a }: { approval: Approval }) {
       </div>
 
       {open && (
-        <div className="px-4 pb-4 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-          <div className="grid md:grid-cols-2 gap-6">
+        <div style={{ padding: '12px 16px 16px', borderTop: '1px solid var(--border)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
             <div>
-              <h4 className="text-[12px] font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-tertiary)' }}>Risk Factors</h4>
-              <ul className="space-y-2">
+              <h4 style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-tertiary)' }}>Risk Factors</h4>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {a.riskFactors.map((f, i) => (
-                  <li key={i} className="flex justify-between text-[13px]">
+                  <li key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
                     <span style={{ color: 'var(--text-secondary)' }}>{f.name}</span>
-                    <span className="font-semibold" style={{ color: f.impact > 0 ? 'var(--risk-high)' : 'var(--risk-safe)' }}>
+                    <span style={{ fontWeight: 600, color: f.impact > 0 ? 'var(--risk-high)' : 'var(--risk-safe)' }}>
                       {f.impact > 0 ? '+' : ''}{f.impact}
                     </span>
                   </li>
@@ -179,19 +180,19 @@ function ApprovalRow({ approval: a }: { approval: Approval }) {
               </ul>
             </div>
             <div>
-              <h4 className="text-[12px] font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-tertiary)' }}>Details</h4>
-              <div className="space-y-1.5 text-[13px]" style={{ color: 'var(--text-secondary)' }}>
-                <p><span style={{ color: 'var(--text-tertiary)' }}>Contract: </span><span className="font-mono">{a.spenderAddress.slice(0, 18)}…</span></p>
+              <h4 style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-tertiary)' }}>Details</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
+                <p><span style={{ color: 'var(--text-tertiary)' }}>Contract: </span><span style={{ fontFamily: 'monospace' }}>{a.spenderAddress.slice(0, 18)}…</span></p>
                 <p><span style={{ color: 'var(--text-tertiary)' }}>Chain: </span>{a.chainId}</p>
                 <p><span style={{ color: 'var(--text-tertiary)' }}>First seen: </span>{a.firstSeenAt.toLocaleDateString()}</p>
               </div>
             </div>
           </div>
-          <div className="flex gap-2 mt-5">
-            <button className="px-4 py-2 rounded-lg text-[13px] font-semibold text-white transition-all hover:opacity-90" style={{ background: 'var(--risk-critical)' }}>
+          <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
+            <button style={{ padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, color: 'white', background: 'var(--risk-critical)' }}>
               Revoke Approval
             </button>
-            <button className="px-4 py-2 rounded-lg text-[13px] transition-all" style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
+            <button style={{ padding: '8px 16px', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)', border: '1px solid var(--border)', background: 'transparent' }}>
               View on Explorer
             </button>
           </div>
