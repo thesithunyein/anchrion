@@ -1,23 +1,20 @@
 @import "tailwindcss";
 
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap');
+
 :root {
   --bg: #ffffff;
   --bg-alt: #f8fafc;
-  --bg-hover: #f1f5f9;
   --blue: #1a73e8;
-  --blue-light: #4a9eff;
   --text: #0f172a;
   --text-secondary: #64748b;
   --text-tertiary: #94a3b8;
   --border: #e2e8f0;
   --border-hover: #cbd5e1;
   --radius: 10px;
-  --radius-sm: 6px;
-  --radius-lg: 14px;
   --risk-critical: #ef4444;
   --risk-high: #f97316;
   --risk-medium: #eab308;
-  --risk-low: #22c55e;
   --risk-safe: #16a34a;
 }
 
@@ -25,7 +22,7 @@
 html, body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: 'Instrument Sans', -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   line-height: 1.5;
   overflow-x: hidden;
@@ -37,66 +34,25 @@ button { cursor: pointer; border: none; font-family: inherit; }
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.animate-fade-up {
-  animation: fade-up 0.4s ease forwards;
-}
+.animate-fade-up { animation: fade-up 0.4s ease forwards; }
 
-/* Fix button overflow */
 .btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 24px;
-  background: var(--blue);
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 8px;
-  white-space: nowrap;
-  transition: opacity 0.2s;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 24px; background: var(--blue); color: white;
+  font-size: 14px; font-weight: 600; border-radius: 8px;
+  white-space: nowrap; transition: opacity 0.2s;
 }
 .btn-primary:hover { opacity: 0.9; }
 
-.btn-outline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 500;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-.btn-outline:hover { border-color: var(--border-hover); color: var(--text); }
-
-/* Fix nav overflow */
 .nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
+  max-width: 1200px; margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between; height: 64px;
 }
 
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-}
+.nav-links { display: flex; align-items: center; gap: 32px; }
 
-/* Fix hero centering */
 .hero {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 24px 40px;
-  text-align: center;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px 24px 40px; text-align: center;
 }

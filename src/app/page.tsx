@@ -4,47 +4,22 @@ import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-function Icon({ type, size = 32 }: { type: string; size?: number }) {
-  const s = size;
-  const color = '#1a73e8';
-  const icons: Record<string, React.ReactElement> = {
-    shield: (
-      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-    ),
-    scan: (
-      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M12 6v6l4 2"/>
-      </svg>
-    ),
-    zap: (
-      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-      </svg>
-    ),
-    link: (
-      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-      </svg>
-    ),
-    lock: (
-      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-    ),
-    dollar: (
-      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23"/>
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-      </svg>
-    ),
-  };
-  return icons[type] || null;
+function Icon({ d, size = 28 }: { d: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d={d} />
+    </svg>
+  );
 }
+
+const icons = {
+  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  chart: 'M22 12h-4l-3 9L9 3l-3 9H2',
+  zap: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
+  link: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71',
+  lock: 'M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zM7 11V7a5 5 0 0 1 10 0v4',
+  dollar: 'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
+};
 
 export default function Home() {
   const { isConnected } = useAccount();
@@ -53,12 +28,11 @@ export default function Home() {
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
-      {/* Nav */}
       <nav style={{ position: 'fixed', top: 0, width: '100%', zIndex: 50, background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}>
         <div className="nav-container">
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <img src="/logo.png" alt="Anchrion" style={{ width: 32, height: 32, borderRadius: 8 }} />
-            <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>Anchrion</span>
+            <span style={{ fontSize: 16, fontWeight: 600 }}>Anchrion</span>
           </a>
           <div className="nav-links">
             <a href="#features" style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Features</a>
@@ -69,7 +43,6 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero */}
       <section className="hero">
         <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--blue)', marginBottom: 20 }}>
           Wallet Security, Reimagined
@@ -90,7 +63,6 @@ export default function Home() {
         </p>
       </section>
 
-      {/* Stats */}
       <section style={{ background: 'var(--bg-alt)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '64px 24px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32, textAlign: 'center' }}>
           {[
@@ -107,7 +79,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
       <section id="features" style={{ padding: '96px 24px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--blue)', textAlign: 'center', marginBottom: 12 }}>Features</p>
@@ -117,15 +88,15 @@ export default function Home() {
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
             {[
-              { icon: 'shield', title: 'Real-time Monitor', desc: 'Catches new approvals the moment they happen. Never miss a dangerous contract.' },
-              { icon: 'scan', title: 'Risk Analysis', desc: 'Explains in plain English why an approval is dangerous. No Solidity knowledge needed.' },
-              { icon: 'zap', title: 'One-Click Revoke', desc: 'Revoke dangerous approvals with a single click. Gas-optimized transactions.' },
-              { icon: 'link', title: 'Multi-Chain', desc: 'Works across Ethereum, Base, Arbitrum, and Optimism. One dashboard for all.' },
-              { icon: 'lock', title: 'Encrypted Memory', desc: 'Remembers your approval history. Tracks changes over time. Data stays private.' },
-              { icon: 'dollar', title: 'Pay-per-Scan', desc: 'Premium deep analysis via x402 on Hedera. Pay only when you need deeper insight.' },
+              { icon: icons.shield, title: 'Real-time Monitor', desc: 'Catches new approvals the moment they happen. Never miss a dangerous contract.' },
+              { icon: icons.chart, title: 'Risk Analysis', desc: 'Explains in plain English why an approval is dangerous. No Solidity knowledge needed.' },
+              { icon: icons.zap, title: 'One-Click Revoke', desc: 'Revoke dangerous approvals with a single click. Gas-optimized transactions.' },
+              { icon: icons.link, title: 'Multi-Chain', desc: 'Works across Ethereum, Base, Arbitrum, and Optimism. One dashboard for all.' },
+              { icon: icons.lock, title: 'Encrypted Memory', desc: 'Remembers your approval history. Tracks changes over time. Data stays private.' },
+              { icon: icons.dollar, title: 'Pay-per-Scan', desc: 'Premium deep analysis via x402 on Hedera. Pay only when you need deeper insight.' },
             ].map(f => (
               <div key={f.title} style={{ padding: 24, borderRadius: 12, border: '1px solid var(--border)', transition: 'all 0.2s' }}>
-                <div style={{ marginBottom: 16 }}><Icon type={f.icon} size={28} /></div>
+                <div style={{ marginBottom: 16 }}><Icon d={f.icon} /></div>
                 <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>{f.title}</h3>
                 <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>{f.desc}</p>
               </div>
@@ -134,7 +105,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works */}
       <section id="how" style={{ padding: '96px 24px', background: 'var(--bg-alt)', borderTop: '1px solid var(--border)' }}>
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
           <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--blue)', textAlign: 'center', marginBottom: 12 }}>How It Works</p>
@@ -156,16 +126,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
       <section style={{ padding: '96px 24px', textAlign: 'center' }}>
         <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 12 }}>Ready to protect your wallet?</h2>
         <p style={{ fontSize: 15, marginBottom: 32, color: 'var(--text-secondary)' }}>Connect your wallet in seconds. No signup required.</p>
-        <button onClick={() => router.push('/dashboard')} className="btn-primary" style={{ padding: '12px 28px', fontSize: 15 }}>
-          Get Started
-        </button>
+        <button onClick={() => router.push('/dashboard')} className="btn-primary" style={{ padding: '12px 28px', fontSize: 15 }}>Get Started</button>
       </section>
 
-      {/* Footer */}
       <footer style={{ padding: '40px 24px', borderTop: '1px solid var(--border)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 40, marginBottom: 32 }}>
