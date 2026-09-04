@@ -42,25 +42,26 @@ button { cursor: pointer; border: none; font-family: inherit; }
 /* ============ ANIMATED BACKGROUND ============ */
 .bg {
   position: absolute; inset: 0; overflow: hidden;
-  background: radial-gradient(ellipse 120% 80% at 30% 20%, #0d1b2a 0%, #08090d 60%, #000 100%);
+  background: linear-gradient(135deg, #0a1628 0%, #0d1f3c 25%, #0f2847 50%, #0a1628 75%, #050a14 100%);
 }
 .bg::before {
   content: ''; position: absolute; inset: 0;
   background: 
-    radial-gradient(circle 600px at 20% 30%, rgba(26,115,232,0.08) 0%, transparent 70%),
-    radial-gradient(circle 400px at 80% 70%, rgba(74,158,255,0.05) 0%, transparent 60%);
-  animation: bgPulse 8s ease-in-out infinite alternate;
+    radial-gradient(ellipse 800px 600px at 25% 35%, rgba(26,115,232,0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 400px at 75% 65%, rgba(74,158,255,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 400px 300px at 50% 20%, rgba(100,180,255,0.08) 0%, transparent 50%);
+  animation: bgPulse 12s ease-in-out infinite alternate;
 }
 .bg::after {
   content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
   background: 
-    radial-gradient(2px 2px at 20% 30%, rgba(26,115,232,0.4) 0%, transparent 100%),
-    radial-gradient(2px 2px at 40% 70%, rgba(74,158,255,0.3) 0%, transparent 100%),
-    radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,0.15) 0%, transparent 100%),
-    radial-gradient(1px 1px at 80% 50%, rgba(26,115,232,0.25) 0%, transparent 100%),
-    radial-gradient(1px 1px at 10% 80%, rgba(74,158,255,0.2) 0%, transparent 100%),
-    radial-gradient(1px 1px at 70% 90%, rgba(255,255,255,0.1) 0%, transparent 100%);
-  animation: drift 60s linear infinite;
+    radial-gradient(2px 2px at 15% 25%, rgba(26,115,232,0.5) 0%, transparent 100%),
+    radial-gradient(2px 2px at 35% 65%, rgba(74,158,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 45%, rgba(26,115,232,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 8% 75%, rgba(74,158,255,0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 65% 85%, rgba(255,255,255,0.15) 0%, transparent 100%);
+  animation: drift 80s linear infinite;
 }
 
 @keyframes bgPulse {
@@ -74,21 +75,21 @@ button { cursor: pointer; border: none; font-family: inherit; }
 
 /* ============ STAGE ============ */
 .stage {
-  position: relative; z-index: 2; flex: 1;
+  position: relative; z-index: 2;
   display: flex; flex-direction: column; justify-content: center;
   max-width: 1120px; width: 100%; margin: 0 auto;
-  padding: 0 48px;
+  padding: 80px 48px 380px;
 }
 
 /* ============ HERO ============ */
 .hero-eyebrow {
-  font-size: 13px; font-weight: 500; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--blue-light); margin-bottom: 24px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--blue-light); margin-bottom: 20px;
 }
 .hero-title {
-  font-size: clamp(44px, 6vw, 72px); font-weight: 400; line-height: 1.05;
-  letter-spacing: -0.03em; color: var(--text); margin-bottom: 20px;
-  max-width: 640px;
+  font-size: clamp(36px, 5vw, 56px); font-weight: 400; line-height: 1.1;
+  letter-spacing: -0.025em; color: var(--text); margin-bottom: 16px;
+  max-width: 520px;
 }
 .hero-title span { color: var(--blue-light); }
 .hero-desc {
