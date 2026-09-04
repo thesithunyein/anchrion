@@ -4,6 +4,48 @@ import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+function Icon({ type, size = 32 }: { type: string; size?: number }) {
+  const s = size;
+  const color = '#1a73e8';
+  const icons: Record<string, React.ReactElement> = {
+    shield: (
+      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    ),
+    scan: (
+      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+    ),
+    zap: (
+      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    ),
+    link: (
+      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      </svg>
+    ),
+    lock: (
+      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    ),
+    dollar: (
+      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"/>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+    ),
+  };
+  return icons[type] || null;
+}
+
 export default function Home() {
   const { isConnected } = useAccount();
   const router = useRouter();
@@ -75,15 +117,15 @@ export default function Home() {
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
             {[
-              { icon: '🛡️', title: 'Real-time Monitor', desc: 'Catches new approvals the moment they happen. Never miss a dangerous contract.' },
-              { icon: '🧠', title: 'AI Risk Analysis', desc: 'Explains in plain English why an approval is dangerous. No Solidity knowledge needed.' },
-              { icon: '⚡', title: 'One-Click Revoke', desc: 'Revoke dangerous approvals with a single click. Gas-optimized transactions.' },
-              { icon: '🔗', title: 'Multi-Chain', desc: 'Works across Ethereum, Base, Arbitrum, and Optimism. One dashboard for all.' },
-              { icon: '🔒', title: 'Encrypted Memory', desc: 'Remembers your approval history. Tracks changes over time. Data stays private.' },
-              { icon: '💰', title: 'Pay-per-Scan', desc: 'Premium deep analysis via x402 on Hedera. Pay only when you need deeper insight.' },
+              { icon: 'shield', title: 'Real-time Monitor', desc: 'Catches new approvals the moment they happen. Never miss a dangerous contract.' },
+              { icon: 'scan', title: 'Risk Analysis', desc: 'Explains in plain English why an approval is dangerous. No Solidity knowledge needed.' },
+              { icon: 'zap', title: 'One-Click Revoke', desc: 'Revoke dangerous approvals with a single click. Gas-optimized transactions.' },
+              { icon: 'link', title: 'Multi-Chain', desc: 'Works across Ethereum, Base, Arbitrum, and Optimism. One dashboard for all.' },
+              { icon: 'lock', title: 'Encrypted Memory', desc: 'Remembers your approval history. Tracks changes over time. Data stays private.' },
+              { icon: 'dollar', title: 'Pay-per-Scan', desc: 'Premium deep analysis via x402 on Hedera. Pay only when you need deeper insight.' },
             ].map(f => (
               <div key={f.title} style={{ padding: 24, borderRadius: 12, border: '1px solid var(--border)', transition: 'all 0.2s' }}>
-                <div style={{ fontSize: 28, marginBottom: 16 }}>{f.icon}</div>
+                <div style={{ marginBottom: 16 }}><Icon type={f.icon} size={28} /></div>
                 <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>{f.title}</h3>
                 <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>{f.desc}</p>
               </div>
