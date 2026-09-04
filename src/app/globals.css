@@ -78,18 +78,18 @@ button { cursor: pointer; border: none; font-family: inherit; }
   position: relative; z-index: 2;
   display: flex; flex-direction: column; justify-content: center;
   max-width: 1120px; width: 100%; margin: 0 auto;
-  padding: 80px 48px 380px;
+  padding: 100px 48px 400px;
 }
 
 /* ============ HERO ============ */
 .hero-eyebrow {
-  font-size: 12px; font-weight: 500; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--blue-light); margin-bottom: 20px;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--blue-light); margin-bottom: 16px;
 }
 .hero-title {
-  font-size: clamp(36px, 5vw, 56px); font-weight: 400; line-height: 1.1;
-  letter-spacing: -0.025em; color: var(--text); margin-bottom: 16px;
-  max-width: 520px;
+  font-size: clamp(28px, 4vw, 44px); font-weight: 400; line-height: 1.15;
+  letter-spacing: -0.02em; color: var(--text); margin-bottom: 14px;
+  max-width: 440px;
 }
 .hero-title span { color: var(--blue-light); }
 .hero-desc {
