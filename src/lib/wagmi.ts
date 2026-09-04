@@ -1,6 +1,6 @@
 import { http, createConfig } from 'wagmi';
 import { mainnet, base, arbitrum, optimism } from 'wagmi/chains';
-import { metaMask, rainbow, walletConnect } from 'wagmi/connectors';
+import { metaMask, coinbaseWallet, walletConnect } from 'wagmi/connectors';
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '';
 
@@ -8,7 +8,7 @@ export const config = createConfig({
   chains: [mainnet, base, arbitrum, optimism],
   connectors: [
     metaMask(),
-    rainbow({ projectId }),
+    coinbaseWallet({ appName: 'Anchrion' }),
     ...(projectId ? [walletConnect({ projectId })] : []),
   ],
   transports: {
