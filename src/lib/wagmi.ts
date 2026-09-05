@@ -1,6 +1,6 @@
 import { http, createConfig } from 'wagmi';
 import { mainnet, base, arbitrum, optimism } from 'wagmi/chains';
-import { metaMask, coinbaseWallet, walletConnect } from 'wagmi/connectors';
+import { metaMask, coinbaseWallet, walletConnect, injected } from 'wagmi/connectors';
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '';
 
@@ -9,6 +9,7 @@ export const config = createConfig({
   connectors: [
     metaMask({ shimDisconnect: true }),
     coinbaseWallet({ appName: 'Anchrion', darkMode: true, preference: 'eoaOnly' }),
+    injected({ target: 'phantom', shimDisconnect: true }),
     ...(projectId ? [walletConnect({ projectId })] : []),
   ],
   transports: {

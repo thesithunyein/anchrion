@@ -13,10 +13,16 @@ export default function Dashboard() {
   const { connect, connectors, isPending } = useConnect();
   const [connectError, setConnectError] = useState<string | null>(null);
 
-  const handleConnect = useCallback((connectorName: string) => {
+  const handleConnect = useCallback((walletId: string) => {
     setConnectError(null);
     try {
-      const connector = connectors.find(c => c.name === connectorName);
+      let connector;
+      if (walletId === 'phantom') {
+        // Phantom uses injected connector with specific target
+        connector = connectors.find(c => c.name === 'Phantom' || (c as any).id === 'injected.phantom');
+      } else {
+        connector = connectors.find(c => c.name.toLowerCase().includes(walletId));
+      }
       if (connector) {
         connect({ connector }, {
           onError: (err) => {
@@ -25,7 +31,8 @@ export default function Dashboard() {
           }
         });
       } else {
-        setConnectError(`${connectorName} is not installed. Please install the browser extension first.`);
+        const installUrl = walletId === 'metamask' ? 'https://metamask.io' : walletId === 'coinbase' ? 'https://www.coinbase.com/wallet' : 'https://phantom.app';
+        setConnectError(`${walletId.charAt(0).toUpperCase() + walletId.slice(1)} is not installed. Install it from ${installUrl}`);
       }
     } catch (err: any) {
       setConnectError(err.message || 'Connection failed');
@@ -103,10 +110,11 @@ export default function Dashboard() {
           {[
             { name: 'MetaMask', id: 'metamask' },
             { name: 'Coinbase Wallet', id: 'coinbase' },
+            { name: 'Phantom', id: 'phantom' },
           ].map((wallet) => (
             <button
               key={wallet.id}
-              onClick={() => handleConnect(wallet.name)}
+              onClick={() => handleConnect(wallet.id)}
               disabled={isPending}
               style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text)', fontSize: 14, fontWeight: 500, cursor: isPending ? 'wait' : 'pointer', transition: 'all .2s', textAlign: 'left' }}
             >
@@ -119,7 +127,7 @@ export default function Dashboard() {
           ))}
         </div>
         <p style={{ fontSize: 12, color: 'var(--text-tertiary)', maxWidth: 300, lineHeight: 1.5, marginTop: 4 }}>
-          Don't have a wallet? Install <a href="https://metamask.io" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue-light)' }}>MetaMask</a> or <a href="https://www.coinbase.com/wallet" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue-light)' }}>Coinbase Wallet</a> browser extension.
+          Don't have a wallet? Install <a href="https://metamask.io" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue-light)' }}>MetaMask</a>, <a href="https://www.coinbase.com/wallet" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue-light)' }}>Coinbase Wallet</a>, or <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue-light)' }}>Phantom</a> browser extension.
         </p>
         <a href="/" style={{ marginTop: 8, fontSize: 13, color: 'var(--text-tertiary)', transition: 'color .2s' }}>
           &larr; Back to home
