@@ -73,7 +73,10 @@ export default function Dashboard() {
           </p>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 320 }}>
-          {connectors.filter(c => !c.name.includes('Injected')).map((connector) => (
+          {connectors.filter(c => {
+            const n = c.name.toLowerCase();
+            return n.includes('metamask') || n.includes('coinbase') || n.includes('phantom') || n.includes('walletconnect');
+          }).map((connector) => (
             <button
               key={connector.uid}
               onClick={() => connect({ connector })}
