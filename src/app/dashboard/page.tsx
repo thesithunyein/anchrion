@@ -50,10 +50,11 @@ export default function Dashboard() {
 
   /* ── Wallet logo helper ── */
   function walletLogo(name: string) {
-    if (name.includes('MetaMask')) return <img src="/metamask.png" alt="MetaMask" style={{ width: 28, height: 28, borderRadius: 6 }} />;
-    if (name.includes('Coinbase')) return <img src="/coinbase.png" alt="Coinbase" style={{ width: 28, height: 28, borderRadius: 6 }} />;
-    if (name.includes('Phantom')) return <img src="/phantom.png" alt="Phantom" style={{ width: 28, height: 28, borderRadius: 6 }} />;
-    if (name.includes('WalletConnect')) return <img src="/walletconnect.png" alt="WalletConnect" style={{ width: 28, height: 28, borderRadius: 6 }} />;
+    const imgBase: React.CSSProperties = { width: 28, height: 28, borderRadius: 6, objectFit: 'contain' };
+    if (name.includes('MetaMask')) return <div style={{ width: 28, height: 28, borderRadius: 6, overflow: 'hidden', background: '#F6851B' }}><img src="/metamask.png" alt="MetaMask" style={{ ...imgBase, mixBlendMode: 'screen' }} /></div>;
+    if (name.includes('Coinbase')) return <img src="/coinbase.png" alt="Coinbase" style={imgBase} />;
+    if (name.includes('Phantom')) return <div style={{ width: 28, height: 28, borderRadius: 6, overflow: 'hidden', background: '#AB9FF2' }}><img src="/phantom.png" alt="Phantom" style={{ ...imgBase, mixBlendMode: 'multiply' }} /></div>;
+    if (name.includes('WalletConnect')) return <img src="/walletconnect.png" alt="WalletConnect" style={imgBase} />;
     return <div style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(26,115,232,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'var(--blue-light)' }}><span>W</span></div>;
   }
 
