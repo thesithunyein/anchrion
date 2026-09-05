@@ -135,17 +135,23 @@ export async function POST(request: Request) {
               '0000000000000000000000000000000000000000000000000000000000000000'.slice(0, 64);
 
             // Check allowance for common spenders
+            // Check allowance against known spenders
             const spendersToCheck = [
-              '0x68b3465431183803873192726470238124654e48',
-              '0x7a250d5630b4cf539739df2c5dacb4c659f2488d',
-              '0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad',
-              '0x1111111254eeb25477b68fb85ed929f73a960582',
-              '0xdef1c0ded9bec7f1a1670819833240f027b25eff',
-              '0x1111111254fb6c44bac0bed2854e76f90643097d',
-              '0x881d40237659c251811cec9c364ef91dc08d300c',
-              '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f',
-              '0x72228695d8dfe9f76762b82475e09de304b23575',
-              '0xe592427a0aece92de3edee1f18e0157c05861564',
+              '0x68b3465431183803873192726470238124654e48', // Uniswap SwapRouter
+              '0x7a250d5630b4cf539739df2c5dacb4c659f2488d', // Uniswap V2 Router
+              '0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad', // Uniswap Universal Router
+              '0x1111111254eeb25477b68fb85ed929f73a960582', // 1inch Router
+              '0xdef1c0ded9bec7f1a1670819833240f027b25eff', // 0x Exchange
+              '0x1111111254fb6c44bac0bed2854e76f90643097d', // 1inch V4
+              '0x881d40237659c251811cec9c364ef91dc08d300c', // MetaMask Swap
+              '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f', // SushiSwap
+              '0x72228695d8dfe9f76762b82475e09de304b23575', // Uniswap V3
+              '0xe592427a0aece92de3edee1f18e0157c05861564', // Uniswap V3 Router
+              '0x000000000022d473030f116ddee9f6b43ac78ba3', // Uniswap Universal v2
+              '0x6a000f200059802af069f9824342615872c7ab0f', //inch SwapRouter
+              '0x111111125421ca6dc452d289314280a0f8842a65', // 1inch Router v5
+              '0xd6e0a906765d0872e581c936a4b49836c4ad429f', // OKX DEX Router
+              '0x3b3ae7912549c4c7c48412b15c3749a15d58455f', // Paraswap
             ];
 
             const allowanceResults = await Promise.all(
@@ -166,18 +172,20 @@ export async function POST(request: Request) {
 
             const validAllowances = allowanceResults.filter(Boolean);
 
-            // Also query approval event logs for additional spenders
-            const fromBlock = 0; // Search from genesis to find all historical approvals
+            // Also query approval event logs (small range — public RPCs limit archive queries)
             let events: any[] = [];
             try {
+              const blockHex = await rpcCall(rpcUrls, 'eth_blockNumber', []);
+              const blockNum = parseInt(blockHex, 16);
+              const fromBlock = Math.max(0, blockNum - 5000); // ~16 hours on Ethereum
               events = await rpcCall(rpcUrls, 'eth_getLogs', [{
-                fromBlock: '0x' + Math.max(0, (await rpcCall(rpcUrls, 'eth_blockNumber', [])) - 100000).toString(16),
+                fromBlock: '0x' + fromBlock.toString(16),
                 toBlock: 'latest',
                 address: tokenAddress,
                 topics: [APPROVAL_TOPIC, addressTopic],
               }]);
             } catch {
-              // Some RPCs may not support large ranges
+              // Public RPCs may not support historical queries
             }
 
             // Merge event-based approvals with direct allowance checks
