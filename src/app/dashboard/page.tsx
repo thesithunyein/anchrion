@@ -1,7 +1,7 @@
 'use client';
 
 import { useAccount, useDisconnect } from 'wagmi';
-import { useRouter } from 'next/navigation';
+
 import { useEffect, useState, useMemo } from 'react';
 import { Approval, WalletStats } from '@/types/approval';
 import { calculateRiskScore, getRiskLabel } from '@/lib/risk/scorer';
@@ -10,14 +10,14 @@ import { fetchApprovals, getTokenPrice } from '@/lib/graph/client';
 export default function Dashboard() {
   const { address, isConnected, chain } = useAccount();
   const { disconnect } = useDisconnect();
-  const router = useRouter();
+  
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
 
-  useEffect(() => { if (!isConnected) router.push('/'); }, [isConnected, router]);
+
   useEffect(() => { if (isConnected && address && chain) loadApprovals(); }, [isConnected, address, chain]);
 
   async function loadApprovals() {
@@ -50,7 +50,18 @@ export default function Dashboard() {
     return matchSearch && matchFilter;
   }), [approvals, search, filter]);
 
-  if (!isConnected) return null;
+  if (!isConnected) return (
+    <div style={{ background: 'var(--bg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24 }}>
+      <img src="/logo.png" alt="Anchrion" style={{ width: 56, height: 56, borderRadius: 14 }} />
+      <h1 style={{ fontSize: 24, fontWeight: 600 }}>Connect Your Wallet</h1>
+      <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 380, textAlign: 'center', lineHeight: 1.6 }}>
+        Connect your wallet to scan approvals and check your risk score.
+      </p>
+      <a href="/" style={{ marginTop: 8, padding: '12px 28px', background: 'var(--blue)', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>
+        Go Back
+      </a>
+    </div>
+  );
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
