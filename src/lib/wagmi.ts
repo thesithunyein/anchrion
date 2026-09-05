@@ -8,7 +8,7 @@ export const config = createConfig({
   chains: [mainnet, base, arbitrum, optimism],
   connectors: [
     metaMask({ shimDisconnect: true }),
-    coinbaseWallet({ appName: 'Anchrion', darkMode: true, preference: 'eoaOnly' }),
+    coinbaseWallet({ appName: 'Anchrion', preference: { options: 'eoaOnly' } }),
     injected({ target: 'phantom', shimDisconnect: true }),
     ...(projectId ? [walletConnect({ projectId })] : []),
   ],
