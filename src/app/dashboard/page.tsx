@@ -1,6 +1,6 @@
 'use client';
 
-import { useAccount, useDisconnect } from 'wagmi';
+import { useAccount, useDisconnect, useConnect } from 'wagmi';
 import { useEffect, useState, useMemo } from 'react';
 import { Approval, WalletStats } from '@/types/approval';
 import { calculateRiskScore, getRiskLabel } from '@/lib/risk/scorer';
@@ -9,6 +9,7 @@ import { fetchApprovals, getTokenPrice } from '@/lib/graph/client';
 export default function Dashboard() {
   const { address, isConnected, chain } = useAccount();
   const { disconnect } = useDisconnect();
+  const { connect, connectors, isPending } = useConnect();
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,15 +50,38 @@ export default function Dashboard() {
 
   /* ── Not connected ── */
   if (!isConnected) return (
-    <div style={{ background: 'var(--bg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 20, padding: 32, textAlign: 'center' }}>
-      <img src="/logo.png" alt="Anchrion" style={{ width: 52, height: 52, borderRadius: 14 }} />
-      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 400 }}>Connect Your Wallet</h1>
-      <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 380, lineHeight: 1.6 }}>
-        Connect your wallet to scan approvals and check your risk score.
-      </p>
-      <a href="/" style={{ marginTop: 4, padding: '12px 28px', background: '#fff', color: '#000', borderRadius: 6, fontSize: 14, fontWeight: 500, transition: 'all .25s ease' }}>
-        Go Back
-      </a>
+    <div style={{ minHeight: '100vh', position: 'relative' }}>
+      {/* Background */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', background: 'linear-gradient(135deg, #0a1628 0%, #0d1f3c 25%, #0f2847 50%, #0a1628 75%, #050a14 100%)' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 800px 600px at 25% 35%, rgba(26,115,232,0.12) 0%, transparent 70%), radial-gradient(ellipse 600px 400px at 75% 65%, rgba(74,158,255,0.08) 0%, transparent 60%)' }} />
+      </div>
+      <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24, padding: 32, textAlign: 'center' }}>
+        <img src="/logo.png" alt="Anchrion" style={{ width: 56, height: 56, borderRadius: 14 }} />
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px,3vw,32px)', fontWeight: 400, marginBottom: 10 }}>Connect Your Wallet</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 380, lineHeight: 1.6 }}>
+            Scan your approvals and check your wallet risk score.
+          </p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 320 }}>
+          {connectors.map((connector) => (
+            <button
+              key={connector.uid}
+              onClick={() => connect({ connector })}
+              disabled={isPending}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text)', fontSize: 14, fontWeight: 500, cursor: isPending ? 'wait' : 'pointer', transition: 'all .2s', textAlign: 'left' }}
+            >
+              <span style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(26,115,232,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'var(--blue-light)' }}>
+                {connector.name === 'MetaMask' ? 'M' : connector.name === 'Coinbase Wallet' ? 'C' : 'W'}
+              </span>
+              {connector.name}
+            </button>
+          ))}
+        </div>
+        <a href="/" style={{ marginTop: 8, fontSize: 13, color: 'var(--text-tertiary)', transition: 'color .2s' }}>
+          &larr; Back to home
+        </a>
+      </div>
     </div>
   );
 
