@@ -51,14 +51,13 @@ export default function Dashboard() {
     setLoading(true); setError(null);
     try {
       const raw = await fetchApprovals(address, chain.id as any);
-      const enriched = await Promise.all(raw.map(async (a) => {
+      const enriched = raw.map((a) => {
         const { score, level, factors } = calculateRiskScore(a);
-        const price = await getTokenPrice(a.tokenSymbol);
-        return { ...a, riskScore: score, riskLevel: level, riskFactors: factors, allowanceUsd: parseFloat(a.allowanceFormatted) * price };
-      }));
+        return { ...a, riskScore: score, riskLevel: level, riskFactors: factors };
+      });
       enriched.sort((a, b) => b.riskScore - a.riskScore);
       setApprovals(enriched);
-    } catch { setError('Failed to load approvals.'); }
+    } catch (e: any) { setError(e.message || 'Failed to load approvals.'); }
     finally { setLoading(false); }
   }
 
@@ -273,7 +272,9 @@ function ApprovalRow({ approval: a }: { approval: Approval }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0, marginLeft: 16 }}>
           <div style={{ textAlign: 'right' }}>
             <p style={{ fontSize: 14, fontWeight: 600 }}>${a.allowanceUsd.toLocaleString()}</p>
-            <p style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{a.allowanceFormatted} {a.tokenSymbol}</p>
+            <p style={{ fontSize: 12, color: (a as any).isUnlimited ? '#fca5a5' : 'var(--text-tertiary)' }}>
+              {(a as any).isUnlimited ? '∞ Unlimited' : a.allowanceFormatted} {a.tokenSymbol}
+            </p>
           </div>
           <span style={{ padding: '3px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: a.riskScore >= 70 ? 'rgba(239,68,68,0.12)' : a.riskScore >= 50 ? 'rgba(249,115,22,0.12)' : a.riskScore >= 30 ? 'rgba(234,179,8,0.12)' : 'rgba(34,197,94,0.12)', color: a.riskScore >= 70 ? '#fca5a5' : a.riskScore >= 50 ? '#fdba74' : a.riskScore >= 30 ? '#fde047' : '#86efac' }}>
             {getRiskLabel(a.riskLevel)}

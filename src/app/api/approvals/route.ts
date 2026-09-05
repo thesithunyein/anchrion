@@ -224,22 +224,34 @@ export async function POST(request: Request) {
               'DAO': 1, 'CATS': 0.001,
             };
 
-            return validAllowances.map((a) => ({
-              id: `${tokenAddress}-${a!.spender}`,
-              walletAddress,
-              tokenAddress,
-              tokenName: tokenInfo.name,
-              tokenSymbol: tokenInfo.symbol,
-              tokenDecimals: tokenInfo.decimals,
-              spenderAddress: a!.spender,
-              spenderLabel: KNOWN_SPENDERS[a!.spender.toLowerCase()] || 'Unknown Contract',
-              allowanceRaw: BigInt(a!.value).toString(),
-              allowanceFormatted: formatUnits(BigInt(a!.value).toString(), tokenInfo.decimals),
-              allowanceUsd: parseFloat(formatUnits(BigInt(a!.value).toString(), tokenInfo.decimals)) * (prices[tokenInfo.symbol] || 1),
-              chainId,
-              firstSeenAt: new Date(Date.now()).toISOString(),
-              lastSeenAt: new Date(Date.now()).toISOString(),
-            }));
+            // Max uint256 = unlimited approval
+            const MAX_UINT256 = BigInt('115792089237316195423570985008687907853269984665640564039457584007913129639935');
+
+            return validAllowances.map((a) => {
+              const rawVal = BigInt(a!.value);
+              const isUnlimited = rawVal >= MAX_UINT256 / BigInt(2);
+              const allowanceFormatted = isUnlimited ? 'Unlimited' : formatUnits(rawVal.toString(), tokenInfo.decimals);
+              const price = prices[tokenInfo.symbol] || 1;
+              const allowanceUsd = isUnlimited ? price * 10000 : parseFloat(allowanceFormatted) * price;
+
+              return {
+                id: `${tokenAddress}-${a!.spender}`,
+                walletAddress,
+                tokenAddress,
+                tokenName: tokenInfo.name,
+                tokenSymbol: tokenInfo.symbol,
+                tokenDecimals: tokenInfo.decimals,
+                spenderAddress: a!.spender,
+                spenderLabel: KNOWN_SPENDERS[a!.spender.toLowerCase()] || 'Unknown Contract',
+                allowanceRaw: rawVal.toString(),
+                allowanceFormatted,
+                allowanceUsd,
+                isUnlimited,
+                chainId,
+                firstSeenAt: new Date(Date.now()).toISOString(),
+                lastSeenAt: new Date(Date.now()).toISOString(),
+              };
+            });
           } catch {
             return null;
           }
