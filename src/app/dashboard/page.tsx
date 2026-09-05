@@ -50,52 +50,11 @@ export default function Dashboard() {
 
   /* ── Wallet logo helper ── */
   function walletLogo(name: string) {
-    if (name.includes('MetaMask')) return (
-      <svg width="28" height="28" viewBox="0 0 35 33" fill="none">
-        <path d="M32.2 1L19.3 10.5l2.3-8.6L32.2 1z" fill="#E17726" stroke="#E17726" strokeWidth="0.25"/>
-        <path d="M2.8 1l12.7 9.6-2.1-8.6L2.8 1zM29.6 23.5l-3.2 4.9 6.9 1.9 2-6.7-5.7-.1zM1.3 23.6l2 6.7 6.9-1.9-3.2-4.9-.7.1z" fill="#E27625" stroke="#E27625" strokeWidth="0.25" strokeLinejoin="round"/>
-        <path d="M10.4 14.9l-2 3 7.1.3-.3-7.4-4.8 4.1zM31.5 14.9l-4.9-4.2-.2 7.6 7.1-.3-2-3.1z" fill="#E27625" stroke="#E27625" strokeWidth="0.25"/>
-        <path d="M10.8 28.4l4.2-2-3.6-2.8-.6 4.8zM19.4 26.4l4.2 2 .1-4.9-3.7-2.9-.6 4.8z" fill="#D0021B" stroke="#D0021B" strokeWidth="0.25"/>
-        <path d="M23.6 26.4l-4.2-2 .5 3.4-.1 1.4h4.5l.1-1.5-.8-1.3z" fill="#D0021B" stroke="#D0021B" strokeWidth="0.25"/>
-        <path d="M10.3 28.4l.1-1.4-.1-.1H6l-.3.1.1 1.4.2.6 4.3-1.6.2-.6z" fill="#D0021B" stroke="#D0021B" strokeWidth="0.25"/>
-        <path d="M10 11.8l-4.8 3.5 3.4-.1 1.4-3.4zM10.8 26.4l4.2-2 .5 3.4-.1 1.4h4.5l.1-1.5-.8-1.3z" fill="#D0021B" stroke="#D0021B" strokeWidth="0.25"/>
-        <path d="M5.2 15.3l3.4.1-1.5 4.6-5.2-1.5 3.3-3.2zM12.4 14.9l-.1 7.6 3.6-6.4 2.8-1.3-6.3.1z" fill="#E27625" stroke="#E27625" strokeWidth="0.25"/>
-        <path d="M17.4 11.8l-2.9-1.3.7-3.2 2.2 4.5zM29.5 15.3l3.4-.1-3.3-3.2-5.2 1.5 1.5 4.6 3.6-.8zM12.3 22.6l3.6-6.4.7-3.5-5.1.1 1.4 9.8z" fill="#D0021B" stroke="#D0021B" strokeWidth="0.25"/>
-        <path d="M16.7 12.8l2.9 1.3-.3 1.3-2.6-.5-.7-.9v-.2z" fill="#553300" stroke="#553300" strokeWidth="0.25"/>
-        <path d="M32 15.2l-5.2-1.5-1.5 4.6 3.6.8-.2 1.4 5.3-1.5.5-1.4-2.5-2.4z" fill="#553300" stroke="#553300" strokeWidth="0.25"/>
-        <path d="M10 11.8l5.6-4.6 3.7-.6-5.5 3.9.7.6 3.3 3.4-5.3 1.5-2.2-1.5-.6-.8 3.4-2.4z" fill="#D0021B" stroke="#D0021B" strokeWidth="0.25"/>
-        <path d="M24.4 7.1l5.5-3.9 3.7.6-5.6 4.6 1.4.8-3.5 1.7z" fill="#D0021B" stroke="#D0021B" strokeWidth="0.25"/>
-        <path d="M17.4 11.8l3.5-1.7-3.4-3.4.1.1 3.3-3.4 2.2.6-2.2 4.5-2 .2z" fill="#D0021B" stroke="#D0021B" strokeWidth="0.25"/>
-      </svg>
-    );
-    if (name.includes('Coinbase')) return (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <rect width="24" height="24" rx="4" fill="#0052FF"/>
-        <path d="M12 6.5c2.2 0 3.8 1.5 3.8 3.5v1c0 2-1.6 3.5-3.8 3.5S8.2 13 8.2 11v-1c0-2 1.6-3.5 3.8-3.5z" fill="white"/>
-        <path d="M12 16.5c2.2 0 3.8-1.5 3.8-3.5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-      </svg>
-    );
-    if (name.includes('Phantom')) return (
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-        <rect width="32" height="32" rx="16" fill="#AB9FF2"/>
-        <path d="M22.8 10.4c-1.2-1.2-3.2-1.2-4.4 0l-1.4 1.4c-.2.2-.5.2-.7 0l-1.4-1.4c-1.2-1.2-3.2-1.2-4.4 0s-1.2 3.2 0 4.4l1.4 1.4c.2.2.2.5 0 .7l-1.4 1.4c-1.2 1.2-1.2 3.2 0 4.4s3.2 1.2 4.4 0l1.4-1.4c.2-.2.5-.2.7 0l1.4 1.4c1.2 1.2 3.2 1.2 4.4 0s1.2-3.2 0-4.4l-1.4-1.4c-.2-.2-.2-.5 0-.7l1.4-1.4c1.2-1.2 1.2-3.2 0-4.4z" fill="white"/>
-        <circle cx="13.6" cy="14.6" r="1.2" fill="#AB9FF2"/>
-        <circle cx="18.4" cy="14.6" r="1.2" fill="#AB9FF2"/>
-      </svg>
-    );
-    if (name.includes('WalletConnect')) return (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <path d="M12 1C6.5 1 2 5.5 2 11v12l4-3 4 3 4-3 4 3 4-3V11c0-5.5-4.5-10-10-10z" fill="#3B99FC"/>
-        <path d="M9.5 12.5c1.1-.7 2.5-.7 3.6 0l.4.2c.2.1.3.3.3.5v2.1c0 .3-.2.5-.5.5-.2 0-.3-.1-.4-.2l-.7-.4c-.9-.5-1.9-.5-2.8 0l-.7.4c-.1.1-.3.2-.4.2-.3 0-.5-.2-.5-.5v-2.1c0-.2.1-.4.3-.5l.4-.2zm5 0c1.1-.7 2.5-.7 3.6 0l.4.2c.2.1.3.3.3.5v2.1c0 .3-.2.5-.5.5-.2 0-.3-.1-.4-.2l-.7-.4c-.9-.5-1.9-.5-2.8 0l-.7.4c-.1.1-.3.2-.4.2-.3 0-.5-.2-.5-.5v-2.1c0-.2.1-.4.3-.5l.4-.2z" fill="white"/>
-      </svg>
-    );
-    // Default
-    return (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <rect width="24" height="24" rx="4" fill="rgba(26,115,232,0.15)"/>
-        <path d="M12 4l-8 4.5v7L12 20l8-4.5v-7L12 4z" stroke="var(--blue-light)" strokeWidth="1.5" fill="none"/>
-      </svg>
-    );
+    if (name.includes('MetaMask')) return <img src="/metamask.png" alt="MetaMask" style={{ width: 28, height: 28, borderRadius: 6 }} />;
+    if (name.includes('Coinbase')) return <img src="/coinbase.png" alt="Coinbase" style={{ width: 28, height: 28, borderRadius: 6 }} />;
+    if (name.includes('Phantom')) return <img src="/phantom.png" alt="Phantom" style={{ width: 28, height: 28, borderRadius: 6 }} />;
+    if (name.includes('WalletConnect')) return <img src="/walletconnect.png" alt="WalletConnect" style={{ width: 28, height: 28, borderRadius: 6 }} />;
+    return <div style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(26,115,232,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'var(--blue-light)' }}><span>W</span></div>;
   }
 
   /* ── Not connected ── */
@@ -114,7 +73,7 @@ export default function Dashboard() {
           </p>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 320 }}>
-          {connectors.map((connector) => (
+          {connectors.filter(c => !c.name.includes('Injected')).map((connector) => (
             <button
               key={connector.uid}
               onClick={() => connect({ connector })}
