@@ -1,7 +1,8 @@
 'use client';
 
 import { useAccount, useDisconnect, useConnect } from 'wagmi';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { metaMask, coinbaseWallet } from 'wagmi/connectors';
 import { Approval, WalletStats } from '@/types/approval';
 import { calculateRiskScore, getRiskLabel } from '@/lib/risk/scorer';
 import { fetchApprovals, getTokenPrice } from '@/lib/graph/client';
@@ -10,6 +11,26 @@ export default function Dashboard() {
   const { address, isConnected, chain } = useAccount();
   const { disconnect } = useDisconnect();
   const { connect, connectors, isPending } = useConnect();
+  const [connectError, setConnectError] = useState<string | null>(null);
+
+  const handleConnect = useCallback((connectorName: string) => {
+    setConnectError(null);
+    try {
+      const connector = connectors.find(c => c.name === connectorName);
+      if (connector) {
+        connect({ connector }, {
+          onError: (err) => {
+            console.error('Connect error:', err);
+            setConnectError(`Failed to connect: ${err.message}`);
+          }
+        });
+      } else {
+        setConnectError(`${connectorName} is not installed. Please install the browser extension first.`);
+      }
+    } catch (err: any) {
+      setConnectError(err.message || 'Connection failed');
+    }
+  }, [connect, connectors]);
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,22 +94,33 @@ export default function Dashboard() {
             Scan your approvals and check your wallet risk score.
           </p>
         </div>
+        {connectError && (
+          <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#fca5a5', fontSize: 13, maxWidth: 320, width: '100%' }}>
+            {connectError}
+          </div>
+        )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 320 }}>
-          {connectors.filter(c => {
-            const n = c.name.toLowerCase();
-            return n.includes('metamask') || n.includes('coinbase') || n.includes('phantom') || n.includes('walletconnect');
-          }).map((connector) => (
+          {[
+            { name: 'MetaMask', id: 'metamask' },
+            { name: 'Coinbase Wallet', id: 'coinbase' },
+          ].map((wallet) => (
             <button
-              key={connector.uid}
-              onClick={() => connect({ connector })}
+              key={wallet.id}
+              onClick={() => handleConnect(wallet.name)}
               disabled={isPending}
               style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text)', fontSize: 14, fontWeight: 500, cursor: isPending ? 'wait' : 'pointer', transition: 'all .2s', textAlign: 'left' }}
             >
-              {walletLogo(connector.name)}
-              {connector.name}
+              {walletLogo(wallet.name)}
+              {wallet.name}
+              <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-tertiary)' }}>
+                {isPending ? 'Connecting...' : '→'}
+              </span>
             </button>
           ))}
         </div>
+        <p style={{ fontSize: 12, color: 'var(--text-tertiary)', maxWidth: 300, lineHeight: 1.5, marginTop: 4 }}>
+          Don't have a wallet? Install <a href="https://metamask.io" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue-light)' }}>MetaMask</a> or <a href="https://www.coinbase.com/wallet" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue-light)' }}>Coinbase Wallet</a> browser extension.
+        </p>
         <a href="/" style={{ marginTop: 8, fontSize: 13, color: 'var(--text-tertiary)', transition: 'color .2s' }}>
           &larr; Back to home
         </a>
