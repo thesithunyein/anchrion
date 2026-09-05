@@ -1,17 +1,12 @@
-import { Approval, ChainId, SUPPORTED_CHAINS } from '@/types/approval';
+import { Approval, ChainId } from '@/types/approval';
 
 /**
- * Fetch token approvals via our API route (avoids CORS)
+ * Fetch token approvals via our API route
  */
 export async function fetchApprovals(
   walletAddress: string,
-  chainId: ChainId = 1
+  chainId: ChainId = 11155111 // Default to Sepolia testnet
 ): Promise<Approval[]> {
-  const chainConfig = SUPPORTED_CHAINS[chainId];
-  if (!chainConfig) {
-    throw new Error(`Unsupported chain: ${chainId}`);
-  }
-
   const response = await fetch('/api/approvals', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -34,16 +29,4 @@ export async function fetchApprovals(
     isKnownMalicious: false,
     isKnownSafe: false,
   }));
-}
-
-/**
- * Get token price from CoinGecko (simplified)
- */
-export async function getTokenPrice(tokenSymbol: string): Promise<number> {
-  const mockPrices: Record<string, number> = {
-    'USDC': 1, 'USDT': 1, 'DAI': 1, 'USDe': 1,
-    'WETH': 2500, 'ETH': 2500, 'stETH': 2500,
-    'WBTC': 60000, 'UNI': 10, 'LINK': 15, 'AAVE': 100,
-  };
-  return mockPrices[tokenSymbol.toUpperCase()] || 1;
 }

@@ -1,11 +1,11 @@
 import { http, createConfig } from 'wagmi';
-import { mainnet, base, arbitrum, optimism } from 'wagmi/chains';
+import { mainnet, sepolia, base, arbitrum, optimism } from 'wagmi/chains';
 import { metaMask, coinbaseWallet, walletConnect, injected } from 'wagmi/connectors';
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '';
 
 export const config = createConfig({
-  chains: [mainnet, base, arbitrum, optimism],
+  chains: [sepolia, mainnet, base, arbitrum, optimism],
   connectors: [
     metaMask(),
     coinbaseWallet({ appName: 'Anchrion', preference: { options: 'eoaOnly' } }),
@@ -13,6 +13,7 @@ export const config = createConfig({
     ...(projectId ? [walletConnect({ projectId })] : []),
   ],
   transports: {
+    [sepolia.id]: http(),
     [mainnet.id]: http(),
     [base.id]: http(),
     [arbitrum.id]: http(),

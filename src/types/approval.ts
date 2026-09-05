@@ -27,7 +27,7 @@ export interface Approval {
 export interface RiskFactor {
   name: string;
   description: string;
-  impact: number; // +points added to risk score
+  impact: number;
   severity: 'critical' | 'high' | 'medium' | 'low';
 }
 
@@ -40,28 +40,7 @@ export interface WalletStats {
   chainId: number;
 }
 
-export interface ScanResult {
-  id: string;
-  walletAddress: string;
-  chainId: number;
-  totalApprovals: number;
-  riskyApprovals: number;
-  valueAtRiskUsd: number;
-  scanDurationMs: number;
-  createdAt: Date;
-}
-
-export interface RevokeResult {
-  approvalId: string;
-  txHash: string;
-  status: 'pending' | 'confirmed' | 'failed';
-  gasUsed?: number;
-  gasPrice?: number;
-  createdAt: Date;
-  confirmedAt?: Date;
-}
-
-export type ChainId = 1 | 8453 | 42161 | 10; // Ethereum, Base, Arbitrum, Optimism
+export type ChainId = 1 | 11155111 | 8453 | 42161 | 10;
 
 export interface ChainConfig {
   id: ChainId;
@@ -69,17 +48,25 @@ export interface ChainConfig {
   symbol: string;
   rpcUrl: string;
   blockExplorer: string;
-  graphEndpoint: string;
+  isTestnet: boolean;
 }
 
 export const SUPPORTED_CHAINS: Record<ChainId, ChainConfig> = {
+  11155111: {
+    id: 11155111,
+    name: 'Sepolia',
+    symbol: 'ETH',
+    rpcUrl: 'https://rpc.sepolia.org',
+    blockExplorer: 'https://sepolia.etherscan.io',
+    isTestnet: true,
+  },
   1: {
     id: 1,
     name: 'Ethereum',
     symbol: 'ETH',
-    rpcUrl: 'https://eth.llamarpc.com',
+    rpcUrl: 'https://ethereum-rpc.publicnode.com',
     blockExplorer: 'https://etherscan.io',
-    graphEndpoint: 'https://gateway-arbitrum.network.thegraph.com/api/subgraphs/id/5zw4oy5ZL1Fv2GWr8rYsTnNqFmnhc4bKPLx9vQqFJWZA',
+    isTestnet: false,
   },
   8453: {
     id: 8453,
@@ -87,7 +74,7 @@ export const SUPPORTED_CHAINS: Record<ChainId, ChainConfig> = {
     symbol: 'ETH',
     rpcUrl: 'https://mainnet.base.org',
     blockExplorer: 'https://basescan.org',
-    graphEndpoint: 'https://gateway-arbitrum.network.thegraph.com/api/subgraphs/id/CH9dzHVCVvHDf7bqcjqNRjNg52WJ2t8bW7dALx7M4N6v',
+    isTestnet: false,
   },
   42161: {
     id: 42161,
@@ -95,7 +82,7 @@ export const SUPPORTED_CHAINS: Record<ChainId, ChainConfig> = {
     symbol: 'ETH',
     rpcUrl: 'https://arb1.arbitrum.io/rpc',
     blockExplorer: 'https://arbiscan.io',
-    graphEndpoint: 'https://gateway-arbitrum.network.thegraph.com/api/subgraphs/id/5ortHMBpB5wLjXEBwhv2dSGZ6czAMUu8g4FqsXW3ETx7',
+    isTestnet: false,
   },
   10: {
     id: 10,
@@ -103,6 +90,15 @@ export const SUPPORTED_CHAINS: Record<ChainId, ChainConfig> = {
     symbol: 'ETH',
     rpcUrl: 'https://mainnet.optimism.io',
     blockExplorer: 'https://optimistic.etherscan.io',
-    graphEndpoint: 'https://gateway-arbitrum.network.thegraph.com/api/subgraphs/id/Cd2gEDVeqnjBn1hSeqFMitw8Q1iiyV9FYUZkLNRcL87g',
+    isTestnet: false,
   },
+};
+
+// Human-readable network names for the UI
+export const NETWORK_NAMES: Record<number, string> = {
+  1: 'Ethereum Mainnet',
+  11155111: 'Sepolia Testnet',
+  8453: 'Base',
+  42161: 'Arbitrum One',
+  10: 'Optimism',
 };
