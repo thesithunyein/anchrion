@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Anchrion — Every wallet permission, and how a drain actually happened</title>
-<meta name="description" content="Anchrion finds every token permission your wallet has granted, scores it with a published model, revokes it in one click, and reconstructs which permission was used if funds already left."/>
+<title>Anchrion — See how a drain happened, and what is still reachable</title>
+<meta name="description" content="Paste any wallet address. Anchrion shows the transfer that took the tokens, the permission that allowed it, and every permission the same address can still reach. Revoke any of them in one click. No wallet connection, no API keys."/>
 <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -77,12 +77,12 @@ a{color:inherit;text-decoration:none}
 
 <div class="page">
   <main class="hero">
-    <p class="eyebrow anim-init">Permission scanner and incident reconstruction</p>
-    <h1 class="headline anim-init">Every permission your wallet granted<br><span>is still open.</span></h1>
-    <p class="lede anim-init">Anchrion reads every token approval your wallet has granted, scores each one with a published model, and revokes them in one click — including the contracts nobody has ever heard of.</p>
-    <p class="proof anim-init">And when funds have already left: it reconstructs the incident from on-chain facts — which transaction moved them, which permission authorised it, and what the same address can still reach.</p>
+    <p class="eyebrow anim-init">Drain reconstruction, and the permissions behind it</p>
+    <h1 class="headline anim-init">See how a drain happened.<br><span>Then close what is still open.</span></h1>
+    <p class="lede anim-init">Paste any wallet address. Anchrion shows the transfer that took the tokens, the permission that allowed it, and every permission the same address can still reach. No wallet connection needed.</p>
+    <p class="proof anim-init">It also reads every token permission a wallet has granted, including contracts nobody has labeled, scores each one with a published model, and revokes any of them in one click.</p>
     <div class="cta-row anim-init">
-      <a href="/dashboard" class="cta">Scan a wallet</a>
+      <a href="/dashboard" class="cta">Inspect an address</a>
       <a href="/method" class="cta-ghost">Read the risk model</a>
     </div>
   </main>
@@ -95,7 +95,7 @@ a{color:inherit;text-decoration:none}
             <img src="/logo.png" alt="Anchrion"/>
             <span>Anchrion</span>
           </div>
-          <p class="footer-tagline anim-init">Find the permissions you forgot, and understand the ones that were used.</p>
+          <p class="footer-tagline anim-init">Understand what happened, and what can still be taken.</p>
         </div>
         <nav class="footer-nav">
           <div class="footer-col anim-init">
@@ -118,7 +118,7 @@ a{color:inherit;text-decoration:none}
       </div>
       <div class="footer-rule"></div>
       <div class="footer-bottom">
-        <p class="footer-legal anim-init">&copy; 2026 Anchrion — MIT licensed. Anchrion reads public chain data with view calls only: it never asks for a private key, never signs on your behalf, and cannot move your funds.</p>
+        <p class="footer-legal anim-init">&copy; 2026 Anchrion — MIT licensed. Anchrion reads public chain data with view calls only. It never asks for a private key and cannot move your funds. Revoking sends a transaction your own wallet signs.</p>
         <div class="footer-socials">
           <a href="https://github.com/thesithunyein/anchrion" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="anim-init">
             <svg width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>

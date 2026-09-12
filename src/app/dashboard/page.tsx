@@ -352,12 +352,12 @@ export default function Dashboard() {
           <img src="/logo.png" alt="Anchrion" style={{ width: 56, height: 56, borderRadius: 14 }} />
           <div>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px,3vw,32px)', fontWeight: 400, marginBottom: 10 }}>
-              Connect a wallet
+              See how a drain happened
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 470, lineHeight: 1.6 }}>
-              Find every permission a wallet has granted, see which ones are dangerous, and revoke
-              them. If funds already left in a transaction that wallet did not send, reconstruct how
-              it happened.
+              Paste any address below and Anchrion reconstructs the incident: the transfer that took
+              the tokens, the permission that allowed it, and what the same address can still reach.
+              Connect a wallet only when you want to revoke.
             </p>
           </div>
           {connectError && (

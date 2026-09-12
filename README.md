@@ -3,7 +3,7 @@
 
   # Anchrion
 
-  **Find every permission your wallet granted. See how a drain actually happened.**
+  **See how a drain happened. Find every permission your wallet granted.**
 
   [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
@@ -15,29 +15,51 @@
 
 ## The problem
 
-Every crypto wallet accumulates token permissions. You grant them to a swap, a mint, a
-staking pool — and then they stay open forever. Most people have no idea how many are
-still live, or which ones can reach their whole balance.
+A drain takes a few seconds. What follows takes hours, and nobody helps with it.
 
-Detection has genuinely improved: drainer-phishing losses fell **83%, from $494M in 2024
-to ~$84M in 2025**. What has *not* improved is the hour after someone is drained. At that
-point you cannot see:
+The wallet is empty. The transaction that emptied it is not one you signed, which means no key
+was stolen: a permission you granted once was used to move your tokens. You have eleven
+permissions left, three of them unlimited, and no way to tell which one did it or whether the
+same address can still reach the rest.
 
-- which permission was used,
-- who used it,
-- which of your remaining permissions that same address can still reach.
+The tools that exist are preventive, or inventory-shaped:
 
-Existing tools are all preventive. **Rabby**, **MetaMask** (which acquired Wallet Guard in
-2024), and **Revoke.cash** warn you before you sign, or list what you have. None of them
-reconstruct what already happened. And searching for "revoke my approval" after a scare
-now regularly lands people on phishing clones that look like revoke tools and instead
-grant the attacker an approval.
+- **Rabby** simulates a transaction before you sign it and shows the balance change.
+- **MetaMask** acquired Wallet Guard and now warns about drainers before you sign.
+- **Revoke.cash** lists every on-chain permission you hold and revokes any of them.
 
-Anchrion does both halves, and is explicit about which is which.
+All three are good at what they do, and each one acts before the loss or shows you what is
+still open. None of them tells you what happened to you.
+
+The numbers say that gap is widening, not closing. Wallet-drainer phishing losses fell **83%,
+from $494M in 2024 to $83.85M in 2025** (Scam Sniffer). Over roughly the same period
+Chainalysis recorded personal wallet theft incidents rising to about **158,000 in 2025 from
+54,000 in 2022**, while the total taken from individuals fell from a **$1.5B peak to $713M**.
+Fewer dollars, more victims. The average loss is now under a thousand dollars, which is
+precisely why no company builds the tool for the person it happened to.
+
+So that person follows the search results, and the search results are thin. "Revoke approvals",
+without naming which one. Worse, searching to revoke an approval now regularly lands people on
+phishing clones of revoke tools that grant the attacker a fresh permission instead.
+
+Two honest limits belong in this section, not in a footnote. First, nothing here recovers
+stolen funds, because nothing can, and anyone promising that is running a second scam. What is
+possible is stopping the rest. Second, a clean dashboard is not a clean bill of health: permit
+signatures (ERC-2612, Permit2) are off-chain, so no approval checker can see them, including
+this one. Anchrion says so on every scan rather than implying otherwise.
+
+Anchrion covers both halves, and is explicit about which half is which.
 
 ## What it does
 
-**1. Discovery — finds approvals a watchlist cannot.**
+**1. Incident reconstruction.** Given an address, Anchrion finds token transfers out of it
+inside transactions the wallet did **not** send (funds only leave that way when a permission
+is used), resolves the sender of each one, matches it against the live permissions, and
+groups every remaining permission that shares a deployer with the attacker. Then it offers to
+revoke the whole family at once. Every line of the reconstruction links to a transaction you
+can open yourself.
+
+**2. Discovery — finds approvals a watchlist cannot.**
 Anchrion decodes `approve(address,uint256)` and `increaseAllowance` calls out of your own
 transaction history, adds every contract your wallet has ever called as a spender
 candidate, folds in ERC-20 `Approval` events for tokens you have touched, and then reads
@@ -55,26 +77,19 @@ was the only bundled entry the old chain filter allowed on Sepolia. It is gone, 
 the real Sepolia SwapRouter02, and an audit script now checks that this class of claim
 reproduces (see *Verifying the coverage panel* below).
 
-**1b. Read-only inspection.** Any address can be scanned without connecting a wallet. This
+**3. Read-only inspection.** Any address can be scanned without connecting a wallet. This
 is how the project is meant to be evaluated: paste an address and see real findings in
 seconds. Revoking is only enabled when the connected wallet is that same address on that
 same network, and the button says so when it is not.
 
-**2. Honest scoring.** A transparent, published rule set — not a threat feed, not a
+**4. Honest scoring.** A transparent, published rule set — not a threat feed, not a
 trained model. Every factor is tagged `detected` (read from chain or explorer) or
 `estimated` (derived). Unmeasured signals add nothing and are displayed as *not measured*,
 never as safe. The full weights and the model's blind spots are on `/method`.
 
-**3. Real revoke.** One click, or batch. `approve(spender, 0)` through your wallet, with
+**5. Real revoke.** One click, or batch. `approve(spender, 0)` through your wallet, with
 pending/confirmed states, an explorer link per transaction, and a rescan from chain
 afterwards so the list reflects reality rather than optimism.
-
-**4. Incident reconstruction — the part nobody else builds.** Given a wallet, Anchrion
-finds token transfers out of it inside transactions the wallet did **not** send (funds only
-leave that way when a permission is used), resolves the sender of each one, matches it
-against the live permissions, and groups every remaining permission that shares a deployer
-with the attacker. Then it offers to revoke the whole family at once. Every line of the
-reconstruction links to a transaction you can open yourself.
 
 ## Quick start
 
