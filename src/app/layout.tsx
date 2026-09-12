@@ -3,8 +3,9 @@ import './globals.css';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: 'Anchrion — Wallet Security Guardian',
-  description: 'AI-powered guardian that monitors, explains, and protects your wallet approvals across multiple chains.',
+  title: 'Anchrion — Wallet permission scanner and incident reconstruction',
+  description:
+    'Find every token permission your wallet has granted, see which ones are dangerous, revoke them, and reconstruct how funds left if a permission was already used.',
   icons: {
     icon: [
       { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
@@ -22,7 +23,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body>
         <Providers>{children}</Providers>

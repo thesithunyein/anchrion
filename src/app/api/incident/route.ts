@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { scanApprovals } from '@/lib/approvals/scan';
+import { reconstructIncident } from '@/lib/incident/reconstruct';
 import { isSupportedChainId } from '@/types/approval';
 
 export const runtime = 'nodejs';
@@ -8,9 +8,17 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { walletAddress?: string; chainId?: number };
+    const body = (await request.json()) as {
+      walletAddress?: string;
+      chainId?: number;
+      txHash?: string;
+    };
     const walletAddress = (body.walletAddress ?? '').toLowerCase();
     const chainId = Number(body.chainId);
+    const txHash =
+      typeof body.txHash === 'string' && /^0x[0-9a-fA-F]{64}$/.test(body.txHash)
+        ? body.txHash
+        : undefined;
 
     if (!/^0x[0-9a-f]{40}$/.test(walletAddress)) {
       return NextResponse.json({ error: 'A valid wallet address is required.' }, { status: 400 });
@@ -22,11 +30,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const { approvals, coverage, degraded } = await scanApprovals(chainId, walletAddress);
-    return NextResponse.json({ approvals, coverage, degraded });
+    const incident = await reconstructIncident(chainId, walletAddress, txHash);
+    return NextResponse.json({ incident });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch approvals';
-    console.error('Approvals API error:', message);
+    const message = error instanceof Error ? error.message : 'Failed to reconstruct incident';
+    console.error('Incident API error:', message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
