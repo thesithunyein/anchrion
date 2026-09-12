@@ -42,3 +42,8 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# submission material (problem statement, pitch deck, demo script, form text)
+# kept locally and intentionally not published in the repository
+/submission/
+ETHGLOBAL_EMAIL.md
