@@ -51,7 +51,14 @@ import {
 } from '@/lib/explorer/blockscout';
 import { getUsdPrices, priceFor } from '@/lib/prices';
 import { calculateRiskScore } from '@/lib/risk/scorer';
-import { isSupportedChainId, type Approval, type ScanCoverage, type TokenMeta } from '@/types/approval';
+import {
+  SUPPORTED_CHAINS,
+  isSupportedChainId,
+  type Approval,
+  type ChainId,
+  type ScanCoverage,
+  type TokenMeta,
+} from '@/types/approval';
 
 /* ── Scan budgets. Chosen so a scan stays interactive on public endpoints. ── */
 
@@ -85,24 +92,62 @@ const LOG_VERIFY_WINDOW_BLOCKS = 2_000;
  * This is *not* a threat feed and not a substitute for scanning: it exists so a
  * wallet that approved a major router long ago still gets that router checked
  * even if the approving transaction has scrolled out of its history.
+ *
+ * `chains` is measured, not assumed. Every address below was checked with
+ * `eth_getCode` on 2026-09-12 and is only offered as a seed on a chain where it
+ * actually has bytecode — an address with no code can never hold a permission,
+ * so seeding it is a fabricated coverage claim and costs a real slot.
+ *
+ * Reproduce the per-chain measurement:
+ *   for a in 0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45 ... ; do
+ *     curl -s -X POST https://gateway.tenderly.co/public/mainnet \
+ *       -H 'content-type: application/json' \
+ *       -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"eth_getCode\",\"params\":[\"$a\",\"latest\"]}";
+ *   done
+ *
+ * One entry that used to be here does not survive that check:
+ * 0x3bfa4769fb075c4a5fb0ec02e73249f2c16438b3, labelled "Uniswap V3 Router
+ * (Sepolia)", returns `0x` on all five supported chains. It was also the only
+ * entry the old chain filter allowed on Sepolia, so a Sepolia scan advertised a
+ * bundled router that does not exist. It is gone, and the real Sepolia
+ * SwapRouter02 — 0x3bFA4769FB09eefC5a80d6E87c3B9c650f7Ae48E — replaces it.
  */
-export const KNOWN_SPENDERS: Record<string, string> = {
-  '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45': 'Uniswap Universal Router',
-  '0x7a250d5630b4cf539739df2c5dacb4c659f2488d': 'Uniswap V2 Router',
-  '0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad': 'Uniswap Universal Router',
-  '0xe592427a0aece92de3edee1f18e0157c05861564': 'Uniswap V3 SwapRouter',
-  '0x111111125421ca6dc452d289314280a0f8842a65': '1inch Router',
-  '0x1111111254eeb25477b68fb85ed929f73a960582': '1inch Router',
-  '0xdef1c0ded9bec7f1a1670819833240f027b25eff': '0x Exchange Proxy',
-  '0x881d40237659c251811cec9c364ef91dc08d300c': 'MetaMask Swap Router',
-  '0x000000000022d473030f116ddee9f6b43ac78ba3': 'Uniswap Permit2',
-  '0x00000000000000adc04c56bf30ac9d3c0aaf14dc': 'Seaport (OpenSea)',
-  '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f': 'SushiSwap Router',
-  '0x3bfa4769fb075c4a5fb0ec02e73249f2c16438b3': 'Uniswap V3 Router (Sepolia)',
-  '0xc36442b4a4522e871399cd717abdd847ab11fe88': 'Uniswap V3 Position Manager',
-  '0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b': 'Uniswap Universal Router',
-  '0x66a9893cc07d91d95644aedd05d03f95e1dba8af': 'Uniswap Universal Router',
-};
+export interface BundledSpender {
+  address: string;
+  label: string;
+  /** Chains where this address was measured to have deployed bytecode. */
+  chains: ChainId[];
+}
+
+export const BUNDLED_SPENDERS: BundledSpender[] = [
+  { address: '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45', label: 'Uniswap Universal Router', chains: [1, 8453, 42161, 10] },
+  { address: '0x7a250d5630b4cf539739df2c5dacb4c659f2488d', label: 'Uniswap V2 Router', chains: [1, 42161, 10] },
+  { address: '0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad', label: 'Uniswap Universal Router', chains: [1, 11155111, 8453, 42161, 10] },
+  { address: '0xe592427a0aece92de3edee1f18e0157c05861564', label: 'Uniswap V3 SwapRouter', chains: [1, 8453, 42161, 10] },
+  { address: '0xc36442b4a4522e871399cd717abdd847ab11fe88', label: 'Uniswap V3 Position Manager', chains: [1, 8453, 42161, 10] },
+  { address: '0x66a9893cc07d91d95644aedd05d03f95e1dba8af', label: 'Uniswap Universal Router', chains: [1, 8453, 42161, 10] },
+  { address: '0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b', label: 'Uniswap Universal Router (v1)', chains: [1, 42161, 10] },
+  // Canonical form 0x3bFA4769FB09eefC5a80d6E87c3B9c650f7Ae48E. Sepolia only.
+  { address: '0x3bfa4769fb09eefc5a80d6e87c3b9c650f7ae48e', label: 'Uniswap V3 SwapRouter02 (Sepolia)', chains: [11155111] },
+  { address: '0x111111125421ca6dc452d289314280a0f8842a65', label: '1inch Router', chains: [1, 11155111, 8453, 42161, 10] },
+  { address: '0x1111111254eeb25477b68fb85ed929f73a960582', label: '1inch Router (v6)', chains: [1, 8453, 42161, 10] },
+  { address: '0xdef1c0ded9bec7f1a1670819833240f027b25eff', label: '0x Exchange Proxy', chains: [1, 11155111, 8453, 42161] },
+  { address: '0x881d40237659c251811cec9c364ef91dc08d300c', label: 'MetaMask Swap Router', chains: [1] },
+  { address: '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f', label: 'SushiSwap Router', chains: [1] },
+  { address: '0x000000000022d473030f116ddee9f6b43ac78ba3', label: 'Uniswap Permit2', chains: [1, 11155111, 8453, 42161, 10] },
+  { address: '0x00000000000000adc04c56bf30ac9d3c0aaf14dc', label: 'Seaport (OpenSea)', chains: [1, 11155111, 8453, 42161, 10] },
+];
+
+export function bundledSpendersFor(chainId: number): BundledSpender[] {
+  return BUNDLED_SPENDERS.filter((entry) => entry.chains.includes(chainId as ChainId));
+}
+
+/** Display label for a bundled protocol, matched case-insensitively. */
+export function bundledLabelFor(address: string | null | undefined): string | null {
+  if (!address) return null;
+  const lower = address.toLowerCase();
+  return BUNDLED_SPENDERS.find((entry) => entry.address === lower)?.label ?? null;
+}
 
 /** High-liquidity tokens per chain, always included as approval candidates. */
 const SEED_TOKENS: Record<number, string[]> = {
@@ -299,6 +344,10 @@ export async function scanApprovals(
   let approvalLogsParsed = 0;
   let logsWindowUsed: number | null = null;
   let logsTruncated = false;
+  /** Tokens whose approval-event history was actually read this scan. */
+  let tokensLogRead = 0;
+  /** Tokens left unread because the log phase ran out of time. */
+  let tokensSkippedByBudget = 0;
 
   if (latestBlock !== null && tokenCandidates.length > 0) {
     // Probe against the highest-volume seed token: it is the worst case for
@@ -317,7 +366,10 @@ export async function scanApprovals(
       let windowUsed: number | null = null;
 
       await mapLimit(tokenCandidates, 4, async (tokenAddress) => {
-        if (Date.now() > logDeadline) return;
+        if (Date.now() > logDeadline) {
+          tokensSkippedByBudget += 1;
+          return;
+        }
         const { rows: wide, windowBlocks: used } = await readApprovalLogsForToken(
           urls,
           tokenAddress,
@@ -326,6 +378,7 @@ export async function scanApprovals(
           ceiling,
         );
         if (used === null) return;
+        tokensLogRead += 1;
 
         let rows = wide;
         let tokenWindow: number = ceiling;
@@ -382,22 +435,41 @@ export async function scanApprovals(
       });
 
       logsWindowUsed = windowUsed;
+      if (tokensLogRead === 0) {
+        notes.push(
+          'Approval-event history could not be read for any candidate token, so a permission granted inside a contract call is not covered by this result. Everything listed was found from transaction history and live allowance reads.',
+        );
+      }
     }
   }
 
   /* ── 3. Candidate spenders, then the allowance cross-product ───────────── */
 
-  // Priority: spenders we know approved something, then contracts the wallet has
-  // called (routers, dApps), then the bundled seeds.
+  /*
+   * Priority: spenders we know approved something, then contracts the wallet has
+   * called (routers, dApps), then the bundled seeds — but the seeds get reserved
+   * slots rather than whatever is left over.
+   *
+   * Appended, the bundle is silently emptied by a busy wallet: measured on a
+   * 35-slot budget, a wallet whose history names more than 34 spenders pushed the
+   * bundled list down to a single entry while the coverage panel still claimed the
+   * list had been included. A floor that disappears under load is not a floor.
+   */
+  const bundledSeeds = bundledSpendersFor(chainId).map((entry) => entry.address);
+  const reservedForBundle = Math.min(bundledSeeds.length, MAX_SPENDER_CANDIDATES);
+  const walletSpenders = Array.from(new Set([...approvedSpenders, ...calledContracts]));
+  const walletSlots = Math.max(0, MAX_SPENDER_CANDIDATES - reservedForBundle);
+  const walletSpendersIncluded = walletSpenders.slice(0, walletSlots);
+
+  if (walletSpenders.length > walletSpendersIncluded.length) {
+    notes.push(
+      `${walletSpenders.length - walletSpendersIncluded.length} contract(s) this wallet has called were left out of the spender cross-product to keep room for the bundled well-known routers; their live allowance may still be unread.`,
+    );
+  }
+
   const spenderCandidates = Array.from(
-    new Set([
-      ...approvedSpenders,
-      ...calledContracts,
-      ...Object.keys(KNOWN_SPENDERS).filter((address) =>
-        chainId === 11155111 ? address === '0x3bfa4769fb075c4a5fb0ec02e73249f2c16438b3' : true,
-      ),
-    ]),
-  ).slice(0, MAX_SPENDER_CANDIDATES);
+    new Set([...walletSpendersIncluded, ...bundledSeeds]),
+  );
 
   for (const tokenAddress of tokenCandidates) {
     for (const spenderAddress of spenderCandidates) {
@@ -500,7 +572,7 @@ export async function scanApprovals(
       contractAgeDays: ageDays,
       // A proxy's name is not a useful label for a person, so a recognised
       // protocol label wins, then the explorer name, then nothing.
-      label: KNOWN_SPENDERS[spender] ?? (!/proxy/i.test(info.name ?? '') ? info.name : null),
+      label: bundledLabelFor(spender) ?? (!/proxy/i.test(info.name ?? '') ? info.name : null),
     });
   });
 
@@ -541,7 +613,7 @@ export async function scanApprovals(
       chainId,
       token,
       spenderAddress: pair.spenderAddress,
-      spenderLabel: info?.label ?? KNOWN_SPENDERS[pair.spenderAddress] ?? null,
+      spenderLabel: info?.label ?? bundledLabelFor(pair.spenderAddress),
       allowanceRaw: allowance.toString(),
       allowanceFormatted: isUnlimited ? 'Unlimited' : formatUnits(allowance, token.decimals),
       isUnlimited,
@@ -595,8 +667,17 @@ export async function scanApprovals(
     notes.push('USD values use a dated static price snapshot because live prices were unavailable.');
   }
   if (logsWindowUsed !== null) {
+    /*
+     * Reported as "read for N of M" rather than "read for M": a token skipped by
+     * the log time budget was not read, and saying otherwise would inflate the
+     * one number a reviewer is most likely to trust.
+     */
+    const skipped =
+      tokensSkippedByBudget > 0
+        ? ` ${tokensSkippedByBudget} further token(s) were not read before the log phase hit its time budget.`
+        : '';
     notes.push(
-      `Approval events were read for ${tokenCandidates.length} token(s) over the last ${logsWindowUsed.toLocaleString()} blocks. Every token's range was checked against a ${LOG_VERIFY_WINDOW_BLOCKS.toLocaleString()}-block read and reduced if the wider range turned out to be incomplete, so this is the narrowest window actually used. An approval older than that, which never appeared in this wallet's transaction history, would not be seen.`,
+      `Approval events were read for ${tokensLogRead} of ${tokenCandidates.length} candidate token(s) over the last ${logsWindowUsed.toLocaleString()} blocks. ${logsWindowUsed.toLocaleString()} is the narrowest window actually used, because each token's wide read was validated against a ${LOG_VERIFY_WINDOW_BLOCKS.toLocaleString()}-block read and rejected whenever it turned out to be incomplete. An approval older than that, which never appeared in this wallet's transaction history, would not be seen.${skipped}`,
     );
   }
   if (logsTruncated) {
@@ -607,9 +688,21 @@ export async function scanApprovals(
   notes.push(
     'Anchrion covers ERC-20 allowance approvals. ERC-721 / ERC-1155 approvals and off-chain permits (Permit2, ERC-2612, Seaport orders) are not covered.',
   );
-  if (Object.keys(KNOWN_SPENDERS).length > 0) {
+  /*
+   * What the bundle can honestly claim is limited to the bundled addresses whose
+   * live allowance was actually read. Counting membership in the candidate list
+   * instead would let the note claim routers the on-chain pair budget never
+   * reached.
+   */
+  if (bundledSeeds.length > 0) {
+    const bundledChecked = new Set(
+      cappedPairs
+        .filter((pair) => bundledSeeds.includes(pair.spenderAddress))
+        .map((pair) => pair.spenderAddress),
+    ).size;
+    const bundledMissed = bundledSeeds.length - bundledChecked;
     notes.push(
-      `The spender set includes a bundled list of ${spenderCandidates.filter((address) => address in KNOWN_SPENDERS).length} widely used routers, so those are checked even when the approving transaction is outside the readable history. Anchrion ships no malicious-address list.`,
+      `${bundledChecked} of the ${bundledSeeds.length} bundled well-known router address(es) for ${SUPPORTED_CHAINS[chainId].name} had their live allowance read in this scan${bundledMissed > 0 ? `; the other ${bundledMissed} fell outside the on-chain pair budget` : ''}. The bundle is a floor, not the method — it exists so a router approved before this wallet's readable history is still checked. Anchrion ships no malicious-address list.`,
     );
   }
 

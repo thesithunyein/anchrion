@@ -136,6 +136,12 @@ const MAX_ROWS_PER_LOG_WINDOW = 3_000;
 
 interface WindowProbe {
   window: number | null;
+  /**
+   * Cached alongside the window: dropping it made a re-scan of the same wallet
+   * inside the TTL report the same window with the "wider ranges rejected"
+   * warning silently missing.
+   */
+  truncated: boolean;
   at: number;
 }
 
@@ -226,7 +232,7 @@ export async function probeLogWindow(
   const cached = windowProbeCache.get(cacheKey);
   const now = Date.now();
   if (cached && now - cached.at < WINDOW_PROBE_TTL_MS) {
-    return { window: cached.window, truncated: cached.window === null };
+    return { window: cached.window, truncated: cached.truncated };
   }
 
   const ownerTopic = `0x${pad32(owner)}`;
@@ -261,7 +267,7 @@ export async function probeLogWindow(
     if (keys.size > MAX_ROWS_PER_LOG_WINDOW) break;
   }
 
-  windowProbeCache.set(cacheKey, { window: verifiedWindow, at: now });
+  windowProbeCache.set(cacheKey, { window: verifiedWindow, truncated, at: now });
   return { window: verifiedWindow, truncated };
 }
 

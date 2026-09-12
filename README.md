@@ -46,6 +46,15 @@ Nothing gates discovery behind a known-spender list: a permission to a contract 
 heard of appears if your history or the token's events reach it, and a bundled list of
 major routers is only ever an *addition* to that.
 
+That bundled list is **measured, not assumed**. Every router in it was checked with
+`eth_getCode` on all five supported chains, and is only used as a seed on a chain where it
+has bytecode, with reserved slots so a busy wallet's history cannot silently evict it. One
+address previously in the list (`0x3bfa4769fb075c4a5fb0ec02e73249f2c16438b3`, labelled
+"Uniswap V3 Router (Sepolia)") returns `0x` on every chain — it has no code anywhere, and
+was the only bundled entry the old chain filter allowed on Sepolia. It is gone, replaced by
+the real Sepolia SwapRouter02, and an audit script now checks that this class of claim
+reproduces (see *Verifying the coverage panel* below).
+
 **1b. Read-only inspection.** Any address can be scanned without connecting a wallet. This
 is how the project is meant to be evaluated: paste an address and see real findings in
 seconds. Revoking is only enabled when the connected wallet is that same address on that
@@ -241,6 +250,28 @@ report for an active wallet, reproduced by `POST /api/approvals`:
 A scan against a wallet holding a permission granted to a contract that is **not** on any
 bundled list is the test that matters. The verification script for that is
 `scripts/verify-discovery.sh`, and it prints the spender and the discovery source.
+
+## Verifying the coverage panel
+
+The coverage panel is the most load-bearing claim here, so it is auditable rather than
+trustworthy on sight:
+
+```bash
+node scripts/verify-coverage.mjs 0xYourAddress [chainId] [baseUrl]
+```
+
+It re-derives the panel's numbers from the raw sources — the block explorer and the RPC
+endpoint — without importing a line of Anchrion's own code, and prints both columns side by
+side: transactions read, token transfers read, `approve()` calls decoded, whether the
+displayed log window really subsumes a narrower read, and whether the panel's buckets add
+up to the pairs it says it checked. Differences caused by declared budgets are labelled
+rather than hidden.
+
+Both behaviours are exercised on real data: an ordinary wallet reports a 200,000-block
+window that verifiably contains the 2,000-block read, and a high-frequency wallet reports a
+2,000-block window with *wider ranges rejected*, because a 200,000-block read returns 30
+rows where 2,000 blocks return 1,880 — the endpoint truncating silently, which is exactly
+the failure that makes an unverified window worse than a small one.
 
 ## AI tooling disclosure
 
