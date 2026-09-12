@@ -139,12 +139,29 @@ and refuse it. Measured on 2026-09-12 with an owner-filtered USDC query:
 | `ethereum-rpc.publicnode.com` | answered | refused ("archive requests require a personal token") |
 | `eth.drpc.org` | answered | refused |
 | `1rpc.io/eth` | refused | refused |
-| `gateway.tenderly.co/public/mainnet` | answered | answered, and answered at 2,000,000 blocks |
+| `gateway.tenderly.co/public/mainnet` | answered | answered |
 
 So the endpoint that can serve approval history is used first, and the reachable window is
-**probed at scan time** rather than hardcoded. Whatever window a deployment's endpoint
-answers is reported in the coverage panel; a deployment with its own archive node can pin
-it with `NEXT_PUBLIC_LOG_WINDOW_BLOCKS`.
+**probed at scan time** rather than hardcoded. A deployment with its own archive node can
+pin it with `NEXT_PUBLIC_LOG_WINDOW_BLOCKS`.
+
+**And a wider window is not automatically a better one.** Tenderly answers wide ranges
+*without error* while returning a fraction of the events, which is worse than refusing,
+because inventing a coverage number is how a security tool lies. Measured with an
+owner-filtered USDC query on one busy approver:
+
+| Window | Rows returned |
+|---|---|
+| 5,000 blocks | **12,530** |
+| 50,000 blocks | 70 |
+| 2,000,000 blocks | 70 |
+
+A light wallet returns identical rows at every window and looks fine. So completeness is
+checked **per token**, not once: every token's wide read is compared against a 2,000-block
+read, the wide read is discarded if it is missing anything the narrow one contained, and
+the coverage panel reports the narrowest window actually used. On the wallet above the
+scan now reports `Log window: 2,000 blocks (wider ranges rejected as incomplete)` instead
+of an invented 2,000,000.
 
 ## The risk model
 
@@ -215,10 +232,10 @@ report for an active wallet, reproduced by `POST /api/approvals`:
 
 ```
 208 candidate permissions read on chain
-  6 granted then revoked (proved by an approve() call or an Approval event)
-200 candidate pairs never granted
+  5 granted then revoked (proved by an approve() call or an Approval event)
+201 candidate pairs never granted
   2 live permissions found, both unlimited USDC, both via Approval events
-  log window reached: 2,000,000 blocks
+  log window verified complete: 200,000 blocks
 ```
 
 A scan against a wallet holding a permission granted to a contract that is **not** on any
@@ -235,17 +252,18 @@ were made by the author, who reviewed every file and ran the build, typecheck, l
 on-chain tests above. This disclosure is here because claiming otherwise would be
 inaccurate, and because "how did you build this" is a question worth answering honestly.
 
-## Submission kit
+## The 20-second test
 
-Written for the 3rd-Web-Hack submission form, and useful to anyone evaluating the
-project:
+Open the dashboard, paste any address, press **Inspect**. No wallet install, no
+signup, no API key. You get live permissions, the value reachable through each one,
+and a coverage panel naming what the scan could not see. Revoking is enabled only
+when the connected wallet owns that address on that network.
 
-| File | What it is |
-|---|---|
-| [`submission/PROBLEM.md`](submission/PROBLEM.md) | The problem statement, with sourced figures |
-| [`submission/PITCH-DECK.md`](submission/PITCH-DECK.md) | 12-slide deck |
-| [`submission/DEMO-SCRIPT.md`](submission/DEMO-SCRIPT.md) | 2:45 demo video shot list and the 20-second test |
-| [`submission/DEVPOST.md`](submission/DEVPOST.md) | Paste-ready submission text |
+If you want one command instead of a browser:
+
+```bash
+./scripts/verify-discovery.sh 0xYourAddress 1
+```
 
 ## Deployment note
 

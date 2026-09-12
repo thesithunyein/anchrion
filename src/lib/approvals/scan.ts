@@ -66,7 +66,18 @@ const MAX_PAIRS_CHECKED = 400;
 /** Approval events decoded per token before we stop adding pairs. */
 const MAX_LOG_PAIRS_PER_TOKEN = 25;
 /** Wall-clock budget for the log phase, so a slow endpoint cannot stall a scan. */
-const LOG_SCAN_BUDGET_MS = 12_000;
+const LOG_SCAN_BUDGET_MS = 20_000;
+/**
+ * Every token's wide read is re-checked against this narrower read, and the wide
+ * one is discarded unless it contains everything the narrow one found.
+ *
+ * Truncation is token-specific, so a single probe is not enough. Measured on
+ * 2026-09-12 with an owner-filtered USDC query for a busy approver: 5,000 blocks
+ * returned 12,530 rows, while 50,000 and 2,000,000 blocks both returned 70 —
+ * answered without error, most rows silently missing. A light wallet returns the
+ * same rows at every window and passes. Only a per-token comparison catches it.
+ */
+const LOG_VERIFY_WINDOW_BLOCKS = 2_000;
 
 /**
  * Bundled protocol labels, used for display and as spender seeds.
@@ -287,26 +298,71 @@ export async function scanApprovals(
 
   let approvalLogsParsed = 0;
   let logsWindowUsed: number | null = null;
+  let logsTruncated = false;
 
   if (latestBlock !== null && tokenCandidates.length > 0) {
-    const windowBlocks = await probeLogWindow(urls, tokenCandidates[0], wallet, latestBlock);
-    if (windowBlocks === null) {
+    // Probe against the highest-volume seed token: it is the worst case for
+    // endpoint truncation, so a ceiling it passes is a reasonable starting point.
+    const probeToken = seedTokens[0] ?? tokenCandidates[0];
+    const probe = await probeLogWindow(urls, probeToken, wallet, latestBlock);
+    logsTruncated = probe.truncated;
+
+    if (probe.window === null) {
       notes.push(
         'No RPC endpoint answered an approval-event query, so permissions granted inside a contract call could not be read in this scan. Everything listed below was found from transaction history and live allowance reads.',
       );
     } else {
+      const ceiling = probe.window;
       const logDeadline = Date.now() + LOG_SCAN_BUDGET_MS;
+      let windowUsed: number | null = null;
+
       await mapLimit(tokenCandidates, 4, async (tokenAddress) => {
         if (Date.now() > logDeadline) return;
-        const { rows, windowBlocks: used } = await readApprovalLogsForToken(
+        const { rows: wide, windowBlocks: used } = await readApprovalLogsForToken(
           urls,
           tokenAddress,
           wallet,
           latestBlock,
-          windowBlocks,
+          ceiling,
         );
         if (used === null) return;
-        logsWindowUsed = Math.max(logsWindowUsed ?? 0, used);
+
+        let rows = wide;
+        let tokenWindow: number = ceiling;
+
+        /*
+         * Verify this token's wide read against a narrow one, and prefer the
+         * narrow read when the wide one is missing anything the narrow one saw.
+         * Reporting the wide window as coverage while it is silently incomplete
+         * would be the exact kind of false confidence this project exists to
+         * remove, so the check runs even when the wide read returned plenty.
+         */
+        if (ceiling > LOG_VERIFY_WINDOW_BLOCKS) {
+          const { rows: narrow } = await readApprovalLogsForToken(
+            urls,
+            tokenAddress,
+            wallet,
+            latestBlock,
+            LOG_VERIFY_WINDOW_BLOCKS,
+          );
+          if (narrow.length > 0) {
+            const wideKeys = new Set(
+              wide.map((row) => `${row.transactionHash ?? ''}:${row.logIndex ?? row.blockNumber ?? ''}`),
+            );
+            const missing = narrow.filter(
+              (row) => !wideKeys.has(`${row.transactionHash ?? ''}:${row.logIndex ?? row.blockNumber ?? ''}`),
+            );
+            if (missing.length > 0) {
+              logsTruncated = true;
+              rows = narrow;
+              tokenWindow = LOG_VERIFY_WINDOW_BLOCKS;
+            }
+          }
+        }
+
+        // Coverage is only as good as the weakest token, so track the minimum.
+        windowUsed = windowUsed === null ? tokenWindow : Math.min(windowUsed, tokenWindow);
+
         for (const row of rows.slice(0, MAX_LOG_PAIRS_PER_TOKEN)) {
           if (approvalLogsParsed >= MAX_LOG_PAIRS_PER_TOKEN * tokenCandidates.length) return;
           if (!row.topics || row.topics.length < 3) continue;
@@ -324,6 +380,8 @@ export async function scanApprovals(
           });
         }
       });
+
+      logsWindowUsed = windowUsed;
     }
   }
 
@@ -538,7 +596,12 @@ export async function scanApprovals(
   }
   if (logsWindowUsed !== null) {
     notes.push(
-      `Approval events were read for ${tokenCandidates.length} token(s) over the last ${logsWindowUsed.toLocaleString()} blocks. This is the widest window the configured RPC endpoint answered; an approval older than that which never appeared in this wallet's transaction history would not be seen.`,
+      `Approval events were read for ${tokenCandidates.length} token(s) over the last ${logsWindowUsed.toLocaleString()} blocks. Every token's range was checked against a ${LOG_VERIFY_WINDOW_BLOCKS.toLocaleString()}-block read and reduced if the wider range turned out to be incomplete, so this is the narrowest window actually used. An approval older than that, which never appeared in this wallet's transaction history, would not be seen.`,
+    );
+  }
+  if (logsTruncated) {
+    notes.push(
+      'A wider approval-event range was answered with incomplete results, so it was rejected and the verified window above was used instead. This is an endpoint behaviour, not a wallet behaviour: it silently returns fewer events than exist for wide ranges, which is why this scan validates each window against a narrower one before trusting it.',
     );
   }
   notes.push(
@@ -563,6 +626,7 @@ export async function scanApprovals(
     transfersScanned: transfers.length,
     transactionsScanned: transactions.length,
     logsWindowBlocks: logsWindowUsed,
+    logsWindowTruncated: logsTruncated,
     explorerReachable,
     priceSource: prices.source,
     notes,

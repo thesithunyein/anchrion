@@ -59,7 +59,10 @@ function CoveragePanel({ coverage }: { coverage: ScanCoverage }) {
         {coverage.notGrantedFound ? (
           <span>Candidate pairs never granted: {coverage.notGrantedFound}</span>
         ) : null}
-        <span>Log window: {coverage.logsWindowBlocks ? `${coverage.logsWindowBlocks.toLocaleString()} blocks` : 'not read'}</span>
+        <span>
+          Log window: {coverage.logsWindowBlocks ? `${coverage.logsWindowBlocks.toLocaleString()} blocks` : 'not read'}
+          {coverage.logsWindowBlocks && coverage.logsWindowTruncated ? ' (wider ranges rejected as incomplete)' : ''}
+        </span>
         <span>Prices: {coverage.priceSource}</span>
       </div>
       <ul style={{ paddingLeft: 18, fontSize: 12, color: 'var(--text-tertiary)', lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: 4 }}>

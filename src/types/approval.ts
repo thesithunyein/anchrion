@@ -140,7 +140,10 @@ export interface ScanCoverage {
   notGrantedFound?: number;
   transfersScanned: number;
   transactionsScanned: number;
+  /** Widest log window verified complete, or null when none could be read. */
   logsWindowBlocks: number | null;
+  /** True when a wider range was answered but demonstrably incomplete. */
+  logsWindowTruncated?: boolean;
   explorerReachable: boolean;
   priceSource: 'live' | 'static';
   notes: string[];

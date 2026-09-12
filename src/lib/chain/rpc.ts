@@ -121,8 +121,18 @@ function configuredLogWindow(): number | null {
   return null;
 }
 
-/** Ascending ladder of probe windows. The first rejection ends the probe. */
-const LOG_WINDOW_LADDER = [100, 500, 2_000, 10_000, 50_000, 250_000, 2_000_000] as const;
+/**
+ * Ascending ladder of probe windows. Each step must be *verifiably* complete
+ * before it is accepted — see probeLogWindow.
+ */
+const LOG_WINDOW_LADDER = [500, 2_000, 10_000, 50_000, 200_000] as const;
+
+/**
+ * A window returning more rows than this is not worth climbing past: the scan
+ * only uses the newest few pairs per token, and a huge response costs more than
+ * the reach is worth.
+ */
+const MAX_ROWS_PER_LOG_WINDOW = 3_000;
 
 interface WindowProbe {
   window: number | null;
@@ -132,6 +142,11 @@ interface WindowProbe {
 const windowProbeCache = new Map<string, WindowProbe>();
 const WINDOW_PROBE_TTL_MS = 10 * 60 * 1000;
 
+/** Identifies a log row so two windows' results can be compared as sets. */
+function logRowKey(row: { transactionHash?: string; logIndex?: string; blockNumber?: string }): string {
+  return `${row.transactionHash ?? ''}:${row.logIndex ?? row.blockNumber ?? ''}`;
+}
+
 /**
  * Largest log window this endpoint will actually answer for this chain.
  *
@@ -140,47 +155,114 @@ const WINDOW_PROBE_TTL_MS = 10 * 60 * 1000;
  * when even the smallest window is refused — the caller must then report approval
  * event history as unmeasured rather than as empty.
  */
+export interface LogWindowProbe {
+  /** Widest window whose answer was verified complete. null = none usable. */
+  window: number | null;
+  /**
+   * True when a wider range was *answered but incomplete*. Endpoints do this
+   * silently, and reporting that window as coverage would overstate what we saw.
+   */
+  truncated: boolean;
+}
+
+async function fetchLogs(
+  urls: string[],
+  address: string,
+  fromBlock: number,
+  topics: string[],
+): Promise<ApprovalLogRow[] | null> {
+  // Two attempts: an empty answer from a flaky endpoint must not be mistaken for
+  // "this wallet has no approvals".
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const rows = await rpc<ApprovalLogRow[]>(
+        urls,
+        'eth_getLogs',
+        [
+          {
+            address,
+            fromBlock: `0x${Math.max(0, fromBlock).toString(16)}`,
+            toBlock: 'latest',
+            topics,
+          },
+        ],
+        15_000,
+      );
+      if (Array.isArray(rows)) return rows;
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
+/**
+ * Widest log window this endpoint will answer *completely*, measured.
+ *
+ * Accepting a window merely because the endpoint did not error is wrong, and this
+ * is not theoretical. Measured 2026-09-12 against Tenderly's public gateway with
+ * an owner-filtered USDC query for a busy approver:
+ *
+ *   window      rows returned
+ *   5,000       12,530
+ *   50,000      70      <-- answered, no error, most rows missing
+ *   2,000,000   70      <-- same silent truncation
+ *
+ * A wider range that returns *fewer* rows than a narrower one cannot be right, and
+ * a wider range that is missing rows the narrower one contained is incomplete.
+ * So each rung is validated against the rung below it before being accepted, and
+ * the first failure ends the climb at the last verified window.
+ */
 export async function probeLogWindow(
   urls: string[],
   probeToken: string,
   owner: string,
   latestBlock: number,
-): Promise<number | null> {
+): Promise<LogWindowProbe> {
   const pinned = configuredLogWindow();
-  if (pinned !== null) return pinned;
+  if (pinned !== null) return { window: pinned, truncated: false };
 
-  const cacheKey = urls[0] ?? '';
+  const cacheKey = `${urls[0] ?? ''}|${probeToken}`;
   const cached = windowProbeCache.get(cacheKey);
   const now = Date.now();
-  if (cached && now - cached.at < WINDOW_PROBE_TTL_MS) return cached.window;
-
-  const ownerTopic = `0x${pad32(owner)}`;
-  let best: number | null = null;
-  for (const window of LOG_WINDOW_LADDER) {
-    try {
-      // Mirror the shape of the real query (token-scoped + owner-filtered) so the
-      // probe measures the same limit the scan will hit, not a looser one.
-      await rpc<unknown[]>(
-        urls,
-        'eth_getLogs',
-        [
-          {
-            address: probeToken,
-            fromBlock: `0x${Math.max(0, latestBlock - window).toString(16)}`,
-            toBlock: 'latest',
-            topics: [APPROVAL_EVENT_TOPIC, ownerTopic],
-          },
-        ],
-        12_000,
-      );
-      best = window;
-    } catch {
-      break;
-    }
+  if (cached && now - cached.at < WINDOW_PROBE_TTL_MS) {
+    return { window: cached.window, truncated: cached.window === null };
   }
 
-  windowProbeCache.set(cacheKey, { window: best, at: now });
-  return best;
+  const ownerTopic = `0x${pad32(owner)}`;
+  const topics = [APPROVAL_EVENT_TOPIC, ownerTopic];
+
+  let verifiedWindow: number | null = null;
+  let verifiedKeys: Set<string> | null = null;
+  let truncated = false;
+
+  for (const window of LOG_WINDOW_LADDER) {
+    const rows = await fetchLogs(urls, probeToken, latestBlock - window, topics);
+    if (rows === null) {
+      // Refused outright: stop climbing, keep the last verified window.
+      break;
+    }
+
+    const keys = new Set(rows.map(logRowKey));
+
+    if (verifiedKeys !== null) {
+      // Completeness test: everything in the smaller window must still be here.
+      const missing = Array.from(verifiedKeys).filter((key) => !keys.has(key));
+      if (missing.length > 0 || keys.size < verifiedKeys.size) {
+        truncated = true;
+        break;
+      }
+    }
+
+    verifiedWindow = window;
+    verifiedKeys = keys;
+
+    // Enough rows already: climbing further costs more than it can add.
+    if (keys.size > MAX_ROWS_PER_LOG_WINDOW) break;
+  }
+
+  windowProbeCache.set(cacheKey, { window: verifiedWindow, at: now });
+  return { window: verifiedWindow, truncated };
 }
 
 /**
@@ -197,31 +279,12 @@ export async function readApprovalLogsForToken(
   latestBlock: number,
   windowBlocks: number,
 ): Promise<{ rows: ApprovalLogRow[]; windowBlocks: number | null }> {
-  const ownerTopic = `0x${pad32(owner)}`;
-  // Two attempts: transient endpoint failures are common, and giving up after one
-  // silently drops a real permission out of the report.
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      const rows = await rpc<ApprovalLogRow[]>(
-        urls,
-        'eth_getLogs',
-        [
-          {
-            address: tokenAddress,
-            fromBlock: `0x${Math.max(0, latestBlock - windowBlocks).toString(16)}`,
-            toBlock: 'latest',
-            topics: [APPROVAL_EVENT_TOPIC, ownerTopic],
-          },
-        ],
-        12_000,
-      );
-      if (!Array.isArray(rows)) continue;
-      return { rows, windowBlocks };
-    } catch {
-      continue;
-    }
-  }
-  return { rows: [], windowBlocks: null };
+  const rows = await fetchLogs(urls, tokenAddress, latestBlock - windowBlocks, [
+    APPROVAL_EVENT_TOPIC,
+    `0x${pad32(owner)}`,
+  ]);
+  if (rows === null) return { rows: [], windowBlocks: null };
+  return { rows, windowBlocks };
 }
 
 export async function latestBlockNumber(urls: string[]): Promise<number | null> {
@@ -253,6 +316,8 @@ export interface ApprovalLogRow {
   topics: string[];
   transactionHash: string;
   blockNumber: string;
+  /** Present on every real log; used to identify a row when comparing windows. */
+  logIndex?: string;
 }
 
 /**
