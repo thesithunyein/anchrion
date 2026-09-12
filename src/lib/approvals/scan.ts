@@ -553,6 +553,7 @@ export async function scanApprovals(
       creatorAddress: string | null;
       contractAgeDays: number | null;
       label: string | null;
+      labelSource: 'bundled' | 'explorer' | null;
     }
   >();
 
@@ -563,6 +564,10 @@ export async function scanApprovals(
       fetchContractCreator(chainId, spender),
       fetchContractAgeDays(chainId, spender),
     ]);
+    const bundledLabel = bundledLabelFor(spender);
+    // A proxy's name is not a useful label for a person, so a recognised protocol
+    // label wins, then the explorer name, then nothing.
+    const explorerName = /proxy/i.test(info.name ?? '') ? null : (info.name ?? null);
     spenderInfo.set(spender, {
       hasBytecode: code,
       sourceVerified: info.verified,
@@ -570,9 +575,10 @@ export async function scanApprovals(
       isScamFlag: info.isScam,
       creatorAddress: creator,
       contractAgeDays: ageDays,
-      // A proxy's name is not a useful label for a person, so a recognised
-      // protocol label wins, then the explorer name, then nothing.
-      label: bundledLabelFor(spender) ?? (!/proxy/i.test(info.name ?? '') ? info.name : null),
+      label: bundledLabel ?? explorerName,
+      // Tracked separately: only a bundled label may move a risk score, because
+      // an explorer name is chosen by whoever deployed the contract.
+      labelSource: bundledLabel ? 'bundled' : explorerName ? 'explorer' : null,
     });
   });
 
@@ -637,6 +643,7 @@ export async function scanApprovals(
         sourceVerified: info?.sourceVerified ?? null,
         contractName: info?.contractName ?? null,
         isScamFlag: info?.isScamFlag ?? null,
+        spenderLabelSource: info?.labelSource ?? null,
         creatorAddress: info?.creatorAddress ?? null,
         contractAgeDays: info?.contractAgeDays ?? null,
         lastTokenActivityDays,

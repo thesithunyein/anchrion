@@ -166,31 +166,40 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
     });
   }
 
-  // Estimated: value at risk.
-  if (approval.valueAtRiskUsd > 10_000) {
-    add({
-      name: 'High value at risk',
-      description: `About $${Math.round(
-        approval.valueAtRiskUsd,
-      ).toLocaleString()} of this token is reachable through this permission (estimated at ${
-        approval.priceSource === 'live' ? 'live' : 'static snapshot'
-      } prices).`,
-      impact: 15,
-      severity: 'high',
-      evidence: 'estimated',
-    });
-  } else if (approval.valueAtRiskUsd > 1_000) {
-    add({
-      name: 'Moderate value at risk',
-      description: `About $${Math.round(
-        approval.valueAtRiskUsd,
-      ).toLocaleString()} is reachable through this permission (estimated at ${
-        approval.priceSource === 'live' ? 'live' : 'static snapshot'
-      } prices).`,
-      impact: 10,
-      severity: 'medium',
-      evidence: 'estimated',
-    });
+  /*
+   * Estimated: value at risk, for capped permissions only.
+   *
+   * An unlimited permission has no dollar figure — the placeholder used in the UI
+   * (10,000 units at the current price) is not a measurement, and adding a factor
+   * derived from it would put invented precision into a security score. Unlimited
+   * is already scored as unlimited, above.
+   */
+  if (!approval.isUnlimited) {
+    if (approval.valueAtRiskUsd >= 10_000) {
+      add({
+        name: 'High value at risk',
+        description: `About $${Math.round(
+          approval.valueAtRiskUsd,
+        ).toLocaleString()} of this token is reachable through this permission (estimated at ${
+          approval.priceSource === 'live' ? 'live' : 'static snapshot'
+        } prices).`,
+        impact: 15,
+        severity: 'high',
+        evidence: 'estimated',
+      });
+    } else if (approval.valueAtRiskUsd >= 1_000) {
+      add({
+        name: 'Moderate value at risk',
+        description: `About $${Math.round(
+          approval.valueAtRiskUsd,
+        ).toLocaleString()} is reachable through this permission (estimated at ${
+          approval.priceSource === 'live' ? 'live' : 'static snapshot'
+        } prices).`,
+        impact: 10,
+        severity: 'medium',
+        evidence: 'estimated',
+      });
+    }
   }
 
   // Estimated: dormant unlimited permission.
@@ -207,12 +216,24 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
     });
   }
 
-  // Detected: recognised protocol label lowers the score.
+  /*
+   * Detected: a recognised protocol label lowers the score — but only when the
+   * label came from the bundled, address-verified list.
+   *
+   * Matching a substring against whatever name the explorer reports would hand a
+   * 20-point discount to any contract that registers itself as "Uniswap Helper".
+   * That is attacker-controlled input feeding a security score, so it does not
+   * count here, and an unrecognised address simply gets no discount.
+   */
   const label = (approval.spenderLabel ?? '').toLowerCase();
-  if (label !== '' && KNOWN_PROTOCOLS.some((protocol) => label.includes(protocol))) {
+  if (
+    approval.signals.spenderLabelSource === 'bundled' &&
+    label !== '' &&
+    KNOWN_PROTOCOLS.some((protocol) => label.includes(protocol))
+  ) {
     add({
       name: 'Recognised protocol',
-      description: `${approval.spenderLabel} is on Anchrion's bundled protocol allowlist.`,
+      description: `${approval.spenderLabel} is on Anchrion's bundled protocol allowlist, matched by contract address rather than by name.`,
       impact: -20,
       severity: 'low',
       evidence: 'detected',

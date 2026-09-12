@@ -199,9 +199,15 @@ Weights are published on `/method` and in `src/lib/risk/scorer.ts`. Summary:
 | Unverified contract source | +20 | detected |
 | Deployed < 7 / 30 / 90 days ago | +25 / +15 / +5 | detected |
 | Address on your own `NEXT_PUBLIC_THREAT_LIST` | +50 | detected |
-| Value at risk > $10k / > $1k | +15 / +10 | estimated |
+| Capped value at risk ≥ $10k / ≥ $1k | +15 / +10 | estimated |
 | Unlimited and idle > 365 days | +10 | estimated |
 | Recognised protocol on the bundled allowlist | −20 | detected |
+
+An unlimited permission is never priced. It has no cap, so the UI shows a stated
+placeholder instead of a measurement, and the model adds no value factor for it: the
+placeholder must not become a security score. The −20 protocol discount requires an
+**address** match against the bundled list, because the contract name an explorer reports is
+chosen by whoever deployed it and must never move a score.
 
 Bands: critical ≥ 70, high ≥ 50, medium ≥ 30, low ≥ 10, otherwise safe. There is **no
 bundled threat feed** — Anchrion will not pretend to know an address is malicious unless
@@ -246,25 +252,35 @@ victim.** Do not deploy that contract anywhere with real value.
 ## Verification
 
 ```bash
-npx tsc --noEmit   # clean
-npx eslint .       # 0 errors
-npm run build      # builds all routes
+npm run typecheck   # tsc --noEmit, clean
+npm run lint        # eslint, 0 problems
+npm run build       # builds all routes
+npm run verify      # recomputes a scan's coverage numbers, independently
 ```
 
-Measured on real mainnet data (2026-09-12) — the numbers below are the actual coverage
-report for an active wallet, reproduced by `POST /api/approvals`:
+Measured on real mainnet data on 2026-09-12 against one high-frequency address
+(`0x4d146413c0dd1794019f9adee8d28304d0afee05`), read straight off `npm run verify`. The
+first four rows are the app's own numbers next to numbers derived independently from the
+explorer and the RPC endpoint:
 
 ```
-208 candidate permissions read on chain
-  5 granted then revoked (proved by an approve() call or an Approval event)
-201 candidate pairs never granted
-  2 live permissions found, both unlimited USDC, both via Approval events
-  log window verified complete: 200,000 blocks
+transactions read            29   (app)    29   (independent)
+token transfers read         250  (app)    250  (independent)
+approve() calls decoded      0    (app)    0    (independent)
+pairs checked accounted for  75   (app)    75   (independent)
+probe token rows over 2,000 blocks     1,882
+probe token rows over 200,000 blocks   30   <- silently truncated by the endpoint
+log window reported                    2,000 blocks (wider ranges rejected as incomplete)
 ```
+
+That last group is the reason the window is probed rather than assumed. A wider range that
+returns 30 rows where a narrow one returns 1,882 is not coverage, and reporting it as the
+window reached would have overstated what the scan saw by two orders of magnitude.
 
 A scan against a wallet holding a permission granted to a contract that is **not** on any
 bundled list is the test that matters. The verification script for that is
-`scripts/verify-discovery.sh`, and it prints the spender and the discovery source.
+`npm run verify:discovery -- 0xYourAddress`, and it prints the spender and the discovery
+source.
 
 ## Verifying the coverage panel
 
@@ -272,7 +288,7 @@ The coverage panel is the most load-bearing claim here, so it is auditable rathe
 trustworthy on sight:
 
 ```bash
-node scripts/verify-coverage.mjs 0xYourAddress [chainId] [baseUrl]
+npm run verify -- 0xYourAddress [chainId] [baseUrl]
 ```
 
 It re-derives the panel's numbers from the raw sources — the block explorer and the RPC
@@ -304,6 +320,11 @@ Open the dashboard, paste any address, press **Inspect**. No wallet install, no
 signup, no API key. You get live permissions, the value reachable through each one,
 and a coverage panel naming what the scan could not see. Revoking is enabled only
 when the connected wallet owns that address on that network.
+
+Every scan is also a link. The address, network and view are written into the URL as you
+go, so `/dashboard?address=0x…&chain=11155111&view=incident` opens straight onto that
+wallet's reconstruction and starts the scan on load — which is how a finding is meant to be
+handed to somebody else.
 
 If you want one command instead of a browser:
 

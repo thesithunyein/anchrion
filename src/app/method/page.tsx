@@ -45,10 +45,10 @@ const WEIGHTS: Weight[] = [
     why: 'Only fires for addresses you supply through NEXT_PUBLIC_THREAT_LIST. Anchrion ships no threat feed of its own.',
   },
   {
-    name: 'Value at risk above $10k / $1k',
+    name: 'Capped value at risk of at least $10k / $1k',
     points: '+15 / +10',
     evidence: 'estimated',
-    why: 'Allowance multiplied by a USD price. Price is live when reachable, otherwise a dated static snapshot, and the value is labelled as an estimate either way.',
+    why: 'Allowance multiplied by a USD price, for permissions that have a cap. Price is live when reachable, otherwise a dated static snapshot, and the value is labelled an estimate either way. An unlimited permission is never priced: it has no cap, so no dollar figure is quoted for it, and it is already scored as unlimited.',
   },
   {
     name: 'Dormant unlimited permission (no movement in over a year)',
@@ -60,17 +60,17 @@ const WEIGHTS: Weight[] = [
     name: 'Recognised protocol on the bundled allowlist',
     points: '−20',
     evidence: 'detected',
-    why: 'A small bundled list of well-known routers and protocols. It is a label convenience, not an audit: a name on this list is not a safety guarantee.',
+    why: 'A small bundled list of well-known routers, matched by contract address. Only an address match earns the discount: a name the explorer reports cannot move a score, because whoever deploys a contract chooses that name. A name on the list is still not a safety guarantee.',
   },
 ];
 
 const LIMITS = [
   'ERC-20 allowance approvals only. ERC-721 (NFT) approvals and off-chain permits such as Permit2 and ERC-2612 are not covered.',
-  'Approvals granted inside a contract call are only found within a bounded recent log window (5,000 blocks by default), because public RPC endpoints reject deep log ranges.',
+  'Approvals granted inside a contract call are only found within a bounded recent log window, because public RPC endpoints reject deep log ranges. That window is measured per scan rather than assumed: the scan probes the endpoint, validates each range against a narrower read, and reports the window it actually reached, or reports it as unmeasured.',
   'Discovery reads the wallet’s recent transaction history and token transfers. Wallets with thousands of approvals will not have all of them enumerated in a single scan.',
   'Contract enrichment is capped per scan to stay inside public rate limits, and the cap is reported in the coverage panel.',
   'Unknown is not safe. Wherever a signal could not be measured, the UI shows it as not measured, and the risk model adds nothing for it.',
-  'Anchrion reads public chain data with view calls only. It never asks for a private key, never signs on your behalf, and cannot move funds.',
+  'Anchrion reads public chain data with view calls only. It never asks for a private key and cannot move funds. Revoking sends a transaction your own wallet signs, and the app then reads the allowance back from the token contract before calling it revoked.',
 ];
 
 export default function MethodPage() {

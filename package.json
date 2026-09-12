@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "verify": "node scripts/verify-coverage.mjs",
+    "verify:discovery": "bash scripts/verify-discovery.sh"
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "^4.3.7",

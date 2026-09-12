@@ -126,7 +126,7 @@ export function IncidentPanel({
           }}
         >
           <h4 style={{ fontSize: 11, fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>
-            Funds that left in transactions you did not send
+            Funds that left in transactions you did not submit
           </h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {incident.transfers.map((transfer) => (
@@ -154,6 +154,16 @@ export function IncidentPanel({
                     initiated by <span style={{ fontFamily: 'monospace' }}>{short(transfer.initiatedBy)}</span> →
                     recipient <span style={{ fontFamily: 'monospace' }}>{short(transfer.recipient)}</span>
                     {transfer.timestamp ? ` · ${new Date(transfer.timestamp).toLocaleString()}` : ''}
+                  </p>
+                  {/*
+                    * Whether the submitting address still holds a permission here is the
+                    * difference between a spent approval and a relayed transaction, so it
+                    * is stated on the row instead of left to the narrative.
+                    */}
+                  <p style={{ fontSize: 12, marginTop: 4, color: transfer.authorizedByLivePermission ? '#fbbf24' : 'var(--text-tertiary)' }}>
+                    {transfer.authorizedByLivePermission
+                      ? 'This address still holds a live permission on this wallet'
+                      : 'No live permission from this address. Either a permit signature, or a relayed transaction you signed'}
                   </p>
                 </div>
                 <a
@@ -185,8 +195,13 @@ export function IncidentPanel({
                 Still reachable by this family
               </h4>
               <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                {family.length} permission{family.length === 1 ? '' : 's'} · estimated $
-                {incident.stillExposedUsd.toLocaleString()} exposed
+                {family.length} permission{family.length === 1 ? '' : 's'} ·{' '}
+                {incident.unboundedApprovalCount > 0
+                  ? `${incident.unboundedApprovalCount} unlimited`
+                  : `estimated $${incident.stillExposedUsd.toLocaleString()} exposed`}
+                {incident.unboundedApprovalCount > 0 && incident.stillExposedUsd > 0
+                  ? ` · estimated $${incident.stillExposedUsd.toLocaleString()} capped`
+                  : ''}
               </p>
             </div>
             <button

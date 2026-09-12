@@ -40,6 +40,13 @@ export interface ApprovalSignals {
   /** Contract name reported by the explorer when verified. */
   contractName: string | null;
   /**
+   * Where `spenderLabel` came from. 'bundled' means the address is in Anchrion's
+   * own measured list; 'explorer' means it is a name the explorer reports, which
+   * any deployer can choose. The scoring model treats those two differently on
+   * purpose: it will not discount a score on a name nobody verified.
+   */
+  spenderLabelSource: 'bundled' | 'explorer' | null;
+  /**
    * The explorer's own public scam/reputation flag for the spender.
    * null = the explorer reported none, which is not the same as "clean".
    */
@@ -77,7 +84,12 @@ export type DiscoverySource = 'approve-call' | 'approval-log' | 'allowance-read'
 export interface Approval {
   id: string;
   walletAddress: string;
-  chainId: number;
+  /**
+   * Always a chain Anchrion reads. Narrowed at the source (the scan rejects any
+   * other chain), so a revoke can pin the write to this network rather than
+   * trusting whatever network the wallet happens to be on.
+   */
+  chainId: ChainId;
 
   token: TokenMeta;
   spenderAddress: string;
@@ -161,8 +173,18 @@ export interface IncidentTransfer {
   token: TokenMeta;
   amountFormatted: string;
   valueAtRiskUsd: number;
-  /** The address that initiated the transfer (the spender / attacker). */
+  /** The address that submitted the transaction that moved the tokens. */
   initiatedBy: string;
+  /**
+   * True when the submitting address currently holds a live permission on this
+   * wallet, which is what proves a permission was spent rather than a key.
+   *
+   * False is NOT proof of theft: a permit signature leaves no on-chain permission
+   * until it is redeemed, and a transaction the wallet signed itself can be
+   * submitted by a relayer (MEV protection, account abstraction). Both look like
+   * this, so the reconstruction names them instead of accusing.
+   */
+  authorizedByLivePermission: boolean;
   recipient: string;
   blockNumber: number | null;
   timestamp: string | null;
@@ -179,8 +201,22 @@ export interface Incident {
   authorizingApprovals: Approval[];
   /** Remaining approvals tied to the same attacker family. */
   familyApprovals: Approval[];
-  /** USD still exposed through family approvals. */
+  /**
+   * USD still exposed through family approvals that have a cap. Unlimited
+   * permissions are deliberately excluded: a permission with no cap has no dollar
+   * figure, and printing a placeholder as an estimate would be invented precision.
+   */
   stillExposedUsd: number;
+  /** Family approvals with no cap at all, counted rather than priced. */
+  unboundedApprovalCount: number;
+  /**
+   * Token transfers that left the wallet inside transactions the wallet signed
+   * itself. Anchrion cannot tell a swap from a drain there, so it counts them
+   * instead of staying silent about them.
+   */
+  selfSignedOutflowCount: number;
+  /** How many recent outflows the reconstruction could actually look at. */
+  outflowsInspected: number;
   /** Plain-English reconstruction steps, one per line. */
   narrative: string[];
   coverage: ScanCoverage;

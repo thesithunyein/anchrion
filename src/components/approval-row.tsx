@@ -98,6 +98,8 @@ export function ApprovalRow({
 
   const revoking = status === 'signing' || status === 'pending';
   const revoked = status === 'confirmed';
+  /** The transaction landed but the allowance did not read zero afterwards. */
+  const unverified = status === 'unverified';
   const base = explorerBase(approval.chainId);
 
   return (
@@ -338,6 +340,7 @@ export function ApprovalRow({
                     : revoking
                       ? 'rgba(239,68,68,0.6)'
                       : 'var(--risk-critical)',
+                opacity: unverified ? 0.75 : 1,
                 border: !canRevoke ? '1px solid rgba(255,255,255,0.08)' : 'none',
                 cursor: !canRevoke || revoking || revoked ? 'default' : 'pointer',
                 transition: 'opacity .2s',
@@ -347,11 +350,13 @@ export function ApprovalRow({
                 ? 'Revoke needs the wallet'
                 : revoked
                   ? 'Revoked'
-                  : status === 'signing'
-                    ? 'Confirm in your wallet…'
-                    : status === 'pending'
-                      ? 'Confirming on chain…'
-                      : 'Revoke permission'}
+                  : unverified
+                    ? 'Still allowed — check'
+                    : status === 'signing'
+                      ? 'Confirm in your wallet…'
+                      : status === 'pending'
+                        ? 'Confirming on chain…'
+                        : 'Revoke permission'}
             </button>
 
             {txHash && (

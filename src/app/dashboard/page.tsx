@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
 
 import { ApprovalRow } from '@/components/approval-row';
@@ -32,6 +32,41 @@ function chainBadge(chainId: number) {
   return chainId === 11155111
     ? { label: 'Testnet', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' }
     : { label: 'Mainnet', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' };
+}
+
+/*
+ * Deep-link parsing.
+ *
+ * The query string has to be read during the first render, not in an effect: Next
+ * normalises the URL of a static route during hydration and the parameters are gone
+ * by the time effects run. Reading it here is a pure read plus a per-page-load cache,
+ * so every later render sees the same value and the markup the server sent still
+ * matches the markup the client renders.
+ */
+interface DeepLink {
+  address: string;
+  chainId: number;
+  view: 'approvals' | 'incident';
+}
+
+let deepLinkCache: DeepLink | null | undefined;
+
+function deepLinkOnce(): DeepLink | null {
+  if (deepLinkCache !== undefined) return deepLinkCache;
+  if (typeof window === 'undefined') return null;
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get('address')?.trim().toLowerCase() ?? '';
+  if (!/^0x[0-9a-f]{40}$/.test(raw)) {
+    deepLinkCache = null;
+    return deepLinkCache;
+  }
+  const requested = Number(params.get('chain'));
+  deepLinkCache = {
+    address: raw,
+    chainId: isSupportedChainId(requested) ? requested : 1,
+    view: params.get('view') === 'incident' ? 'incident' : 'approvals',
+  };
+  return deepLinkCache;
 }
 
 function Backdrop() {
@@ -164,6 +199,55 @@ export default function Dashboard() {
   const [incidentError, setIncidentError] = useState<string | null>(null);
 
   const incident = incidentRun && incidentRun.key === accountKey ? incidentRun.incident : null;
+
+  /*
+   * Deep links.
+   *
+   * A scan is only useful if it can be handed to someone else, so
+   * /dashboard?address=0x…&chain=11155111&view=incident opens straight onto the
+   * reconstruction with the scan already running. This is how the project is meant
+   * to be shared: one click from the README, from a submission page, or from a
+   * message to whoever needs to see it. Nothing else about the URL is read, and a
+   * malformed link falls back to the normal empty state rather than an error.
+   */
+  const deepLink = deepLinkOnce();
+
+  useEffect(() => {
+    if (!deepLink) return;
+    const timer = setTimeout(() => {
+      setWatchInput(deepLink.address);
+      startReadOnly(deepLink.address, deepLink.chainId);
+      if (deepLink.view === 'incident') setTab('incident');
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [deepLink, startReadOnly]);
+
+  /*
+   * Keep the URL in step with what is on screen, so any view can be shared.
+   *
+   * The first run is skipped on purpose: on mount the incoming link is the source of
+   * truth, and rewriting it before applyDeepLink has settled would strip the address
+   * out of a URL that was just pasted in.
+   */
+  const urlReady = useRef(false);
+  useEffect(() => {
+    if (!urlReady.current) {
+      urlReady.current = true;
+      return;
+    }
+    const params = new URLSearchParams();
+    if (activeAddress) {
+      params.set('address', activeAddress);
+      if (chainId !== undefined) params.set('chain', String(chainId));
+      if (tab === 'incident') params.set('view', 'incident');
+    }
+    const query = params.toString();
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}${query ? `?${query}` : ''}`,
+    );
+  }, [activeAddress, chainId, tab]);
 
   const loadApprovals = useCallback(async (wallet: string, network: number) => {
     setLoading(true);
@@ -306,6 +390,8 @@ export default function Dashboard() {
         id: approval.id,
         tokenAddress: approval.token.address,
         spenderAddress: approval.spenderAddress,
+        chainId: approval.chainId,
+        owner: approval.walletAddress,
       });
       if (activeAddress && chainId !== undefined) refreshAfterRevoke(activeAddress, chainId);
     },
@@ -319,6 +405,8 @@ export default function Dashboard() {
         id: approval.id,
         tokenAddress: approval.token.address,
         spenderAddress: approval.spenderAddress,
+        chainId: approval.chainId,
+        owner: approval.walletAddress,
       })),
     );
     if (activeAddress && chainId !== undefined) refreshAfterRevoke(activeAddress, chainId);
@@ -332,6 +420,8 @@ export default function Dashboard() {
         id: approval.id,
         tokenAddress: approval.token.address,
         spenderAddress: approval.spenderAddress,
+        chainId: approval.chainId,
+        owner: approval.walletAddress,
       }));
     await revoke.revokeMany(targets);
     if (activeAddress && chainId !== undefined) refreshAfterRevoke(activeAddress, chainId);
@@ -365,28 +455,6 @@ export default function Dashboard() {
               {connectError}
             </div>
           )}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 320 }}>
-            {WALLETS.map((wallet) => (
-              <button
-                key={wallet.id}
-                onClick={() => handleConnect(wallet.id)}
-                disabled={isPending}
-                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text)', fontSize: 14, fontWeight: 500, cursor: isPending ? 'wait' : 'pointer', textAlign: 'left' }}
-              >
-                {wallet.name}
-                <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-tertiary)' }}>
-                  {isPending ? 'Connecting…' : '→'}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <div style={{ width: '100%', maxWidth: 470, display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-tertiary)', fontSize: 12 }}>
-            <span style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
-            or inspect any address without connecting
-            <span style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
-          </div>
-
           <form
             onSubmit={(event) => {
               event.preventDefault();
@@ -428,6 +496,28 @@ export default function Dashboard() {
             Read-only mode reads public chain data only. It cannot sign anything: revoking requires
             connecting the wallet that owns the address.
           </p>
+
+          <div style={{ width: '100%', maxWidth: 470, display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-tertiary)', fontSize: 12 }}>
+            <span style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+            or connect a wallet to revoke
+            <span style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 320 }}>
+            {WALLETS.map((wallet) => (
+              <button
+                key={wallet.id}
+                onClick={() => handleConnect(wallet.id)}
+                disabled={isPending}
+                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text)', fontSize: 14, fontWeight: 500, cursor: isPending ? 'wait' : 'pointer', textAlign: 'left' }}
+              >
+                {wallet.name}
+                <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-tertiary)' }}>
+                  {isPending ? 'Connecting…' : '→'}
+                </span>
+              </button>
+            ))}
+          </div>
 
           <p style={{ fontSize: 12, color: 'var(--text-tertiary)', maxWidth: 430, lineHeight: 1.6 }}>
             No wallet? Install{' '}
@@ -584,7 +674,15 @@ export default function Dashboard() {
               Dashboard
             </p>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px,3vw,32px)', fontWeight: 400, lineHeight: 1.2 }}>
-              Wallet <span style={{ color: 'var(--blue-light)' }}>permissions</span>
+              {tab === 'incident' ? (
+                <>
+                  Incident <span style={{ color: 'var(--blue-light)' }}>reconstruction</span>
+                </>
+              ) : (
+                <>
+                  Wallet <span style={{ color: 'var(--blue-light)' }}>permissions</span>
+                </>
+              )}
             </h1>
             <p style={{ marginTop: 8, fontSize: 13, fontFamily: 'monospace', color: 'var(--text-tertiary)' }}>
               {activeAddress}
