@@ -1,5 +1,7 @@
 <div align="center">
-  <img src="public/logo.png" alt="Anchrion" width="100" />
+  <!-- docs/logo.png, not public/logo.png: GitHub caches images by URL, so a mark
+       that changes at the same path keeps rendering the old one. -->
+  <img src="docs/logo.png" alt="Anchrion" width="96" />
 
   # Anchrion
 
