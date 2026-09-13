@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Anchrion — pitch deck</title>
+<meta name="description" content="Anchrion: see how a drain happened, then close what is still open. A wallet permission scanner and incident reconstruction. Problem, solution, innovation, impact, future scope."/>
+<meta property="og:title" content="Anchrion — pitch deck"/>
+<meta property="og:description" content="See how a drain happened, then close what is still open. Problem, solution, innovation, impact and future scope."/>
+<meta property="og:type" content="website"/>
+<link rel="icon" href="/favicon.png?v=2" sizes="any" type="image/png"/>
+<link rel="icon" href="/favicon.ico?v=2"/>
+<link rel="apple-touch-icon" href="/logo.png?v=2"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════════════════════════════════════════════════════════════════
+   ANCHRION — pitch deck
+   Same token block as the landing page and the app, so the deck is the same
+   product rather than a slide theme in its own colours.
+
+   Reading it: scroll, or use ← → / space / Home / End. The dot rail jumps.
+   Printing it: Ctrl+P → Save as PDF gives one slide per landscape page. The
+   screen and print layouts are the same markup at two sizes.
+   ══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --paper:#f4f4f5;--grid-line:#e7e7ea;--card:#fff;--line:#e5e7eb;
+  --ink:#17181c;--ink-soft:#3f3f46;--muted:#6b7280;--faint:#9ca3af;
+  --indigo:#3c56f0;--indigo-600:#3247d4;--indigo-wash:#eef1ff;
+  --blue:#2563eb;--safe:#16a34a;--warn:#f5a623;--risk:#ef4444;
+  --r-pill:999px;--r-lg:26px;--r-md:18px;--r-sm:12px;
+  --sh-card:0 1px 2px rgba(16,24,40,.05),0 16px 44px rgba(16,24,40,.07);
+  --sh-pill:0 2px 6px rgba(16,24,40,.08);
+  --sh-primary:0 10px 24px rgba(60,86,240,.30);
+  --font-display:'Archivo Black',Inter,system-ui,sans-serif;
+  --font-body:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --slide-h:100vh;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);background:var(--paper);color:var(--ink);
+  line-height:1.55;-webkit-font-smoothing:antialiased;
+}
+/* The graph paper, faded out before the content — same as the landing page. */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(var(--grid-line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:30px 30px;
+  -webkit-mask-image:linear-gradient(180deg,#000 0,#000 58%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0,#000 58%,transparent 100%);
+}
+a{color:inherit;text-decoration:none}
+
+/* ── Slides ───────────────────────────────────────────────────────────── */
+.deck{position:relative;z-index:1}
+.slide{
+  min-height:var(--slide-h);
+  display:flex;align-items:center;justify-content:center;
+  padding:clamp(28px,5vh,64px) clamp(20px,4vw,56px);
+  scroll-snap-align:start;
+}
+.slide-inner{width:100%;max-width:1080px}
+.slide-body{
+  background:var(--card);border-radius:var(--r-lg);
+  box-shadow:var(--sh-card);padding:clamp(26px,3.4vw,52px);
+}
+.kicker{
+  font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--indigo);margin-bottom:14px;
+}
+.display{
+  font-family:var(--font-display);font-weight:400;letter-spacing:-.03em;line-height:1.06;
+  text-shadow:.04em .04em 0 var(--ink-soft);
+}
+h1.display{font-size:clamp(30px,5.4vw,60px)}
+h2.display{font-size:clamp(23px,3.4vw,40px);margin-bottom:18px}
+p{font-size:clamp(14px,1.25vw,17px);color:var(--ink-soft)}
+.lede{font-size:clamp(16px,1.7vw,21px);font-weight:600;color:var(--ink-soft)}
+.mono{font-family:var(--font-mono)}
+.muted{color:var(--muted)}
+.faint{color:var(--faint)}
+strong{font-weight:800;color:var(--ink)}
+
+/* ── Title slide ──────────────────────────────────────────────────────── */
+.title-slide{text-align:center}
+.title-slide img{width:76px;height:76px;display:block;margin:0 auto 22px}
+.wordmark{
+  font-family:var(--font-display);font-size:clamp(34px,6vw,66px);letter-spacing:-.04em;
+  text-shadow:.04em .04em 0 var(--ink-soft);
+}
+.title-lede{margin:16px auto 6px;max-width:640px}
+.title-meta{
+  margin-top:26px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+}
+.chip{
+  display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--r-pill);
+  background:#fff;border:1px solid var(--line);box-shadow:var(--sh-pill);
+  font-size:12.5px;font-weight:700;color:var(--ink);
+}
+.chip.dark{background:var(--indigo);border-color:var(--indigo);color:#fff;box-shadow:var(--sh-primary)}
+
+/* ── Layout helpers ───────────────────────────────────────────────────── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,2.6vw,38px)}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.stack{display:flex;flex-direction:column;gap:14px}
+/* Screen only. A width query also fires while a printer lays the page out, which
+   collapsed these grids into one tall column and pushed the last cards off the
+   sheet. Print has its own fixed page width, so it must never reflow. */
+@media screen and (max-width:760px){.two,.three{grid-template-columns:1fr}}
+
+.step{
+  background:#fff;border:1px solid var(--line);border-radius:var(--r-md);
+  box-shadow:var(--sh-card);padding:22px 20px;
+}
+.step-n{
+  font-family:var(--font-display);font-size:13px;color:#fff;background:var(--indigo);
+  width:30px;height:30px;border-radius:10px;display:grid;place-items:center;margin-bottom:14px;
+}
+.step h3{font-size:16px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
+.step p{font-size:14px;color:var(--muted)}
+
+/* ── Comparison table ─────────────────────────────────────────────────── */
+.table-scroll{overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;min-width:660px;background:#fff}
+thead th{
+  font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
+  font-weight:700;background:#fafafb;text-align:left;padding:12px 14px;
+  border-bottom:1px solid var(--line);vertical-align:bottom;line-height:1.3;
+}
+tbody td{padding:13px 14px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr.hero{background:var(--indigo-wash)}
+tbody tr.hero td{font-weight:600}
+.tool{font-weight:700}
+.tool span{display:block;font-size:11.5px;color:var(--faint);font-weight:400;margin-top:2px}
+.pill{
+  display:inline-flex;align-items:center;padding:4px 11px;border-radius:var(--r-pill);
+  font-size:11px;font-weight:700;white-space:nowrap;
+}
+.pill-yes{background:#e9f8ef;color:var(--safe)}
+.pill-no{background:#f1f2f4;color:var(--faint)}
+
+/* ── Numbers ──────────────────────────────────────────────────────────── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:6px}
+@media screen and (max-width:760px){.stats{grid-template-columns:1fr}}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--sh-card);padding:20px}
+.stat .n{font-family:var(--font-display);font-size:clamp(22px,3vw,34px);letter-spacing:-.03em;line-height:1.05}
+.stat .l{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.stat .d{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+.stat.risk .n{color:var(--risk)}
+.stat.safe .n{color:var(--safe)}
+
+.quote{
+  border-left:3px solid var(--indigo);padding:6px 0 6px 18px;margin-top:20px;
+  font-size:14.5px;color:var(--ink-soft);font-style:italic;
+}
+ul.checks{list-style:none;display:flex;flex-direction:column;gap:12px}
+ul.checks li{display:flex;gap:12px;font-size:14.5px;color:var(--ink-soft);line-height:1.6}
+ul.checks i{
+  flex:0 0 9px;width:9px;height:9px;border-radius:50%;background:var(--indigo);margin-top:7px;
+}
+ul.checks i.warn{background:var(--warn)}
+.note{
+  margin-top:20px;padding:16px 18px;border-radius:var(--r-md);
+  background:#fafafb;border:1px dashed var(--line);font-size:13px;color:var(--muted);line-height:1.6;
+}
+.note b{color:var(--ink)}
+
+/* ── Chrome: rail, counter, print button ──────────────────────────────── */
+.rail{
+  position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:20;
+  display:flex;flex-direction:column;gap:8px;align-items:center;
+}
+.rail button{
+  width:9px;height:9px;border-radius:50%;background:#d4d4d8;border:0;padding:0;cursor:pointer;
+  transition:background .15s ease,transform .15s ease;
+}
+.rail button[aria-current="true"]{background:var(--indigo);transform:scale(1.45)}
+.counter{
+  position:fixed;left:16px;bottom:16px;z-index:20;
+  font-family:var(--font-mono);font-size:12px;color:var(--muted);
+  background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:var(--r-pill);
+  padding:6px 13px;box-shadow:var(--sh-pill);backdrop-filter:blur(8px);
+}
+.print-btn{
+  position:fixed;right:16px;bottom:16px;z-index:20;
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--indigo);color:#fff;border:0;border-radius:var(--r-pill);
+  padding:10px 18px;font-size:13px;font-weight:700;font-family:var(--font-body);
+  box-shadow:var(--sh-primary);cursor:pointer;
+}
+@media screen and (max-width:760px){.rail{display:none}.counter{bottom:auto;top:12px}}
+
+/* ── Print: one slide per landscape page, no chrome ───────────────────── */
+@page{size:A4 landscape;margin:0}
+@media print{
+  html,body{background:#f4f4f5}
+  body::before{display:none}
+  .rail,.counter,.print-btn{display:none!important}
+  /*
+   * Top-aligned on purpose. The on-screen slide centres its content, and with
+   * `overflow:hidden` on a fixed 794px page a slide that runs a few pixels over
+   * loses text from BOTH ends -- the future-scope slide was silently losing its
+   * headline off the top and its sixth item off the bottom. Anchoring to the top
+   * means any residual overflow can only ever clip the bottom, and the tighter
+   * spacing below keeps the tallest slide inside the page in the first place.
+   */
+  .slide{
+    min-height:0;height:794px;width:1123px;
+    align-items:flex-start;
+    padding:40px 58px;overflow:hidden;
+    break-after:page;page-break-after:always;
+  }
+  .slide:last-child{break-after:auto;page-break-after:auto}
+  .slide-inner{max-width:none}
+  .slide-body{box-shadow:none;border:1px solid var(--line);padding:32px 44px}
+  .three{gap:12px}
+  .two{gap:22px}
+  .step{padding:15px 16px}
+  .step p{font-size:13px;line-height:1.5}
+  h1.display{font-size:52px}
+  h2.display{font-size:32px;margin-bottom:14px}
+  p{font-size:15px}
+  .lede{font-size:18px}
+  a{color:var(--ink-soft)}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="rail" id="rail" aria-label="Slide navigation"></div>
+<div class="counter" id="counter" aria-live="polite">1 / 12</div>
+<button class="print-btn" onclick="window.print()" title="Save as PDF (landscape)">Save as PDF</button>
+
+<div class="deck" id="deck">
+
+  <!-- 1 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Title">
+    <div class="slide-inner title-slide">
+      <img src="/logo.svg" alt="" width="76" height="76"/>
+      <p class="wordmark">Anchrion</p>
+      <p class="lede title-lede">See how a drain happened.<br/>Then close what is still open.</p>
+      <p class="muted" style="font-size:14.5px">
+        Paste any wallet address. See the permission that moved the funds — and what the same
+        address can still reach.
+      </p>
+      <div class="title-meta">
+        <span class="chip dark">Live: anchrion.sithunyein.com</span>
+        <span class="chip">github.com/thesithunyein/anchrion</span>
+        <span class="chip">3rd-Web-Hack · Blockchain / Open Ended Web</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Problem">
+    <div class="slide-inner">
+      <div class="slide-body">
+        <p class="kicker">Problem</p>
+        <h2 class="display">A drain takes seconds. The hour after it takes hours.</h2>
+        <div class="two" style="margin-top:22px">
+          <div>
+            <p><strong>Who has this problem.</strong> Someone whose wallet was emptied by a
+            transaction they did not sign — which means no private key was stolen. A permission
+            they granted once, months ago, was used to move the tokens.</p>
+            <p style="margin-top:14px"><strong>What they have to work with today.</strong> An empty
+            wallet, a transaction they cannot read, and eleven permissions left — three of them
+            unlimited — with no way to tell which one was spent, or whether the same address can
+            still reach the rest.</p>
+          </div>
+          <div>
+            <p><strong>The question nobody answers.</strong> Not "is this signature dangerous?"
+            and not "what have I approved?". The unanswered one is:</p>
+            <p class="quote">Which permission was used against me — and can it still reach me?</p>
+            <p class="muted" style="margin-top:16px;font-size:14px">
+              They solve it by hand: scrolling a block explorer, matching an outflow to a
+              token contract, guessing at an allowance page that lists everything the wallet ever
+              granted, and revoking whichever name looks most suspicious — usually after the
+              second drain, not before it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Why existing tools do not answer it">
+    <div class="slide-inner">
+      <div class="slide-body">
+        <p class="kicker">Problem</p>
+        <h2 class="display">The tools people already have are answering different questions.</h2>
+        <p style="margin-bottom:20px">Each row is what that product is built to answer, taken from
+        its own published description. These are mature, working tools — simulation is why drainer
+        losses fell. This is a different hour of the same day.</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Tool</th>
+                <th>Built to answer</th>
+                <th>Warns before you sign</th>
+                <th>Revokes</th>
+                <th>Names the permission used</th>
+                <th>Rebuilds a past incident</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="tool">Wallet simulation<span>Rabby · MetaMask · Blockaid</span></td>
+                <td>&ldquo;Is this signature dangerous?&rdquo;</td>
+                <td><span class="pill pill-yes">yes</span></td>
+                <td><span class="pill pill-no">no</span></td>
+                <td><span class="pill pill-no">no</span></td>
+                <td><span class="pill pill-no">no</span></td>
+              </tr>
+              <tr>
+                <td class="tool">Revoke.cash<span>inventory + exploit checker</span></td>
+                <td>&ldquo;What have I approved?&rdquo;</td>
+                <td><span class="pill pill-no">no</span></td>
+                <td><span class="pill pill-yes">yes</span></td>
+                <td><span class="pill pill-no">no</span></td>
+                <td><span class="pill pill-no">no</span></td>
+              </tr>
+              <tr>
+                <td class="tool">Etherscan<span>transaction viewer</span></td>
+                <td>&ldquo;What did this transaction do?&rdquo;</td>
+                <td><span class="pill pill-no">no</span></td>
+                <td><span class="pill pill-no">no</span></td>
+                <td><span class="pill pill-no">no</span></td>
+                <td><span class="pill pill-no">no</span></td>
+              </tr>
+              <tr class="hero">
+                <td class="tool">Anchrion<span>permission reconstruction</span></td>
+                <td>&ldquo;Which permission was used against me, and can it still reach me?&rdquo;</td>
+                <td><span class="pill pill-no">no</span></td>
+                <td><span class="pill pill-yes">yes</span></td>
+                <td><span class="pill pill-yes">yes</span></td>
+                <td><span class="pill pill-yes">yes</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="muted" style="margin-top:16px;font-size:13px">
+          Anchrion is not preventive, and the table says so in its own row. It is the hour after.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Solution">
+    <div class="slide-inner">
+      <div class="slide-body">
+        <p class="kicker">Solution</p>
+        <h2 class="display">One address in. The permission, the outflows it explains, and what is still open.</h2>
+        <div class="three" style="margin-top:8px">
+          <div class="step">
+            <p class="step-n">01</p>
+            <h3>Paste an address</h3>
+            <p>Five networks. No wallet, no install, no API keys — so you can inspect an address you
+            do not own, including the one that just drained you.</p>
+          </div>
+          <div class="step">
+            <p class="step-n">02</p>
+            <h3>Read the reconstruction</h3>
+            <p>Approvals are read live from each token contract. Outflows are paired with the address
+            that submitted them, and with the permission that made them possible.</p>
+          </div>
+          <div class="step">
+            <p class="step-n">03</p>
+            <h3>Revoke, then verify</h3>
+            <p>Connect the wallet that owns the address and sign. The allowance is read back from
+            the contract: a surviving allowance is reported as still allowed, never as a green tick.</p>
+          </div>
+        </div>
+        <div class="note">
+          <b>Not a wallet replacement, and not a bank.</b> Anchrion never asks for a private key,
+          cannot move funds, and ships no list of malicious addresses. Revoking is a transaction your
+          own wallet signs; Anchrion reads the chain before and after it.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Innovation — the reconstruction">
+    <div class="slide-inner">
+      <div class="slide-body">
+        <p class="kicker">Innovation · 1 of 3</p>
+        <h2 class="display">An outflow is evidence only if you can pair it with the permission that let it out.</h2>
+        <div class="two" style="margin-top:18px">
+          <div>
+            <ul class="checks">
+              <li><i></i><span><strong>Tokens that left inside transactions the wallet did not
+              send.</strong> That is the drain fingerprint: a key was not used, so something else
+              authorised the transfer.</span></li>
+              <li><i></i><span><strong>The submitting address, named.</strong> Not "suspicious
+              contract" — the exact address that landed the transaction, on every row.</span></li>
+              <li><i></i><span><strong>Whether that address still holds a live permission right
+              now.</strong> That is what turns a list of transfers into a containment list.</span></li>
+            </ul>
+          </div>
+          <div>
+            <div class="note" style="margin-top:0">
+              <b>The part we refuse to overstate.</b> A transfer with no live permission behind it is
+              <em>not</em> proof of theft. A permit signature leaves nothing on chain until it is
+              redeemed, and a transaction the wallet signed itself can be submitted by a relayer.
+              Both look identical to us, so the panel names them instead of accusing —
+              <span class="mono">No live permission from this address. Either a permit signature, or
+              a relayed transaction you signed.</span>
+            </div>
+            <p class="muted" style="margin-top:14px;font-size:13px">
+              A tool that cries theft on ambiguous evidence is worse than one that reports what it
+              measured.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Innovation — containment">
+    <div class="slide-inner">
+      <div class="slide-body">
+        <p class="kicker">Innovation · 2 of 3</p>
+        <h2 class="display">The first drain already happened. The second one is the one we close.</h2>
+        <div class="two" style="margin-top:18px">
+          <div>
+            <ul class="checks">
+              <li><i></i><span><strong>Attacker family, not a single address.</strong> Approvals are
+              grouped by the address that deployed the spender — falling back to bytecode hash — so a
+              drainer's sibling contracts appear together instead of one at a time.</span></li>
+              <li><i></i><span><strong>One-click revoke of the whole family</strong>, executed
+              sequentially and verified one by one, because a batch that reports success while
+              allowances survive is how people get drained twice.</span></li>
+              <li><i></i><span><strong>Exposure that is measured, never estimated up.</strong>
+              Exposure is capped at the wallet's real balance, so an unlimited permission cannot
+              produce a scary number that is not actually reachable.</span></li>
+            </ul>
+          </div>
+          <div>
+            <div class="stats" style="grid-template-columns:1fr">
+              <div class="stat">
+                <p class="l">Live, on mainnet</p>
+                <p class="n mono" style="font-size:clamp(18px,2.2vw,26px)">768,161.778096 <span class="muted" style="font-size:.6em">USDC</span></p>
+                <p class="d">One real permission on a real wallet, read from the token contract and
+                matched against an independent <span class="mono">eth_call</span> during review.</p>
+              </div>
+              <div class="stat risk">
+                <p class="l">Reachable through it</p>
+                <p class="n">$540,082</p>
+                <p class="d">Capped at the wallet's balance, priced live — the figure a person needs
+                in order to decide whether to act now.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Innovation — refusing to guess">
+    <div class="slide-inner">
+      <div class="slide-body">
+        <p class="kicker">Innovation · 3 of 3</p>
+        <h2 class="display">&ldquo;Not measured&rdquo; is not &ldquo;safe&rdquo; — and the product says so in the interface.</h2>
+        <p style="margin-bottom:20px">Every scan ships with the list of checks that ran and the ones
+        that could not be completed. It is the difference between a scanner you trust and one that
+        looks complete.</p>
+        <div class="two">
+          <div>
+            <ul class="checks">
+              <li><i></i><span>How many transactions, token transfers and approval events were
+              actually decoded.</span></li>
+              <li><i></i><span>The log window that was <strong>validated as complete</strong>, and a
+              note when a wider range was answered but demonstrably incomplete.</span></li>
+              <li><i></i><span>How many allowance pairs were read on chain, and how
+              many permissions were granted and later revoked.</span></li>
+            </ul>
+          </div>
+          <div>
+            <ul class="checks">
+              <li><i class="warn"></i><span>Risk factors are tagged <span class="mono">detected</span>
+              or <span class="mono">estimated</span>, so a heuristic can never launder itself into a
+              measurement.</span></li>
+              <li><i class="warn"></i><span>Money and score are separate numbers: a $540,000
+              permission scores <strong>15</strong> when no danger signal fired. Correct — and the
+              page says to read the two together.</span></li>
+              <li><i class="warn"></i><span>An empty result is presented as a measurement, with the
+              coverage panel attached, not as a failure or an all-clear.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Technical feasibility">
+    <div class="slide-inner">
+      <div class="slide-body">
+        <p class="kicker">Technical feasibility</p>
+        <h2 class="display">It runs from a fresh clone with no signup, no key and no indexer.</h2>
+        <div class="two" style="margin-top:18px">
+          <div>
+            <ul class="checks">
+              <li><i></i><span><strong>Reads.</strong> Live allowance per token via
+              <span class="mono">eth_call</span>, spender bytecode, deployment age and verification
+              status, and owner-filtered approval logs — over public RPC with measured fallbacks, plus
+              keyless explorer endpoints for history.</span></li>
+              <li><i></i><span><strong>Writes.</strong> The only transaction is the one your wallet
+              signs to set an allowance to zero. There is nothing to trust Anchrion with.</span></li>
+              <li><i></i><span><strong>Networks.</strong> Ethereum, Base, Arbitrum One, Optimism and
+              Sepolia — every endpoint probed for capability before it was added, and
+              endpoints that silently truncate log queries are deliberately excluded.</span></li>
+            </ul>
+          </div>
+          <div>
+            <ul class="checks">
+              <li><i></i><span><strong>Pricing.</strong> Live values with a dated static snapshot as
+              a labelled fallback, so "unpriced" is never rendered as zero.</span></li>
+              <li><i></i><span><strong>Reproducible.</strong> Scripts recompute a scan's coverage
+              numbers independently, and the published risk model lets anyone recompute a score by
+              hand and argue with it.</span></li>
+              <li><i></i><span><strong>Stack.</strong> Next.js 16, TypeScript, viem and wagmi, MIT
+              licensed, single repository, deployed and live.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Impact">
+    <div class="slide-inner">
+      <div class="slide-body">
+        <p class="kicker">Impact</p>
+        <h2 class="display">Every hour a live permission stays granted is an hour it can be spent again.</h2>
+        <div class="stats" style="margin-top:20px">
+          <div class="stat">
+            <p class="l">For the victim</p>
+            <p class="n">Hours → minutes</p>
+            <p class="d">The manual job — explorer, token contract, allowance page, guesswork — becomes
+            one scan with the permission named and the exposure priced.</p>
+          </div>
+          <div class="stat risk">
+            <p class="l">At risk per wallet</p>
+            <p class="n">$540,082</p>
+            <p class="d">Measured on one real address during review, reachable through a single
+            permission that was still granted at the time of the scan.</p>
+          </div>
+          <div class="stat safe">
+            <p class="l">Cost to run</p>
+            <p class="n">$0</p>
+            <p class="d">No API keys, no signup, no paid indexer. A tool that needs a subscription is
+            not available at 3am on the worst night of someone's year.</p>
+          </div>
+        </div>
+        <div class="note">
+          <b>What we do not claim.</b> Anchrion cannot recover funds, and it reports no adoption
+          numbers because it has none yet. The impact today is that <em>what is still reachable</em>
+          becomes a measurement a person can act on, and that a second drain can be closed before it
+          happens. Honest reach beats an invented metric.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 ────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Limits">
+    <div class="slide-inner">
+      <div class="slide-body">
+        <p class="kicker">Limits</p>
+        <h2 class="display">The boundaries are part of the product, not an omission.</h2>
+        <div class="two" style="margin-top:18px">
+          <div>
+            <ul class="checks">
+              <li><i class="warn"></i><span><strong>ERC-20 allowances only.</strong> ERC-721 and
+              ERC-1155 approvals are not covered today.</span></li>
+              <li><i class="warn"></i><span><strong>Off-chain permits are invisible.</strong> Permit2,
+              ERC-2612 and Seaport signatures leave no trace on chain until they are redeemed, so no
+              scanner can see them from here — including this one.</span></li>
+            </ul>
+          </div>
+          <div>
+            <ul class="checks">
+              <li><i class="warn"></i><span><strong>History is bounded.</strong> Approval events are
+              read over a validated block window; a permission older than the readable window that
+              never touched the wallet's history can be missed, and the coverage panel says
+              so.</span></li>
+              <li><i class="warn"></i><span><strong>No threat feed.</strong> Anchrion ships no list of
+              malicious addresses and will not call an address an attacker without on-chain evidence.
+              That is a deliberate limit, not an oversight.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 ────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Future scope">
+    <div class="slide-inner">
+      <div class="slide-body">
+        <p class="kicker">Future scope</p>
+        <h2 class="display">The next three things, in the order they unlock the most.</h2>
+        <div class="three" style="margin-top:8px">
+          <div class="step">
+            <p class="step-n">01</p>
+            <h3>Permit reconciliation</h3>
+            <p>Match Permit2, ERC-2612 and Seaport nonces to outflows, so the ambiguous rows in the
+            reconstruction become attributable instead of named as unknown.</p>
+          </div>
+          <div class="step">
+            <p class="step-n">02</p>
+            <h3>Full history, not a window</h3>
+            <p>A self-hosted log index so an old permission is always in reach, and the coverage
+            panel stops needing a bound to disclose.</p>
+          </div>
+          <div class="step">
+            <p class="step-n">03</p>
+            <h3>Watch mode</h3>
+            <p>Standing consent to alert on a new unlimited grant or a fresh approval to a
+            freshly-deployed spender — stopping the drain before it happens, from the same evidence
+            base.</p>
+          </div>
+        </div>
+        <div class="three" style="margin-top:16px">
+          <div class="step">
+            <p class="step-n">04</p>
+            <h3>NFT and smart-account approvals</h3>
+            <p>ERC-721/1155 operator approvals, and the delegation patterns used by account
+            abstraction wallets.</p>
+          </div>
+          <div class="step">
+            <p class="step-n">05</p>
+            <h3>Batch revoke in one signature</h3>
+            <p>A multicall so closing a family costs one wallet confirmation instead of six.</p>
+          </div>
+          <div class="step">
+            <p class="step-n">06</p>
+            <h3>Where the warning already lives</h3>
+            <p>Open this reconstruction from inside the drain warning a wallet already shows —
+            the same evidence, at the moment a person is still looking.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 ────────────────────────────────────────────────────────────── -->
+  <section class="slide" aria-label="Close">
+    <div class="slide-inner">
+      <div class="slide-body" style="text-align:center">
+        <p class="kicker">Anchrion</p>
+        <h2 class="display">Understand what happened, and what can still be taken.</h2>
+        <p class="lede" style="max-width:640px;margin:0 auto">
+          Public chain data only. No wallet, no API keys, five networks. MIT licensed.
+        </p>
+        <div class="title-meta" style="margin-top:26px">
+          <a class="chip dark" href="/dashboard">Open the dashboard</a>
+          <a class="chip" href="/method">Risk model and limits</a>
+          <a class="chip" href="https://github.com/thesithunyein/anchrion" target="_blank" rel="noopener noreferrer">Source on GitHub</a>
+        </div>
+        <p class="faint" style="margin-top:24px;font-size:12.5px">
+          It never asks for a private key and cannot move your funds. Revoking sends a transaction
+          your own wallet signs, and the allowance is read back from the token contract afterwards.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/*
+ * Slide navigation. The deck is a plain stack of sections, so it is fully
+ * readable and printable with JavaScript disabled — this only adds the rail,
+ * the counter and the keyboard shortcuts on top.
+ */
+(function () {
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var rail = document.getElementById('rail');
+  var counter = document.getElementById('counter');
+  var current = 0;
+
+  slides.forEach(function (slide, index) {
+    var dot = document.createElement('button');
+    dot.type = 'button';
+    dot.setAttribute('aria-label', 'Slide ' + (index + 1));
+    dot.addEventListener('click', function () { go(index); });
+    rail.appendChild(dot);
+  });
+  var dots = [].slice.call(rail.children);
+
+  function paint() {
+    dots.forEach(function (dot, index) {
+      dot.setAttribute('aria-current', index === current ? 'true' : 'false');
+    });
+    counter.textContent = (current + 1) + ' / ' + slides.length;
+    if (location.hash !== '#' + (current + 1)) {
+      history.replaceState(null, '', '#' + (current + 1));
+    }
+  }
+
+  function go(index) {
+    current = Math.max(0, Math.min(slides.length - 1, index));
+    slides[current].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    paint();
+  }
+
+  // Keep the counter honest when the page is scrolled by hand.
+  function fromScroll() {
+    var middle = window.innerHeight / 2;
+    for (var i = 0; i < slides.length; i++) {
+      var box = slides[i].getBoundingClientRect();
+      if (box.top <= middle && box.bottom > middle) { current = i; paint(); return; }
+    }
+  }
+  window.addEventListener('scroll', fromScroll, { passive: true });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === ' ' || event.key === 'PageDown') {
+      event.preventDefault(); go(current + 1);
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp' || event.key === 'PageUp') {
+      event.preventDefault(); go(current - 1);
+    } else if (event.key === 'Home') {
+      event.preventDefault(); go(0);
+    } else if (event.key === 'End') {
+      event.preventDefault(); go(slides.length - 1);
+    }
+  });
+
+  /*
+   * Open on a specific slide: #7, or ?s=7. The query form exists because a
+   * fragment-only navigation is not a page load in some clients (and is not one
+   * in a headless capture either), so ?s=7 is the form to paste into a post.
+   */
+  var param = new URLSearchParams(location.search).get('s');
+  var start = parseInt(param || (location.hash || '').replace('#', ''), 10);
+  if (start > 1 && start <= slides.length) {
+    current = start - 1;
+    setTimeout(function () { slides[current].scrollIntoView({ block: 'start' }); }, 0);
+  }
+  paint();
+})();
+</script>
+</body>
+</html>

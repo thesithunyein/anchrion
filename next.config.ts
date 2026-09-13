@@ -21,6 +21,9 @@ const nextConfig: NextConfig = {
         { source: '/', destination: '/anchrion.html' },
       ],
       afterFiles: [
+        // The pitch deck is a static file; /deck is the link that gets shared.
+        { source: '/deck', destination: '/deck.html' },
+        { source: '/deck/', destination: '/deck.html' },
         // Kept so links shared while the study was at the root still resolve.
         { source: '/anchrion', destination: '/anchrion.html' },
         { source: '/anchrion/', destination: '/anchrion.html' },
