@@ -342,19 +342,19 @@ Two static pages live in `public/` alongside the Next.js app, and the rewrites i
 
 | Path | Serves | Source |
 |---|---|---|
+| `/` | the project landing page | `public/anchrion.html` |
 | `/dashboard` | the app — paste an address, revoke, reconstruct an incident | `src/app/dashboard` |
 | `/method` | the published risk model and its limits | `src/app/method` |
-| `/anchrion` | the project landing page | `public/anchrion.html` |
-| `/` | a separate design study, not part of Anchrion | `public/chestly/index.html` |
-| `/index.html` | alias for `/anchrion` | — |
-| `/chestly` | alias for `/` | — |
+| `/anchrion`, `/index.html` | aliases for `/` | — |
+| `/chestly` | a separate design study, shares no code with Anchrion | `public/chestly/index.html` |
 
 Two wrinkles worth knowing before you change this:
 
 1. Next.js serves files in `public/` by exact path and will **not** resolve a
    folder's `index.html`, which is why `/chestly` needs its own rewrite.
 2. Vercel serves `public/index.html` at `/` by itself, and that beats any Next
-   rewrite. There is deliberately no `public/index.html` for exactly that reason.
+   rewrite — which is why the landing is `public/anchrion.html` with the root
+   mapped explicitly. Rename it back and the platform takes the root over again.
 
 The route that matters to a reviewer is `/dashboard`; if a hosting platform has a
 stale build it will keep serving the old app until it is redeployed, so rebuild and

@@ -6,10 +6,9 @@ action, floating icon stickers, a fixed right-hand action rail and a sticky
 bottom dock.
 
 **A design study, separate from Anchrion.** It lives in this repository only as
-static files under `public/chestly/` and shares no code with the app. It is what
-the site root serves; `/chestly` still works as an alias, and the Anchrion
-project page moved to `/anchrion`. All of that is the rewrites in
-`next.config.ts` — see the comment there before changing any of it.
+static files under `public/chestly/`, shares no code with the app, and is served
+at `/chestly` by the rewrites in `next.config.ts` — see the comment there before
+changing any of it. The project itself is the site root.
 
 Open `index.html` in a browser, or visit the published path. No build, no
 server, no dependencies — the only external requests are three Google font

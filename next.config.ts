@@ -2,29 +2,31 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /*
-   * Both landing pages are static files in public/.
+   * The project landing page and an unrelated design study are both static files
+   * in public/, served alongside the Next.js app.
    *
    * Two things make this less obvious than it looks:
    *   1. Next serves public files by exact path and will not resolve a folder's
    *      index, so /chestly needs the rewrite below to reach its index.html.
-   *   2. Vercel serves public/index.html at / automatically, and that wins over
-   *      any Next rewrite. So there is deliberately no public/index.html: the
-   *      root rule lives in beforeFiles (which runs ahead of filesystem routes)
-   *      and has nothing left to compete with.
+   *   2. Vercel serves public/index.html at / automatically, and that beats any
+   *      Next rewrite. That is why the landing page here is public/anchrion.html
+   *      with the root mapped explicitly in beforeFiles (which runs ahead of
+   *      filesystem routes) — and why there is no public/index.html to compete
+   *      with it. Renaming the landing back to index.html would make the root
+   *      rule dead code and hand the root back to the platform.
    */
   async rewrites() {
     return {
       beforeFiles: [
-        { source: '/', destination: '/chestly/index.html' },
+        { source: '/', destination: '/anchrion.html' },
       ],
       afterFiles: [
-        // /chestly stays as an alias so links already shared keep working.
-        { source: '/chestly', destination: '/chestly/index.html' },
-        { source: '/chestly/', destination: '/chestly/index.html' },
+        // Kept so links shared while the study was at the root still resolve.
         { source: '/anchrion', destination: '/anchrion.html' },
         { source: '/anchrion/', destination: '/anchrion.html' },
-        // The old root path, so any link to /index.html still lands somewhere.
         { source: '/index.html', destination: '/anchrion.html' },
+        { source: '/chestly', destination: '/chestly/index.html' },
+        { source: '/chestly/', destination: '/chestly/index.html' },
       ],
       fallback: [],
     };
