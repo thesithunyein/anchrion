@@ -347,6 +347,8 @@ Two static pages live in `public/` alongside the Next.js app, and the rewrites i
 | `/` | the project landing page | `public/anchrion.html` |
 | `/dashboard` | the app — paste an address, revoke, reconstruct an incident | `src/app/dashboard` |
 | `/method` | the published risk model and its limits | `src/app/method` |
+| `/deck` | the pitch deck — twelve slides, prints to a PDF from the browser | `public/deck.html` |
+| `/anchrion-pitch-deck.pdf` | the same deck as a committed 12-page landscape PDF | `public/` |
 | `/anchrion`, `/index.html` | aliases for `/` | — |
 | `/chestly` | a separate design study, shares no code with Anchrion | `public/chestly/index.html` |
 
