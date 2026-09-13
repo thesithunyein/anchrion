@@ -100,7 +100,13 @@ export interface Approval {
   allowanceFormatted: string;
   isUnlimited: boolean;
 
-  valueAtRiskUsd: number;
+  /**
+   * USD the permission can move right now: min(live allowance, live balance) ×
+   * price. null means no figure is quoted, because the token has no known price or
+   * the balance could not be read — an unlimited permission is bounded by the
+   * balance rather than priced by a placeholder.
+   */
+  valueAtRiskUsd: number | null;
   priceSource: 'live' | 'static';
 
   riskScore: number;
@@ -202,9 +208,10 @@ export interface Incident {
   /** Remaining approvals tied to the same attacker family. */
   familyApprovals: Approval[];
   /**
-   * USD still exposed through family approvals that have a cap. Unlimited
-   * permissions are deliberately excluded: a permission with no cap has no dollar
-   * figure, and printing a placeholder as an estimate would be invented precision.
+   * USD still moveable through family approvals that have a cap and a measured
+   * figure. Unlimited permissions are kept out because nothing is capped to price,
+   * and capped ones whose token could not be priced or whose balance could not be
+   * read are counted separately rather than folded in as a zero.
    */
   stillExposedUsd: number;
   /** Family approvals with no cap at all, counted rather than priced. */

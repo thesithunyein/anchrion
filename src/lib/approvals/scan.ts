@@ -33,6 +33,7 @@ import {
 } from '@/lib/abi/erc20';
 import {
   callAllowance,
+  callBalanceOf,
   hasBytecode,
   latestBlockNumber,
   mapLimit,
@@ -516,6 +517,19 @@ export async function scanApprovals(
   const active = allowanceResults.filter(
     (result) => result.allowance !== null && result.allowance > BigInt(0),
   );
+
+  /*
+   * One balance read per token, not per pair: exposure is bounded by the wallet's
+   * holding, and every spender shares the same holding of the same token.
+   */
+  const balancesByToken = new Map<string, bigint | null>();
+  await mapLimit(
+    Array.from(new Set(active.map((result) => result.pair.tokenAddress))),
+    10,
+    async (tokenAddress) => {
+      balancesByToken.set(tokenAddress, await callBalanceOf(urls, tokenAddress, wallet));
+    },
+  );
   /*
    * A zero allowance means two different things, and conflating them would be a
    * lie. For a pair that an approval event or an approve() call proved existed,
@@ -598,15 +612,21 @@ export async function scanApprovals(
 
     const isUnlimited = isUnlimitedAllowance(allowance);
     const price = priceFor(prices.prices, token.symbol);
-    const humanAmount = isUnlimited
-      ? Number.POSITIVE_INFINITY
-      : Number(formatUnits(allowance, token.decimals));
+    /*
+     * What a permission can move is the smaller of its allowance and the wallet's
+     * live balance of that token. Pricing the allowance alone overstates it: an
+     * allowance of 1,000,000 USDC on a wallet holding 12 USDC is 12 USDC of
+     * exposure. An unlimited allowance has no figure of its own, so the balance is
+     * the whole bound — which is why the balance is read rather than substituting
+     * a placeholder that would read as a measurement.
+     */
+    const balance = balancesByToken.get(pair.tokenAddress) ?? null;
+    const reachable =
+      balance === null ? null : isUnlimited || balance < allowance ? balance : allowance;
     const valueAtRiskUsd =
-      price === null
-        ? 0
-        : isUnlimited
-          ? Math.round(price * 10_000)
-          : Math.round(humanAmount * price);
+      price === null || reachable === null
+        ? null
+        : Math.round(Number(formatUnits(reachable, token.decimals)) * price);
 
     const info = spenderInfo.get(pair.spenderAddress);
     const lastSeen = transferMetaByToken.get(pair.tokenAddress)?.lastSeen ?? null;
@@ -662,8 +682,18 @@ export async function scanApprovals(
 
   approvals.sort((a, b) => {
     if (b.riskScore !== a.riskScore) return b.riskScore - a.riskScore;
-    return b.valueAtRiskUsd - a.valueAtRiskUsd;
+    // Permissions with no dollar figure sort last among equal scores, not first.
+    return (b.valueAtRiskUsd ?? -1) - (a.valueAtRiskUsd ?? -1);
   });
+
+  const unpricedFromBalance = approvals.filter(
+    (approval) => approval.valueAtRiskUsd === null,
+  ).length;
+  if (unpricedFromBalance > 0) {
+    notes.push(
+      `${unpricedFromBalance} permission(s) are listed without a USD figure because this wallet's balance of that token, or the token's price, could not be read. Nothing is quoted rather than estimated.`,
+    );
+  }
 
   if (!explorerReachable) {
     notes.push(

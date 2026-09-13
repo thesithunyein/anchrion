@@ -162,7 +162,9 @@ export function ApprovalRow({
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: 14, fontWeight: 600 }}>
-                ${approval.valueAtRiskUsd.toLocaleString()}
+                {approval.valueAtRiskUsd === null
+                  ? 'No figure'
+                  : `$${approval.valueAtRiskUsd.toLocaleString()}`}
                 {approval.priceSource === 'static' && (
                   <span style={{ fontSize: 10, color: 'var(--text-tertiary)', marginLeft: 4 }}>est.</span>
                 )}

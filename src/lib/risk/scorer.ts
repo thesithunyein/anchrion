@@ -177,12 +177,11 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
   /*
    * Estimated: value at risk, for capped permissions only.
    *
-   * An unlimited permission has no dollar figure — the placeholder used in the UI
-   * (10,000 units at the current price) is not a measurement, and adding a factor
-   * derived from it would put invented precision into a security score. Unlimited
-   * is already scored as unlimited, above.
+   * An unlimited permission is not scored on its dollar figure: unlimited is
+   * already scored as unlimited, above, and its reachable amount is what the wallet
+   * happens to hold today rather than what the permission permits.
    */
-  if (!approval.isUnlimited) {
+  if (!approval.isUnlimited && approval.valueAtRiskUsd !== null) {
     if (approval.valueAtRiskUsd >= 10_000) {
       add({
         name: 'High value at risk',

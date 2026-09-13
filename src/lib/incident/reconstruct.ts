@@ -141,13 +141,18 @@ export async function reconstructIncident(
 
   /*
    * Exposure is reported in two parts because they are two different facts. A
-   * capped permission has a dollar figure. An unlimited one has no figure at all,
-   * and pricing it with the UI placeholder would be invented precision.
+   * capped permission has a dollar figure. An unlimited one has no cap, so the
+   * figure quoted for it would describe today's balance, not what the permission
+   * allows — that is stated separately instead of folded into the capped total.
    */
   const cappedExposure = familyApprovals.filter((approval) => !approval.isUnlimited);
   const unboundedApprovalCount = familyApprovals.length - cappedExposure.length;
-  const stillExposedUsd = cappedExposure.reduce(
-    (sum, approval) => sum + approval.valueAtRiskUsd,
+  const pricedCappedExposure = cappedExposure.filter(
+    (approval) => approval.valueAtRiskUsd !== null,
+  );
+  const unpricedCappedCount = cappedExposure.length - pricedCappedExposure.length;
+  const stillExposedUsd = pricedCappedExposure.reduce(
+    (sum, approval) => sum + (approval.valueAtRiskUsd ?? 0),
     0,
   );
 
@@ -229,8 +234,12 @@ export async function reconstructIncident(
   if (familyApprovals.length > 0) {
     narrative.push(
       `Value still reachable through the capped permissions listed above: ${usd(stillExposedUsd)}.${
+        unpricedCappedCount > 0
+          ? ` ${unpricedCappedCount} further capped permission(s) have no figure here because this wallet's balance of that token could not be read.`
+          : ''
+      }${
         unboundedApprovalCount > 0
-          ? ` A further ${unboundedApprovalCount} permission(s) are unlimited, so there is no figure to quote for those: assume everything of that token until they are revoked.`
+          ? ` A further ${unboundedApprovalCount} permission(s) are unlimited, so there is no cap to price: assume everything of that token until they are revoked.`
           : ''
       }`,
     );

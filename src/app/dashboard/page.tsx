@@ -396,9 +396,18 @@ export default function Dashboard() {
     const risky = approvals.filter((approval) => approval.riskScore >= 50).length;
     const critical = approvals.filter((approval) => approval.riskScore >= 70).length;
     const unlimited = approvals.filter((approval) => approval.isUnlimited).length;
+    /*
+     * Capped permissions only, and only where a figure was actually measured. An
+     * unlimited permission has no cap to price, and its short-term reach is the
+     * wallet's balance — counting that here would put a number on the card that the
+     * hint underneath does not describe.
+     */
     const valueAtRisk = approvals
-      .filter((approval) => approval.riskScore >= 50)
-      .reduce((sum, approval) => sum + approval.valueAtRiskUsd, 0);
+      .filter(
+        (approval) =>
+          approval.riskScore >= 50 && !approval.isUnlimited && approval.valueAtRiskUsd !== null,
+      )
+      .reduce((sum, approval) => sum + (approval.valueAtRiskUsd ?? 0), 0);
     const healthScore = total === 0 ? 100 : Math.round(((total - risky) / total) * 100);
     return { total, risky, critical, unlimited, valueAtRisk, healthScore };
   }, [approvals]);
@@ -819,7 +828,19 @@ export default function Dashboard() {
                     : stats.healthScore >= 70
                       ? 'var(--risk-safe)'
                       : 'var(--risk-high)',
-                hint: stats.total === 0 ? 'no permissions to measure' : undefined,
+                /*
+                 * The score is the share of permissions that are not risky, and
+                 * saying so under the number stops it reading as "this wallet is
+                 * safe": a wallet can hold nine unlimited permissions to a router
+                 * and still show 100% here, which is the model's arithmetic, not a
+                 * clean bill of health.
+                 */
+                hint:
+                  stats.total === 0
+                    ? 'no permissions to measure'
+                    : `${stats.total - stats.risky} of ${stats.total} permission${
+                        stats.total === 1 ? '' : 's'
+                      } score under 50`,
               },
             ].map((item) => (
               <div key={item.label} style={{ padding: '18px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>

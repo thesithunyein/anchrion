@@ -203,11 +203,14 @@ Weights are published on `/method` and in `src/lib/risk/scorer.ts`. Summary:
 | Unlimited and idle > 365 days | +10 | estimated |
 | Recognised protocol on the bundled allowlist | −20 | detected |
 
-An unlimited permission is never priced. It has no cap, so the UI shows a stated
-placeholder instead of a measurement, and the model adds no value factor for it: the
-placeholder must not become a security score. The −20 protocol discount requires an
-**address** match against the bundled list, because the contract name an explorer reports is
-chosen by whoever deployed it and must never move a score.
+Every dollar figure is a measurement, not a placeholder: exposure is the smaller of the
+live allowance and the wallet's live balance of that token, priced at the current (or a
+dated snapshot) USD rate. Where either read fails, no figure is quoted at all and the row
+says so. An unlimited permission is never scored on its dollar figure — unlimited is
+already a weight of its own, and its reachable amount is today's balance rather than what
+the permission permits. The −20 protocol discount requires an **address** match against
+the bundled list, because the contract name an explorer reports is chosen by whoever
+deployed it and must never move a score.
 
 Bands: critical ≥ 70, high ≥ 50, medium ≥ 30, low ≥ 10, otherwise safe. There is **no
 bundled threat feed** — Anchrion will not pretend to know an address is malicious unless

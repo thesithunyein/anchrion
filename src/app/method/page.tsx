@@ -60,7 +60,7 @@ const WEIGHTS: Weight[] = [
     name: 'Capped value at risk of at least $10k / $1k',
     points: '+15 / +10',
     evidence: 'estimated',
-    why: 'Allowance multiplied by a USD price, for permissions that have a cap. Price is live when reachable, otherwise a dated static snapshot, and the value is labelled an estimate either way. An unlimited permission is never priced: it has no cap, so no dollar figure is quoted for it, and it is already scored as unlimited.',
+    why: 'What the permission can actually move — the smaller of its allowance and this wallet\u2019s live token balance — multiplied by a USD price. Price is live when reachable, otherwise a dated static snapshot, and the value is labelled an estimate either way. An unlimited permission is not scored on a dollar figure: unlimited is already scored above, and its reachable amount is today\u2019s balance rather than what the permission permits.',
   },
   {
     name: 'Dormant unlimited permission (no movement in over a year)',

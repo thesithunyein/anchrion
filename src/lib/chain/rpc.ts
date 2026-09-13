@@ -85,6 +85,27 @@ export async function callAllowance(
   }
 }
 
+/**
+ * Reads the live ERC-20 balance. null means the call failed — not zero.
+ *
+ * Used to bound exposure: a permission can only move what the wallet actually
+ * holds, so the balance is read rather than assuming the allowance is reachable
+ * in full.
+ */
+export async function callBalanceOf(
+  urls: string[],
+  tokenAddress: string,
+  owner: string,
+): Promise<bigint | null> {
+  const data = `0x70a08231${pad32(owner)}`;
+  try {
+    const hex = await rpc<string>(urls, 'eth_call', [{ to: tokenAddress, data }, 'latest']);
+    return BigInt(hex);
+  } catch {
+    return null;
+  }
+}
+
 /** null means the RPC did not answer — not "no code". */
 export async function hasBytecode(urls: string[], address: string): Promise<boolean | null> {
   try {
