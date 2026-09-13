@@ -49,9 +49,10 @@ export function IncidentPanel({
       <div
         style={{
           padding: '18px 20px',
-          borderRadius: 10,
-          background: 'rgba(255,255,255,0.02)',
-          border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: 18,
+          background: 'var(--card)',
+          border: '1px solid var(--line)',
+          boxShadow: 'var(--sh-card)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -70,7 +71,7 @@ export function IncidentPanel({
             disabled={loading}
             style={{
               padding: '10px 18px',
-              borderRadius: 8,
+              borderRadius: 999,
               fontSize: 13,
               fontWeight: 600,
               color: 'white',
@@ -86,7 +87,7 @@ export function IncidentPanel({
       </div>
 
       {error && (
-        <div style={{ padding: '14px 18px', borderRadius: 10, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 13, color: '#fca5a5' }}>
+        <div style={{ padding: '14px 18px', borderRadius: 18, background: '#fdecec', border: '1px solid #f4c9c9', fontSize: 13, color: '#b91c1c' }}>
           {error}
         </div>
       )}
@@ -95,18 +96,19 @@ export function IncidentPanel({
         <div
           style={{
             padding: '18px 20px',
-            borderRadius: 10,
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            borderRadius: 18,
+            background: 'var(--card)',
+            border: '1px solid var(--line)',
+            boxShadow: 'var(--sh-card)',
           }}
         >
-          <h4 style={{ fontSize: 11, fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>
+          <h4 style={{ fontSize: 11, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--indigo)' }}>
             What happened
           </h4>
           <ol style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
             {incident.narrative.map((line, index) => (
               <li key={index} style={{ display: 'flex', gap: 12, fontSize: 14, lineHeight: 1.6 }}>
-                <span style={{ color: 'var(--blue-light)', fontFamily: 'monospace', fontSize: 12, paddingTop: 3 }}>
+                <span style={{ color: 'var(--blue-light)', fontFamily: 'var(--font-mono)', fontSize: 12, paddingTop: 3 }}>
                   {String(index + 1).padStart(2, '0')}
                 </span>
                 <span style={{ color: 'var(--text-secondary)' }}>{line}</span>
@@ -120,12 +122,13 @@ export function IncidentPanel({
         <div
           style={{
             padding: '18px 20px',
-            borderRadius: 10,
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            borderRadius: 18,
+            background: 'var(--card)',
+            border: '1px solid var(--line)',
+            boxShadow: 'var(--sh-card)',
           }}
         >
-          <h4 style={{ fontSize: 11, fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>
+          <h4 style={{ fontSize: 11, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--indigo)' }}>
             Funds that left in transactions you did not submit
           </h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -138,9 +141,9 @@ export function IncidentPanel({
                   gap: 16,
                   flexWrap: 'wrap',
                   padding: '12px 14px',
-                  borderRadius: 8,
-                  background: 'rgba(239,68,68,0.04)',
-                  border: '1px solid rgba(239,68,68,0.15)',
+                  borderRadius: 12,
+                  background: '#fef4f4',
+                  border: '1px solid #f4c9c9',
                 }}
               >
                 <div style={{ fontSize: 13 }}>
@@ -151,8 +154,8 @@ export function IncidentPanel({
                     </span>
                   </p>
                   <p style={{ color: 'var(--text-tertiary)', fontSize: 12, marginTop: 3 }}>
-                    initiated by <span style={{ fontFamily: 'monospace' }}>{short(transfer.initiatedBy)}</span> →
-                    recipient <span style={{ fontFamily: 'monospace' }}>{short(transfer.recipient)}</span>
+                    initiated by <span style={{ fontFamily: 'var(--font-mono)' }}>{short(transfer.initiatedBy)}</span> →
+                    recipient <span style={{ fontFamily: 'var(--font-mono)' }}>{short(transfer.recipient)}</span>
                     {transfer.timestamp ? ` · ${new Date(transfer.timestamp).toLocaleString()}` : ''}
                   </p>
                   {/*
@@ -160,7 +163,7 @@ export function IncidentPanel({
                     * difference between a spent approval and a relayed transaction, so it
                     * is stated on the row instead of left to the narrative.
                     */}
-                  <p style={{ fontSize: 12, marginTop: 4, color: transfer.authorizedByLivePermission ? '#fbbf24' : 'var(--text-tertiary)' }}>
+                  <p style={{ fontSize: 12, marginTop: 4, color: transfer.authorizedByLivePermission ? '#b45309' : 'var(--text-tertiary)' }}>
                     {transfer.authorizedByLivePermission
                       ? 'This address still holds a live permission on this wallet'
                       : 'No live permission from this address. Either a permit signature, or a relayed transaction you signed'}
@@ -184,14 +187,15 @@ export function IncidentPanel({
         <div
           style={{
             padding: '18px 20px',
-            borderRadius: 10,
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            borderRadius: 18,
+            background: 'var(--card)',
+            border: '1px solid var(--line)',
+            boxShadow: 'var(--sh-card)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', marginBottom: 14 }}>
             <div>
-              <h4 style={{ fontSize: 11, fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>
+              <h4 style={{ fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--indigo)' }}>
                 Still reachable by this family
               </h4>
               <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
@@ -210,14 +214,14 @@ export function IncidentPanel({
               title={canRevoke ? undefined : 'Connect the wallet that owns this address to revoke'}
               style={{
                 padding: '10px 18px',
-                borderRadius: 8,
+                borderRadius: 999,
                 fontSize: 13,
                 fontWeight: 600,
                 color: 'white',
                 background: !canRevoke
-                  ? 'rgba(255,255,255,0.08)'
+                  ? 'var(--line)'
                   : revocable.length === 0
-                    ? 'rgba(34,197,94,0.5)'
+                    ? '#15803d'
                     : 'var(--risk-critical)',
                 border: 'none',
                 cursor: !canRevoke || revocable.length === 0 ? 'default' : 'pointer',
@@ -248,9 +252,9 @@ export function IncidentPanel({
                     gap: 16,
                     flexWrap: 'wrap',
                     padding: '10px 14px',
-                    borderRadius: 8,
-                    background: 'rgba(0,0,0,0.15)',
-                    border: `1px solid ${done ? 'rgba(34,197,94,0.25)' : 'rgba(255,255,255,0.06)'}`,
+                    borderRadius: 999,
+                    background: 'var(--surface-2)',
+                    border: `1px solid ${done ? '#bfe6cd' : 'var(--line)'}`,
                   }}
                 >
                   <div style={{ fontSize: 13 }}>
@@ -283,15 +287,15 @@ export function IncidentPanel({
                       title={canRevoke ? undefined : 'Connect the wallet that owns this address to revoke'}
                       style={{
                         padding: '7px 14px',
-                        borderRadius: 7,
+                        borderRadius: 999,
                         fontSize: 12,
                         fontWeight: 600,
-                        color: !canRevoke ? 'var(--text-secondary)' : done ? '#86efac' : 'white',
+                        color: !canRevoke ? 'var(--text-secondary)' : done ? '#15803d' : 'white',
                         background: !canRevoke
-                          ? 'rgba(255,255,255,0.06)'
+                          ? 'var(--line)'
                           : done
-                            ? 'rgba(34,197,94,0.15)'
-                            : 'rgba(239,68,68,0.85)',
+                            ? '#e9f8ef'
+                            : 'var(--risk-critical)',
                         border: 'none',
                         cursor: !canRevoke || done ? 'default' : 'pointer',
                       }}
@@ -318,9 +322,9 @@ export function IncidentPanel({
         <div
           style={{
             padding: '14px 18px',
-            borderRadius: 10,
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px dashed rgba(255,255,255,0.1)',
+            borderRadius: 18,
+            background: 'var(--card)',
+            border: '1px dashed var(--line-strong)',
             fontSize: 12,
             color: 'var(--text-tertiary)',
             lineHeight: 1.6,

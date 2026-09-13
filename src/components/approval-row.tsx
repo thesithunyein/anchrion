@@ -14,19 +14,19 @@ const LEVEL_LABEL: Record<RiskLevel, string> = {
 };
 
 const LEVEL_COLOR: Record<RiskLevel, string> = {
-  critical: '#fca5a5',
-  high: '#fdba74',
-  medium: '#fde047',
-  low: '#86efac',
-  safe: '#86efac',
+  critical: '#b91c1c',
+  high: '#c2410c',
+  medium: '#a16207',
+  low: '#15803d',
+  safe: '#15803d',
 };
 
 const LEVEL_BG: Record<RiskLevel, string> = {
-  critical: 'rgba(239,68,68,0.12)',
-  high: 'rgba(249,115,22,0.12)',
-  medium: 'rgba(234,179,8,0.12)',
-  low: 'rgba(34,197,94,0.12)',
-  safe: 'rgba(34,197,94,0.12)',
+  critical: '#fdecec',
+  high: '#fef2e8',
+  medium: '#fdf6e3',
+  low: '#e9f8ef',
+  safe: '#e9f8ef',
 };
 
 function explorerBase(chainId: number): string {
@@ -92,13 +92,13 @@ export function ApprovalRow({
   const level = approval.riskLevel;
   const borderColor =
     level === 'critical'
-      ? 'rgba(239,68,68,0.25)'
+      ? '#f4c9c9'
       : level === 'high'
-        ? 'rgba(249,115,22,0.2)'
+        ? '#f6d5bd'
         : level === 'medium'
-          ? 'rgba(234,179,8,0.15)'
-          : 'rgba(255,255,255,0.06)';
-  const bgColor = level === 'critical' ? 'rgba(239,68,68,0.04)' : 'rgba(255,255,255,0.02)';
+          ? '#efdfb0'
+          : 'var(--line)';
+  const bgColor = level === 'critical' ? '#fef4f4' : 'var(--card)';
 
   const revoking = status === 'signing' || status === 'pending';
   const revoked = status === 'confirmed';
@@ -109,9 +109,10 @@ export function ApprovalRow({
   return (
     <div
       style={{
-        borderRadius: 10,
+        borderRadius: 18,
         background: bgColor,
-        border: `1px solid ${revoked ? 'rgba(34,197,94,0.25)' : borderColor}`,
+        border: `1px solid ${revoked ? '#bfe6cd' : borderColor}`,
+        boxShadow: 'var(--sh-pill)',
         transition: 'border-color .2s',
         opacity: revoked ? 0.75 : 1,
       }}
@@ -137,9 +138,9 @@ export function ApprovalRow({
                 justifyContent: 'center',
                 fontSize: 12,
                 fontWeight: 700,
-                background: 'rgba(26,115,232,0.1)',
+                background: 'var(--indigo-wash)',
                 color: 'var(--blue-light)',
-                border: '1px solid rgba(26,115,232,0.15)',
+                border: '1px solid #cdd6fb',
                 flexShrink: 0,
               }}
             >
@@ -151,7 +152,7 @@ export function ApprovalRow({
               </p>
               <p style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-tertiary)' }}>
                 {approval.spenderLabel ?? 'Unrecognised contract'}{' '}
-                <span style={{ fontFamily: 'monospace' }}>{short(approval.spenderAddress)}</span>
+                <span style={{ fontFamily: 'var(--font-mono)' }}>{short(approval.spenderAddress)}</span>
               </p>
             </div>
           </div>
@@ -166,14 +167,14 @@ export function ApprovalRow({
                   <span style={{ fontSize: 10, color: 'var(--text-tertiary)', marginLeft: 4 }}>est.</span>
                 )}
               </p>
-              <p style={{ fontSize: 12, color: approval.isUnlimited ? '#fca5a5' : 'var(--text-tertiary)' }}>
+              <p style={{ fontSize: 12, color: approval.isUnlimited ? '#b91c1c' : 'var(--text-tertiary)' }}>
                 {approval.isUnlimited ? 'Unlimited' : `${approval.allowanceFormatted} ${approval.token.symbol}`}
               </p>
             </div>
             <span
               style={{
                 padding: '3px 12px',
-                borderRadius: 20,
+                borderRadius: 999,
                 fontSize: 12,
                 fontWeight: 600,
                 background: LEVEL_BG[level],
@@ -198,10 +199,10 @@ export function ApprovalRow({
       </div>
 
       {open && (
-        <div style={{ padding: '14px 18px 18px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.15)' }}>
+        <div style={{ padding: '14px 18px 18px', borderTop: '1px solid var(--line)', background: 'var(--surface-2)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
             <div>
-              <h4 style={{ fontSize: 11, fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>
+              <h4 style={{ fontSize: 11, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--indigo)' }}>
                 Why this scored {approval.riskScore}/100
               </h4>
               {approval.riskFactors.length === 0 ? (
@@ -214,7 +215,7 @@ export function ApprovalRow({
                     <li key={factor.name} style={{ fontSize: 13 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
                         <span style={{ color: 'var(--text)', fontWeight: 500 }}>{factor.name}</span>
-                        <span style={{ fontWeight: 600, color: factor.impact > 0 ? '#fca5a5' : '#86efac', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontWeight: 600, color: factor.impact > 0 ? '#b91c1c' : '#15803d', whiteSpace: 'nowrap' }}>
                           {factor.impact > 0 ? '+' : ''}
                           {factor.impact}
                         </span>
@@ -239,7 +240,7 @@ export function ApprovalRow({
             </div>
 
             <div>
-              <h4 style={{ fontSize: 11, fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>
+              <h4 style={{ fontSize: 11, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--indigo)' }}>
                 What we measured
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 7, fontSize: 13 }}>
@@ -333,19 +334,19 @@ export function ApprovalRow({
               title={canRevoke ? undefined : 'Connect the wallet that owns this address to revoke'}
               style={{
                 padding: '9px 18px',
-                borderRadius: 8,
+                borderRadius: 999,
                 fontSize: 13,
                 fontWeight: 600,
                 color: canRevoke ? 'white' : 'var(--text-secondary)',
                 background: !canRevoke
-                  ? 'rgba(255,255,255,0.06)'
+                  ? 'var(--line)'
                   : revoked
                     ? 'var(--risk-safe)'
                     : revoking
-                      ? 'rgba(239,68,68,0.6)'
+                      ? '#b45309'
                       : 'var(--risk-critical)',
                 opacity: unverified ? 0.75 : 1,
-                border: !canRevoke ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                border: !canRevoke ? '1px solid var(--line)' : 'none',
                 cursor: !canRevoke || revoking || revoked ? 'default' : 'pointer',
                 transition: 'opacity .2s',
               }}
@@ -380,10 +381,10 @@ export function ApprovalRow({
               rel="noopener noreferrer"
               style={{
                 padding: '9px 18px',
-                borderRadius: 8,
+                borderRadius: 999,
                 fontSize: 13,
                 color: 'var(--text-secondary)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                border: '1px solid var(--line)',
                 textDecoration: 'none',
               }}
             >
@@ -391,7 +392,7 @@ export function ApprovalRow({
             </a>
 
             {error && (
-              <span style={{ fontSize: 12, color: '#fca5a5', maxWidth: 340 }}>
+              <span style={{ fontSize: 12, color: '#b91c1c', maxWidth: 340 }}>
                 {error.includes('User rejected') || error.includes('denied')
                   ? 'You rejected the transaction in your wallet.'
                   : error}

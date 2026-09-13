@@ -48,8 +48,8 @@ function shortAddress(address: string): string {
 
 function chainBadge(chainId: number) {
   return chainId === 11155111
-    ? { label: 'Testnet', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' }
-    : { label: 'Mainnet', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' };
+    ? { label: 'Testnet', color: '#b45309', bg: '#fdf3e3' }
+    : { label: 'Mainnet', color: '#15803d', bg: '#e9f8ef' };
 }
 
 /*
@@ -87,18 +87,33 @@ function deepLinkOnce(): DeepLink | null {
   return deepLinkCache;
 }
 
+/*
+ * The page canvas. The graph paper is painted once for the whole app by
+ * body::before in globals.css, so this adds only the soft wash that keeps a tall
+ * page from reading as flat grey — an indigo bloom top-left, a gold one
+ * bottom-right, both far too faint to compete with the content.
+ */
 function Backdrop() {
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', background: 'linear-gradient(135deg, #0a1628 0%, #0d1f3c 25%, #0f2847 50%, #0a1628 75%, #050a14 100%)' }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 800px 600px at 25% 35%, rgba(26,115,232,0.12) 0%, transparent 70%), radial-gradient(ellipse 600px 400px at 75% 65%, rgba(74,158,255,0.08) 0%, transparent 60%)' }} />
-    </div>
+    <div
+      aria-hidden
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 0,
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        background:
+          'radial-gradient(ellipse 900px 620px at 22% 10%, rgba(60,86,240,0.06) 0%, transparent 68%), radial-gradient(ellipse 700px 480px at 84% 80%, rgba(245,166,35,0.05) 0%, transparent 62%)',
+      }}
+    />
   );
 }
 
 function CoveragePanel({ coverage }: { coverage: ScanCoverage }) {
   return (
-    <div className="dash-enter-delay-4" style={{ marginTop: 24, padding: '16px 18px', borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)' }}>
-      <h4 style={{ fontSize: 11, fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>
+    <div className="dash-enter-delay-4" style={{ marginTop: 24, padding: '16px 18px', borderRadius: 18, background: 'var(--card)', border: '1px dashed var(--line-strong)', boxShadow: 'var(--sh-card)' }}>
+      <h4 className="kicker" style={{ marginBottom: 10 }}>
         What this scan actually covered
       </h4>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '6px 24px', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
@@ -524,7 +539,7 @@ export default function Dashboard() {
         <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24, padding: 32, textAlign: 'center' }}>
           <img src="/logo.svg" alt="Anchrion" style={{ width: 56, height: 56 }} />
           <div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px,3vw,32px)', fontWeight: 400, marginBottom: 10 }}>
+            <h1 className="display" style={{ fontSize: 'clamp(24px,3vw,32px)', marginBottom: 10 }}>
               See how a drain happened
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 470, lineHeight: 1.6 }}>
@@ -533,7 +548,7 @@ export default function Dashboard() {
             </p>
           </div>
           {connectError && (
-            <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#fca5a5', fontSize: 13, maxWidth: 400, width: '100%' }}>
+            <div style={{ padding: '12px 16px', borderRadius: 18, background: '#fdecec', border: '1px solid #f4c9c9', color: '#b91c1c', fontSize: 13, maxWidth: 400, width: '100%' }}>
               {connectError}
             </div>
           )}
@@ -550,29 +565,32 @@ export default function Dashboard() {
               onChange={(event) => setWatchInput(event.target.value)}
               placeholder="0x… any wallet or smart account"
               spellCheck={false}
-              style={{ flex: 1, minWidth: 220, padding: '12px 16px', borderRadius: 10, fontSize: 14, fontFamily: 'monospace', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text)', outline: 'none' }}
+              className="field"
+              style={{ flex: 1, minWidth: 220, padding: '12px 16px', borderRadius: 12, fontSize: 14, fontFamily: 'var(--font-mono)' }}
             />
             <select
               value={watchChainId}
               onChange={(event) => setWatchChainId(Number(event.target.value))}
               aria-label="Network to inspect"
-              style={{ padding: '12px 14px', borderRadius: 10, fontSize: 13, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-secondary)', outline: 'none' }}
+              className="field"
+              style={{ padding: '12px 14px', borderRadius: 12, fontSize: 13, color: 'var(--text-secondary)' }}
             >
               {CHAIN_IDS.map((id) => (
-                <option key={id} value={id} style={{ background: '#0d1f3c' }}>
+                <option key={id} value={id} style={{ background: '#fff' }}>
                   {SUPPORTED_CHAINS[id].name}
                 </option>
               ))}
             </select>
             <button
               type="submit"
-              style={{ padding: '12px 22px', borderRadius: 10, fontSize: 14, fontWeight: 600, color: 'white', background: 'var(--blue)', border: 'none', cursor: 'pointer' }}
+              className="btn-primary"
+              style={{ padding: '12px 22px' }}
             >
               Inspect
             </button>
           </form>
           {watchError && (
-            <p style={{ fontSize: 13, color: '#fca5a5', maxWidth: 470 }}>{watchError}</p>
+            <p style={{ fontSize: 13, color: '#b91c1c', maxWidth: 470 }}>{watchError}</p>
           )}
           <p style={{ fontSize: 12, color: 'var(--text-tertiary)', maxWidth: 470, lineHeight: 1.6 }}>
             Read-only. Anchrion cannot sign anything — revoking needs the wallet that owns the
@@ -580,9 +598,9 @@ export default function Dashboard() {
           </p>
 
           <div style={{ width: '100%', maxWidth: 470, display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-tertiary)', fontSize: 12 }}>
-            <span style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+            <span style={{ flex: 1, height: 1, background: 'var(--line)' }} />
             or connect a wallet to revoke
-            <span style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+            <span style={{ flex: 1, height: 1, background: 'var(--line)' }} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 320 }}>
@@ -591,7 +609,7 @@ export default function Dashboard() {
                 key={wallet.id}
                 onClick={() => handleConnect(wallet.id)}
                 disabled={isPending}
-                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text)', fontSize: 14, fontWeight: 500, cursor: isPending ? 'wait' : 'pointer', textAlign: 'left' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderRadius: 18, background: '#fff', border: '1px solid var(--line)', color: 'var(--text)', fontSize: 14, fontWeight: 500, cursor: isPending ? 'wait' : 'pointer', textAlign: 'left' }}
               >
                 <img
                   src={wallet.icon}
@@ -633,9 +651,9 @@ export default function Dashboard() {
       <div style={{ minHeight: '100vh', position: 'relative' }}>
         <Backdrop />
         <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 20, padding: 32, textAlign: 'center' }}>
-          <div style={{ width: 56, height: 56, borderRadius: 14, background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>!</div>
+          <div style={{ width: 56, height: 56, borderRadius: 18, background: '#fdf3e3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>!</div>
           <div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(22px,3vw,28px)', fontWeight: 400, marginBottom: 10 }}>
+            <h1 className="display" style={{ fontSize: 'clamp(22px,3vw,28px)', marginBottom: 10 }}>
               Unsupported network
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 420, lineHeight: 1.6 }}>
@@ -651,7 +669,7 @@ export default function Dashboard() {
                 <button
                   key={id}
                   onClick={() => switchChain({ chainId: id })}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text)', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderRadius: 18, background: '#fff', border: '1px solid var(--line)', color: 'var(--text)', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}
                 >
                   <span style={{ padding: '2px 8px', borderRadius: 12, fontSize: 10, fontWeight: 600, background: badge.bg, color: badge.color }}>
                     {badge.label}
@@ -672,11 +690,13 @@ export default function Dashboard() {
   const badge = chainId !== undefined ? chainBadge(chainId) : null;
 
   return (
-    <div style={{ background: 'var(--bg)', minHeight: '100vh', position: 'relative' }}>
+    /* No background of its own: the paper and its graph grid come from the document,
+       so an opaque layer here would hide the grid the landing page is built on. */
+    <div style={{ minHeight: '100vh', position: 'relative' }}>
       <Backdrop />
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <header className="dash-header" style={{ position: 'sticky', top: 0, zIndex: 50, height: 56, display: 'flex', alignItems: 'center', padding: '0 clamp(20px,4vw,48px)', justifyContent: 'space-between', backdropFilter: 'blur(40px) saturate(1.4)', WebkitBackdropFilter: 'blur(40px) saturate(1.4)', background: 'rgba(8,9,13,0.6)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <header className="dash-header" style={{ height: 56, display: 'flex', alignItems: 'center', padding: '0 clamp(20px,4vw,48px)', justifyContent: 'space-between' }}>
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <img src="/logo.svg" alt="Anchrion" style={{ width: 28, height: 28, display: 'block' }} />
             <span style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 400 }}>Anchrion</span>
@@ -688,10 +708,10 @@ export default function Dashboard() {
                   value={chainId}
                   onChange={(event) => setWatchChainId(Number(event.target.value))}
                   aria-label="Network to inspect"
-                  style={{ padding: '5px 10px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: badge.bg, color: badge.color, border: `1px solid ${badge.color}30`, outline: 'none' }}
+                  style={{ padding: '5px 10px', borderRadius: 999, fontSize: 12, fontWeight: 500, background: badge.bg, color: badge.color, border: `1px solid ${badge.color}30`, outline: 'none' }}
                 >
                   {CHAIN_IDS.map((id) => (
-                    <option key={id} value={id} style={{ background: '#0d1f3c' }}>
+                    <option key={id} value={id} style={{ background: '#fff' }}>
                       {SUPPORTED_CHAINS[id].name}
                     </option>
                   ))}
@@ -700,7 +720,7 @@ export default function Dashboard() {
                 <button
                   onClick={() => switchChain({ chainId: chainId === 11155111 ? 1 : 11155111 })}
                   title="Switch between Sepolia and Ethereum mainnet"
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: badge.bg, color: badge.color, border: `1px solid ${badge.color}30`, cursor: 'pointer' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 999, fontSize: 12, fontWeight: 500, background: badge.bg, color: badge.color, border: `1px solid ${badge.color}30`, cursor: 'pointer' }}
                 >
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: badge.color }} />
                   {NETWORK_NAMES[chainId] ?? chain?.name}
@@ -709,23 +729,23 @@ export default function Dashboard() {
             <button
               onClick={() => activeAddress && chainId !== undefined && void loadApprovals(activeAddress, chainId)}
               disabled={loading}
-              style={{ padding: '7px 14px', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.08)', background: 'transparent', cursor: loading ? 'wait' : 'pointer' }}
+              style={{ padding: '7px 14px', borderRadius: 999, fontSize: 13, color: 'var(--text-secondary)', border: '1px solid var(--line)', background: 'transparent', cursor: loading ? 'wait' : 'pointer' }}
             >
               {loading ? 'Scanning…' : 'Rescan'}
             </button>
-            <span style={{ padding: '5px 14px', borderRadius: 20, fontSize: 13, fontFamily: 'monospace', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <span style={{ padding: '5px 14px', borderRadius: 999, fontSize: 13, fontFamily: 'var(--font-mono)', background: '#fff', border: '1px solid var(--line)' }}>
               {shortAddress(activeAddress)}
             </span>
             {readOnly ? (
               <button
                 onClick={stopReadOnly}
                 title="Connect the wallet that owns this address to revoke"
-                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 16px', borderRadius: 8, fontSize: 13, color: '#fbbf24', border: '1px solid rgba(245,158,11,0.25)', background: 'rgba(245,158,11,0.08)', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 16px', borderRadius: 999, fontSize: 13, color: '#b45309', border: '1px solid #f0dcb8', background: '#fdf3e3', cursor: 'pointer' }}
               >
                 Connect wallet
               </button>
             ) : (
-              <button onClick={() => disconnect()} style={{ padding: '7px 16px', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.08)', background: 'transparent' }}>
+              <button onClick={() => disconnect()} style={{ padding: '7px 16px', borderRadius: 999, fontSize: 13, color: 'var(--text-secondary)', border: '1px solid var(--line)', background: 'transparent' }}>
                 Disconnect
               </button>
             )}
@@ -734,9 +754,9 @@ export default function Dashboard() {
 
         <main style={{ maxWidth: 1120, margin: '0 auto', padding: 'clamp(24px,4vh,40px) clamp(20px,4vw,48px)' }}>
           {readOnly && (
-            <div style={{ marginBottom: 20, padding: '12px 16px', borderRadius: 10, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', fontSize: 13, color: 'var(--blue-light)', lineHeight: 1.55 }}>
+            <div style={{ marginBottom: 20, padding: '12px 16px', borderRadius: 18, background: 'var(--indigo-wash)', border: '1px solid #cdd6fb', fontSize: 13, color: 'var(--blue-light)', lineHeight: 1.55 }}>
               <strong>Read-only view.</strong> Showing public chain data for{' '}
-              <span style={{ fontFamily: 'monospace' }}>{activeAddress}</span> on{' '}
+              <span style={{ fontFamily: 'var(--font-mono)' }}>{activeAddress}</span> on{' '}
               {NETWORK_NAMES[chainId ?? 1]}. Every finding below is measured the same way it would be for
               your own wallet. Revoking needs the wallet that owns this address —{' '}
               <button
@@ -753,25 +773,25 @@ export default function Dashboard() {
           )}
 
           {!readOnly && connectionNotice && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 20, padding: '12px 16px', borderRadius: 10, background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 13, color: '#86efac', lineHeight: 1.55 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 20, padding: '12px 16px', borderRadius: 18, background: '#e9f8ef', border: '1px solid #bfe6cd', fontSize: 13, color: '#15803d', lineHeight: 1.55 }}>
               <span>
                 <strong>Connected.</strong>{' '}
                 {connectionNotice.replaced ? (
                   <>
                     Switched from{' '}
-                    <span style={{ fontFamily: 'monospace' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)' }}>
                       {shortAddress(connectionNotice.replaced)}
                     </span>{' '}
                     to your connected wallet.{' '}
                   </>
                 ) : null}
-                Scanning <span style={{ fontFamily: 'monospace' }}>{connectionNotice.address}</span> on{' '}
+                Scanning <span style={{ fontFamily: 'var(--font-mono)' }}>{connectionNotice.address}</span> on{' '}
                 {NETWORK_NAMES[chainId ?? 1]}. Revoking is enabled for this address.
               </span>
               <button
                 onClick={() => setConnectionNotice(null)}
                 aria-label="Dismiss"
-                style={{ background: 'none', border: 'none', color: '#86efac', fontSize: 16, lineHeight: 1, cursor: 'pointer', padding: 0 }}
+                style={{ background: 'none', border: 'none', color: '#15803d', fontSize: 16, lineHeight: 1, cursor: 'pointer', padding: 0 }}
               >
                 ×
               </button>
@@ -779,7 +799,7 @@ export default function Dashboard() {
           )}
 
           {chainId === 11155111 && (
-            <div style={{ marginBottom: 20, padding: '12px 16px', borderRadius: 10, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', fontSize: 13, color: '#fbbf24', lineHeight: 1.5 }}>
+            <div style={{ marginBottom: 20, padding: '12px 16px', borderRadius: 18, background: '#fdf3e3', border: '1px solid #f0dcb8', fontSize: 13, color: '#b45309', lineHeight: 1.5 }}>
               <strong>Sepolia testnet</strong> — grant a permission on a test dApp, then revoke it here. No
               real funds at risk.
             </div>
@@ -800,7 +820,7 @@ export default function Dashboard() {
                 </>
               )}
             </h1>
-            <p style={{ marginTop: 8, fontSize: 13, fontFamily: 'monospace', color: 'var(--text-tertiary)' }}>
+            <p style={{ marginTop: 8, fontSize: 13, fontFamily: 'var(--font-mono)', color: 'var(--text-tertiary)' }}>
               {activeAddress}
             </p>
           </div>
@@ -858,8 +878,8 @@ export default function Dashboard() {
                       } score under 50`,
               },
             ].map((item) => (
-              <div key={item.label} style={{ padding: '18px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <p style={{ fontSize: 11, fontWeight: 500, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>
+              <div key={item.label} style={{ padding: '18px 20px', borderRadius: 18, background: 'var(--card)', border: '1px solid var(--line)', boxShadow: 'var(--sh-card)' }}>
+                <p className="kicker" style={{ marginBottom: 6, color: 'var(--muted)' }}>
                   {item.label}
                 </p>
                 <p style={{ fontSize: 24, fontWeight: 600, color: item.color ?? 'var(--text)' }}>{item.value}</p>
@@ -875,7 +895,7 @@ export default function Dashboard() {
           {stats.total > 0 && (
             <div className="dash-enter-delay-1" style={{ marginBottom: 22 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 9 }}>
-                <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
+                <p className="kicker">
                   Risk distribution
                 </p>
                 <p style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
@@ -916,7 +936,7 @@ export default function Dashboard() {
           {(revokedSinceLastScan.length > 0 || degraded) && (
             <div style={{ marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {revokedSinceLastScan.length > 0 && (
-                <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 13, color: '#86efac' }}>
+                <div style={{ padding: '10px 14px', borderRadius: 18, background: '#e9f8ef', border: '1px solid #bfe6cd', fontSize: 13, color: '#15803d' }}>
                   {revokedSinceLastScan.length} permission{revokedSinceLastScan.length === 1 ? '' : 's'} gone
                   since your last scan{previousScanAt ? ` (${new Date(previousScanAt).toLocaleString()})` : ''}:{' '}
                   {revokedSinceLastScan
@@ -927,7 +947,7 @@ export default function Dashboard() {
                 </div>
               )}
               {degraded && (
-                <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', fontSize: 13, color: '#fbbf24' }}>
+                <div style={{ padding: '10px 14px', borderRadius: 18, background: '#fdf3e3', border: '1px solid #f0dcb8', fontSize: 13, color: '#b45309' }}>
                   Partial scan: no block-explorer history was available for this address, so findings come
                   from live allowance reads against a bundled spender list only. Treat the results as
                   incomplete and read the coverage panel below.
@@ -943,12 +963,12 @@ export default function Dashboard() {
                 onClick={() => setTab(entry)}
                 style={{
                   padding: '9px 18px',
-                  borderRadius: 8,
+                  borderRadius: 999,
                   fontSize: 13,
                   fontWeight: 500,
-                  background: tab === entry ? 'var(--blue)' : 'rgba(255,255,255,0.03)',
+                  background: tab === entry ? 'var(--blue)' : '#fff',
                   color: tab === entry ? 'white' : 'var(--text-secondary)',
-                  border: tab === entry ? 'none' : '1px solid rgba(255,255,255,0.06)',
+                  border: tab === entry ? 'none' : '1px solid var(--line)',
                 }}
               >
                 {entry === 'approvals' ? 'Approvals' : 'Incident reconstruction'}
@@ -964,13 +984,14 @@ export default function Dashboard() {
                   placeholder="Search by token or spender…"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  style={{ flex: 1, minWidth: 200, padding: '11px 16px', borderRadius: 8, fontSize: 14, outline: 'none', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text)' }}
+                  className="field"
+                  style={{ flex: 1, minWidth: 200, padding: '11px 16px', borderRadius: 12, fontSize: 14 }}
                 />
                 {(['all', 'critical', 'high', 'medium', 'low'] as const).map((entry) => (
                   <button
                     key={entry}
                     onClick={() => setFilter(entry)}
-                    style={{ padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500, ...(filter === entry ? { background: 'var(--blue)', color: 'white' } : { background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.06)' }) }}
+                    style={{ padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 500, ...(filter === entry ? { background: 'var(--blue)', color: 'white' } : { background: '#fff', color: 'var(--text-secondary)', border: '1px solid var(--line)' }) }}
                   >
                     {FILTER_LABELS[entry]}
                   </button>
@@ -978,19 +999,19 @@ export default function Dashboard() {
               </div>
 
               {selected.length > 0 && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16, padding: '12px 16px', borderRadius: 10, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16, padding: '12px 16px', borderRadius: 18, background: 'var(--indigo-wash)', border: '1px solid #cdd6fb', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{selected.length} selected</span>
                   <button
                     onClick={() => void onRevokeSelected()}
                     disabled={batchRunning || !canRevoke}
                     title={canRevoke ? undefined : 'Connect the wallet that owns this address to revoke'}
-                    style={{ padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, color: 'white', background: 'var(--risk-critical)', border: 'none', opacity: canRevoke ? 1 : 0.5, cursor: batchRunning ? 'wait' : canRevoke ? 'pointer' : 'not-allowed' }}
+                    style={{ padding: '8px 16px', borderRadius: 999, fontSize: 13, fontWeight: 600, color: 'white', background: 'var(--risk-critical)', border: 'none', opacity: canRevoke ? 1 : 0.5, cursor: batchRunning ? 'wait' : canRevoke ? 'pointer' : 'not-allowed' }}
                   >
                     {revoke.batch && batchRunning ? `Revoking ${revoke.batch.done + 1} of ${revoke.batch.total}…` : 'Revoke selected'}
                   </button>
                   <button
                     onClick={() => setSelected([])}
-                    style={{ padding: '8px 14px', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)' }}
+                    style={{ padding: '8px 14px', borderRadius: 999, fontSize: 13, color: 'var(--text-secondary)', background: 'transparent', border: '1px solid var(--line)' }}
                   >
                     Clear
                   </button>
@@ -1001,7 +1022,7 @@ export default function Dashboard() {
                 {loading ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {[1, 2, 3, 4].map((row) => (
-                      <div key={row} style={{ height: 64, borderRadius: 10, background: 'rgba(255,255,255,0.02)', animation: 'pulse 2s infinite' }} />
+                      <div key={row} style={{ height: 64, borderRadius: 18, background: 'var(--skeleton)', animation: 'pulse 2s infinite' }} />
                     ))}
                   </div>
                 ) : error ? (
@@ -1009,7 +1030,7 @@ export default function Dashboard() {
                     <p style={{ marginBottom: 16, color: 'var(--risk-critical)' }}>{error}</p>
                     <button
                       onClick={() => activeAddress && chainId !== undefined && void loadApprovals(activeAddress, chainId)}
-                      style={{ padding: '10px 24px', borderRadius: 8, fontSize: 14, fontWeight: 600, color: 'white', background: 'var(--blue)', border: 'none' }}
+                      className="btn-primary"
                     >
                       Try again
                     </button>
@@ -1035,21 +1056,22 @@ export default function Dashboard() {
                         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginTop: 22 }}>
                           <button
                             onClick={() => setTab('incident')}
-                            style={{ padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, color: 'white', background: 'var(--blue)', border: 'none', cursor: 'pointer' }}
+                            className="btn-primary"
+                            style={{ padding: '9px 18px', fontSize: 13 }}
                           >
                             Reconstruct its history
                           </button>
                           {readOnly && (
                             <button
                               onClick={stopReadOnly}
-                              style={{ padding: '9px 18px', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}
+                              style={{ padding: '9px 18px', borderRadius: 999, fontSize: 13, color: 'var(--text-secondary)', background: 'transparent', border: '1px solid var(--line)', cursor: 'pointer' }}
                             >
                               Inspect another address
                             </button>
                           )}
                           <a
                             href="/method"
-                            style={{ padding: '9px 18px', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.08)' }}
+                            style={{ padding: '9px 18px', borderRadius: 999, fontSize: 13, color: 'var(--text-secondary)', border: '1px solid var(--line)' }}
                           >
                             What this cannot see
                           </a>
@@ -1108,7 +1130,7 @@ export default function Dashboard() {
                   </p>
                   <button
                     onClick={() => activeAddress && chainId !== undefined && void runIncident(activeAddress, chainId)}
-                    style={{ padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, color: 'white', background: 'var(--blue)', border: 'none' }}
+                    className="btn-primary"
                   >
                     Run reconstruction
                   </button>
@@ -1118,7 +1140,7 @@ export default function Dashboard() {
           )}
         </main>
 
-        <footer style={{ backdropFilter: 'blur(40px) saturate(1.4)', background: 'rgba(8,9,13,0.75)', borderTop: '1px solid rgba(255,255,255,0.06)', padding: 'clamp(24px,3vh,32px) clamp(20px,4vw,48px)' }}>
+        <footer className="app-footer" style={{ padding: 'clamp(24px,3vh,32px) clamp(20px,4vw,48px)' }}>
           <div style={{ maxWidth: 1120, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <img src="/logo.svg" alt="Anchrion" style={{ width: 22, height: 22, display: 'block' }} />

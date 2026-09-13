@@ -89,7 +89,9 @@ const LIMITS = [
 
 export default function MethodPage() {
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+    /* position/z-index put the page above the fixed graph grid in globals.css,
+       which would otherwise paint over its text. */
+    <div style={{ minHeight: '100vh', position: 'relative', zIndex: 1 }}>
       <div style={{ maxWidth: 900, margin: '0 auto', padding: 'clamp(32px,6vh,72px) clamp(20px,5vw,48px)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
           <img src="/logo.svg" alt="" width={22} height={22} style={{ display: 'block' }} />
@@ -100,7 +102,7 @@ export default function MethodPage() {
           ← Back to dashboard
         </a>
 
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(28px,4vw,40px)', fontWeight: 400, margin: '24px 0 12px' }}>
+        <h1 className="display" style={{ fontSize: 'clamp(28px,4vw,40px)', margin: '24px 0 12px' }}>
           Risk model and limits
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: 15, lineHeight: 1.7, maxWidth: 720 }}>
@@ -109,7 +111,7 @@ export default function MethodPage() {
           numbers in the row detail, and you should feel free to argue with it.
         </p>
 
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 400, margin: '36px 0 14px' }}>
+        <h2 className="display" style={{ fontSize: 22, margin: '36px 0 14px' }}>
           Weights
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -118,9 +120,10 @@ export default function MethodPage() {
               key={weight.name}
               style={{
                 padding: '14px 16px',
-                borderRadius: 10,
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 18,
+                background: 'var(--card)',
+                border: '1px solid var(--line)',
+                boxShadow: 'var(--sh-card)',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'baseline', flexWrap: 'wrap' }}>
@@ -136,7 +139,7 @@ export default function MethodPage() {
                   >
                     {weight.evidence}
                   </span>
-                  <span style={{ fontFamily: 'monospace', fontSize: 14, color: weight.points.startsWith('−') ? '#86efac' : '#fca5a5' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: weight.points.startsWith('−') ? '#15803d' : '#b91c1c' }}>
                     {weight.points}
                   </span>
                 </span>
@@ -148,7 +151,7 @@ export default function MethodPage() {
           ))}
         </div>
 
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 400, margin: '36px 0 14px' }}>
+        <h2 className="display" style={{ fontSize: 22, margin: '36px 0 14px' }}>
           Bands
         </h2>
         <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
@@ -157,7 +160,7 @@ export default function MethodPage() {
           not mean the permission is harmless, and the UI says so.
         </p>
 
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 400, margin: '36px 0 14px' }}>
+        <h2 className="display" style={{ fontSize: 22, margin: '36px 0 14px' }}>
           What Anchrion cannot detect
         </h2>
         <ul style={{ paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
@@ -166,7 +169,7 @@ export default function MethodPage() {
           ))}
         </ul>
 
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 400, margin: '36px 0 14px' }}>
+        <h2 className="display" style={{ fontSize: 22, margin: '36px 0 14px' }}>
           Data sources
         </h2>
         <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
@@ -176,7 +179,7 @@ export default function MethodPage() {
           labelled fallback. No API key is required to run Anchrion with full functionality.
         </p>
 
-        <div style={{ marginTop: 40, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: 13, color: 'var(--text-tertiary)' }}>
+        <div style={{ marginTop: 40, paddingTop: 20, borderTop: '1px solid var(--line)', fontSize: 13, color: 'var(--text-tertiary)' }}>
           <a href="/dashboard" style={{ color: 'var(--blue-light)' }}>
             Open the dashboard
           </a>

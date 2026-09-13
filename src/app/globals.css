@@ -1,44 +1,146 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
+/*
+ * Anchrion — app theme.
+ *
+ * The same tokens as public/anchrion.html, copied verbatim rather than
+ * re-invented, so the landing page and the app cannot drift apart: paper and
+ * graph grid, white cards on a hairline, indigo as the only action colour, gold
+ * for warnings, Archivo Black for headings and JetBrains Mono for data.
+ *
+ * The names below the landing's block (--bg, --text, --border, --blue-light …)
+ * are this app's older aliases, kept so the ~120 existing var() references keep
+ * working. They now point at the new palette instead of at the dark one.
+ */
 :root {
-  --font-display: 'Instrument Serif', Georgia, serif;
-  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --blue: #1a73e8;
-  --blue-light: #4a9eff;
-  --bg: #08090d;
-  --bg-glass: rgba(255,255,255,0.03);
-  --border-glass: rgba(255,255,255,0.06);
-  --text: #ffffff;
-  --text-secondary: rgba(255,255,255,0.68);
-  --text-tertiary: rgba(255,255,255,0.45);
-  --border: rgba(255,255,255,0.08);
-  --risk-safe: #22c55e;
-  --risk-medium: #eab308;
-  --risk-high: #f97316;
-  --risk-critical: #ef4444;
+  /* ── landing tokens, unchanged ── */
+  --paper: #f4f4f5; --grid-line: #e7e7ea; --card: #fff; --line: #e5e7eb;
+  --ink: #17181c; --ink-soft: #3f3f46; --muted: #6b7280; --faint: #9ca3af;
+  --indigo: #3c56f0; --indigo-600: #3247d4; --indigo-wash: #eef1ff;
+  --safe: #16a34a; --warn: #f5a623; --risk: #ef4444;
+  --r-pill: 999px; --r-lg: 26px; --r-md: 18px; --r-sm: 12px;
+  --sh-card: 0 1px 2px rgba(16,24,40,.05), 0 16px 44px rgba(16,24,40,.07);
+  --sh-rail: 0 10px 22px rgba(16,24,40,.10), 0 2px 4px rgba(16,24,40,.05);
+  --sh-pill: 0 2px 6px rgba(16,24,40,.08);
+  --sh-primary: 0 10px 24px rgba(60,86,240,.30);
+  --font-display: 'Archivo Black', Inter, system-ui, sans-serif;
+  --font-body: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ── app aliases ── */
+  --bg: var(--paper);
+  --line-strong: #d4d4d8;
+  --surface-2: #fafafb;
+  --skeleton: #ececee;
+  --glass: rgba(244, 244, 245, 0.82);
+  --text: var(--ink);
+  --text-secondary: var(--ink-soft);
+  --text-tertiary: var(--muted);
+  --blue: var(--indigo);          /* the app's action colour */
+  --blue-light: #2563eb;          /* links, matching the landing */
+  /*
+   * Risk bands are darker than the landing's sticker colours on purpose: on the
+   * dark theme these were read as glowing text, and here they are small text and
+   * 8px dots on white. These are the same four semantics at a readable contrast.
+   */
+  --risk-safe: #15803d;
+  --risk-medium: #a16207;
+  --risk-high: #c2410c;
+  --risk-critical: #dc2626;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
+
+/* The graph paper, fixed and faded out before the cards start. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 30px 30px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 58%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0, #000 58%, transparent 100%);
+}
+
 a { color: inherit; text-decoration: none; }
 button { cursor: pointer; border: none; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+/* Row selection boxes, in the product's indigo rather than the browser's blue. */
+input[type='checkbox'], input[type='radio'] { accent-color: var(--indigo); }
+input::placeholder, textarea::placeholder { color: var(--faint); }
+select option { background: #fff; color: var(--ink); }
+
+/*
+ * Headings carry the landing's offset shadow, which is what makes the type
+ * read as Anchrion rather than as a dashboard default. It is applied to page
+ * titles only — never to table cells or numbers, where it would smear data.
+ */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  text-shadow: 0.04em 0.04em 0 var(--ink-soft);
+}
+
+/* The landing's small-caps label: wide-tracked, indigo, used for section heads. */
+.kicker {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--indigo);
+}
+
+/* ── Actions ──────────────────────────────────────────────────────────── */
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border-radius: var(--r-pill);
+  font-weight: 700;
+  white-space: nowrap;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.app-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.app-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-primary {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 10px 20px; background: var(--blue); color: #fff;
-  font-size: 14px; font-weight: 500; border-radius: 8px;
-  transition: all 0.2s ease;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 10px 22px; border-radius: var(--r-pill);
+  background: var(--indigo); color: #fff;
+  font-size: 14px; font-weight: 700;
+  box-shadow: var(--sh-primary);
+  transition: background 0.15s ease, transform 0.15s ease;
+  white-space: nowrap;
 }
-.btn-primary:hover { background: #1557b0; }
+.btn-primary:hover:not(:disabled) { background: var(--indigo-600); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Dashboard stat cards — one row of four on desktop, two on tablet, one on phone. */
+/* ── Form controls ────────────────────────────────────────────────────── */
+.field {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-wash); }
+
+/* ── Dashboard layout ─────────────────────────────────────────────────── */
+/* One row of four on desktop, two on tablet, one on phone. */
 .stat-grid {
   display: grid;
   gap: 16px;
@@ -58,24 +160,24 @@ button { cursor: pointer; border: none; font-family: inherit; }
  */
 .risk-bar {
   display: flex; height: 10px; border-radius: 999px; overflow: hidden;
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+  background: #fff; border: 1px solid var(--line);
 }
 .risk-bar span { display: block; height: 100%; }
 .risk-legend {
   display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 11px;
-  font-size: 12px; color: var(--text-tertiary);
+  font-size: 12px; color: var(--muted);
 }
-.risk-legend b { font-weight: 600; color: var(--text-secondary); }
+.risk-legend b { font-weight: 700; color: var(--ink-soft); }
 .risk-dot {
   width: 8px; height: 8px; border-radius: 2px; display: inline-block;
   margin-right: 6px; vertical-align: middle;
 }
 
 /*
- * Permission row. The layout moved out of inline styles so the row can reflow on
- * a phone: below 620px the value column drops to its own line and the chevron is
- * dropped, because a judge opening the demo link on a phone was reading a name
- * squeezed into 90px next to three fixed-width columns.
+ * Permission row. The layout lives here rather than in inline styles so the row
+ * can reflow on a phone: below 620px the value column drops to its own line and
+ * the chevron is dropped, because a judge opening the demo link on a phone was
+ * reading a name squeezed into 90px next to three fixed-width columns.
  */
 .approval-head { display: flex; align-items: center; gap: 12px; padding: 13px 18px; }
 .approval-main {
@@ -105,6 +207,15 @@ button { cursor: pointer; border: none; font-family: inherit; }
  * rescan and connect controls need to wrap, and a fixed height turned that into
  * a squeezed row instead. The inline height is overridden deliberately.
  */
+.dash-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  background: var(--glass);
+  border-bottom: 1px solid var(--line);
+}
 @media (max-width: 760px) {
   .dash-header {
     height: auto !important;
@@ -114,6 +225,14 @@ button { cursor: pointer; border: none; font-family: inherit; }
     padding-top: 9px;
     padding-bottom: 9px;
   }
+}
+
+/* Footer, on the same glass as the header so the two ends of the page match. */
+.app-footer {
+  background: var(--glass);
+  border-top: 1px solid var(--line);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
 }
 
 /* Dashboard entrance animation */
