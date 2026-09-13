@@ -198,8 +198,8 @@ td.why{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:270px}
         <div class="hero-inner">
           <p class="eyebrow anim"><i></i>Wallet permission reconstruction</p>
           <h1 class="headline anim">See how a drain happened.<br><em>Then close what is still open.</em></h1>
-          <p class="lede anim">Paste any address to see the permission that moved the funds — and what the same address can still reach.</p>
-          <p class="sub anim">Reads public chain data only. No wallet connection, no API keys, five networks.</p>
+          <p class="lede anim">Paste any address. See the permission that moved the funds — and what is still open.</p>
+          <p class="sub anim">Public chain data only. No wallet, no API keys. Five networks.</p>
           <div class="cta-row anim">
             <a href="/dashboard" class="cta">Inspect an address</a>
             <a href="/method" class="cta-ghost">Read the risk model</a>
@@ -213,31 +213,31 @@ td.why{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:270px}
     <div class="below">
     <div class="wrap">
     <section class="section">
-      <p class="section-kicker">What no other tool answers</p>
-      <h2>Prevention is solved. The hour after a drain is not.</h2>
-      <p class="lead">Simulation and approval dashboards are good, mature products. Read what each one is built to answer — and where Anchrion is the one that fails.</p>
+      <p class="section-kicker">The gap</p>
+      <h2>Prevention is solved. After a drain isn't.</h2>
+      <p class="lead">Simulation stops the drain. Nothing tells you what the drain used — or what is still open.</p>
       <div class="table-scroll">
         <table>
           <thead>
             <tr>
               <th>Tool</th>
               <th>Built to answer</th>
-              <th class="center">Warns before you sign</th>
+              <th class="center">Stops the drain</th>
               <th class="center">Revokes</th>
-              <th class="center">Names the permission that was used against you</th>
-              <th class="center">Reconstructs a past incident</th>
+              <th class="center">Names the permission used</th>
+              <th class="center">Rebuilds a past incident</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="tool">Wallet simulation<br><span class="tool-sub">Rabby · MetaMask · Blockaid</span></td>
-              <td class="why">“Is what I am about to sign dangerous?”</td>
+              <td class="why">“Is this signature dangerous?”</td>
               <td class="center yes">yes</td><td class="center no">no</td>
               <td class="center no">no</td><td class="center no">no</td>
             </tr>
             <tr>
               <td class="tool">Revoke.cash<br><span class="tool-sub">inventory + exploit checker</span></td>
-              <td class="why">“What have I approved, and is any of it on a known-exploit list?”</td>
+              <td class="why">“What have I approved?”</td>
               <td class="center no">no</td><td class="center yes">yes</td>
               <td class="center no">no</td><td class="center no">no</td>
             </tr>
@@ -249,14 +249,14 @@ td.why{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:270px}
             </tr>
             <tr class="ours">
               <td class="tool">Anchrion</td>
-              <td class="why">“Which permission was used against me, and can it still reach me?”</td>
-              <td class="center no">no —<br>it is not preventive</td><td class="center yes">yes</td>
+              <td class="why">“What was used against me — and what's still open?”</td>
+              <td class="center no">no</td><td class="center yes">yes</td>
               <td class="center yes">yes</td><td class="center yes">yes</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p class="table-note">Each row states what the tool is built to answer, taken from its own published description — not a feature audit, and not a claim that these products are bad. They are not: simulation is why drainer losses fell 83% between 2024 and 2025. The distinction is the one Revoke.cash makes about itself: it is preventative, it cannot recover funds, and it tells you to revoke the approvals that were used to take them — without naming which.</p>
+      <p class="table-note">Taken from each tool's own description. Anchrion is not preventive — simulation is why drainer losses fell 83% from 2024 to 2025. This is the hour after. As Revoke.cash puts it about itself: it cannot recover funds, and it will not name the approval that was used.</p>
     </section>
 
     <section class="section">
@@ -266,17 +266,17 @@ td.why{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:270px}
         <div class="card">
           <p class="card-n">01</p>
           <h3>Paste an address</h3>
-          <p>Any wallet or smart account, any of five networks. Nothing is installed and no wallet is connected, so you can inspect an address you do not own.</p>
+          <p>Five networks, no wallet, no install. Inspect an address you don't own.</p>
         </div>
         <div class="card">
           <p class="card-n">02</p>
           <h3>Read the reconstruction</h3>
-          <p>Approvals are read live from each token contract, outflows are paired with their submitting address, and the coverage panel states exactly what was and was not read.</p>
+          <p>Approvals read live from each token contract. Outflows paired with whoever submitted them.</p>
         </div>
         <div class="card">
           <p class="card-n">03</p>
-          <h3>Revoke, and verify</h3>
-          <p>Connect the wallet that owns the address and revoke any permission. After the receipt, the allowance is read back — a surviving allowance is reported as still allowed, never as a green tick.</p>
+          <h3>Revoke, then verify</h3>
+          <p>Sign the revoke. The allowance is read back — still allowed if it survives, never a green tick.</p>
         </div>
       </div>
     </section>
@@ -285,10 +285,10 @@ td.why{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:270px}
       <p class="section-kicker">What this cannot see</p>
       <h2>The limits are part of the product.</h2>
       <div class="limits">
-        <div class="limit"><i></i><span><b>ERC-20 allowances only.</b> ERC-721 and ERC-1155 approvals are not covered.</span></div>
-        <div class="limit"><i></i><span><b>Off-chain permits.</b> Permit2, ERC-2612 and Seaport signatures leave no trace on chain until they are redeemed.</span></div>
-        <div class="limit"><i></i><span><b>A bounded history.</b> Approval events are read over a validated block window; an older permission that never touched the wallet's readable history would be missed.</span></div>
-        <div class="limit"><i></i><span><b>No threat feed.</b> Anchrion ships no list of malicious addresses, and will not call an address an attacker without on-chain evidence.</span></div>
+        <div class="limit"><i></i><span><b>ERC-20 allowances only.</b> Not ERC-721 or ERC-1155 approvals.</span></div>
+        <div class="limit"><i></i><span><b>Off-chain permits.</b> Permit2, ERC-2612 and Seaport stay invisible until redeemed.</span></div>
+        <div class="limit"><i></i><span><b>A bounded history.</b> Permissions older than the readable block window are missed.</span></div>
+        <div class="limit"><i></i><span><b>No threat feed.</b> Nothing is called an attacker without on-chain evidence.</span></div>
       </div>
     </section>
     </div>
@@ -323,7 +323,7 @@ td.why{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:270px}
       </div>
       <div class="footer-rule"></div>
       <div class="footer-bottom">
-        <p class="footer-legal">&copy; 2026 Anchrion — MIT licensed. Reads public chain data only. It never asks for a private key and cannot move your funds; revoking sends a transaction your own wallet signs.</p>
+        <p class="footer-legal">&copy; 2026 Anchrion — MIT licensed. Public chain data only. It never asks for a private key and cannot move your funds; every revoke is a transaction your own wallet signs.</p>
         <div class="footer-socials">
           <a href="https://github.com/thesithunyein/anchrion" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
             <svg width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
