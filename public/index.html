@@ -82,7 +82,12 @@ img{display:block;max-width:100%}
 .cta-ghost:hover{border-color:rgba(255,255,255,0.32);transform:translateY(-1px)}
 
 /* ── Sections ───────────────────────────────────────────────────────────── */
-.section{position:relative;padding:clamp(48px,7vh,88px) 0;border-top:1px solid var(--line);background:var(--ink)}
+/* Everything below the hero sits on full-bleed ink. It used to be painted on
+   the section itself, which is inside the 1180px content column — so on a wide
+   window the ink stopped at the column edge and the live loop showed through
+   the gutters as two vertical strips either side of a black band. */
+.below{position:relative;background:var(--ink)}
+.section{position:relative;padding:clamp(48px,7vh,88px) 0;border-top:1px solid var(--line)}
 /* Fades the live loop into the page above each section, so the seam is a
    gradient rather than a hard cut where the content starts. */
 .section::before{content:'';position:absolute;left:0;right:0;top:0;height:150px;transform:translateY(-100%);
@@ -182,21 +187,24 @@ td.why{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:270px}
     </div>
   </nav>
 
-  <main class="wrap">
-    <section class="hero">
-      <div class="hero-inner">
-        <p class="eyebrow anim"><i></i>Wallet permission reconstruction</p>
-        <h1 class="headline anim">See how a drain happened.<br><em>Then close what is still open.</em></h1>
-        <p class="lede anim">Paste any address to see the permission that moved the funds — and what the same address can still reach.</p>
-        <p class="sub anim">Reads public chain data only. No wallet connection, no API keys, five networks.</p>
-        <div class="cta-row anim">
-          <a href="/dashboard" class="cta">Inspect an address</a>
-          <a href="/method" class="cta-ghost">Read the risk model</a>
+  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div class="hero-inner">
+          <p class="eyebrow anim"><i></i>Wallet permission reconstruction</p>
+          <h1 class="headline anim">See how a drain happened.<br><em>Then close what is still open.</em></h1>
+          <p class="lede anim">Paste any address to see the permission that moved the funds — and what the same address can still reach.</p>
+          <p class="sub anim">Reads public chain data only. No wallet connection, no API keys, five networks.</p>
+          <div class="cta-row anim">
+            <a href="/dashboard" class="cta">Inspect an address</a>
+            <a href="/method" class="cta-ghost">Read the risk model</a>
+          </div>
         </div>
-      </div>
+      </section>
+    </div>
 
-    </section>
-
+    <div class="below">
+    <div class="wrap">
     <section class="section">
       <p class="section-kicker">What no other tool answers</p>
       <h2>Prevention is solved. The hour after a drain is not.</h2>
@@ -276,6 +284,8 @@ td.why{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:270px}
         <div class="limit"><i></i><span><b>No threat feed.</b> Anchrion ships no list of malicious addresses, and will not call an address an attacker without on-chain evidence.</span></div>
       </div>
     </section>
+    </div>
+    </div>
   </main>
 
   <footer class="footer">
