@@ -68,7 +68,6 @@ export interface RiskFactor {
   name: string;
   description: string;
   impact: number;
-  severity: 'critical' | 'high' | 'medium' | 'low';
   evidence: EvidenceKind;
 }
 

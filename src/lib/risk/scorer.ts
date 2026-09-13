@@ -83,7 +83,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
       description:
         'This permission has no cap. If the spender is ever compromised or malicious, every token of this type can be moved.',
       impact: 30,
-      severity: 'high',
       evidence: 'detected',
     });
   } else if (Number(approval.allowanceFormatted) > 1_000_000) {
@@ -91,7 +90,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
       name: 'Very high limit',
       description: 'This permission allows spending more than one million tokens.',
       impact: 20,
-      severity: 'medium',
       evidence: 'detected',
     });
   }
@@ -103,7 +101,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
       description:
         'This address has no deployed code. It is an externally-owned account or a contract that no longer exists — a permission here is not a normal protocol permission.',
       impact: 40,
-      severity: 'critical',
       evidence: 'detected',
     });
   }
@@ -115,7 +112,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
       description:
         'The block explorer publicly flags this address as a scam. Anchrion did not decide this — it is the explorer\u2019s own published reputation flag.',
       impact: 45,
-      severity: 'critical',
       evidence: 'detected',
     });
   }
@@ -127,7 +123,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
       description:
         'The explorer has no verified source code for this contract, so nobody outside the deployer can confirm what it does with your tokens.',
       impact: 20,
-      severity: 'high',
       evidence: 'detected',
     });
   }
@@ -140,7 +135,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
         name: 'Very new contract',
         description: `${deployedAgo(age)}. A newly deployed spender with an unlimited permission has had no time to build a track record.`,
         impact: 25,
-        severity: 'high',
         evidence: 'detected',
       });
     } else if (age < 30) {
@@ -148,7 +142,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
         name: 'Recent contract',
         description: `${deployedAgo(age)}.`,
         impact: 15,
-        severity: 'medium',
         evidence: 'detected',
       });
     } else if (age < 90) {
@@ -156,7 +149,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
         name: 'Somewhat new contract',
         description: `${deployedAgo(age)}.`,
         impact: 5,
-        severity: 'low',
         evidence: 'detected',
       });
     }
@@ -169,7 +161,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
       description:
         'This address is on the threat list you configured via NEXT_PUBLIC_THREAT_LIST.',
       impact: 50,
-      severity: 'critical',
       evidence: 'detected',
     });
   }
@@ -191,7 +182,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
           approval.priceSource === 'live' ? 'live' : 'static snapshot'
         } prices).`,
         impact: 15,
-        severity: 'high',
         evidence: 'estimated',
       });
     } else if (approval.valueAtRiskUsd >= 1_000) {
@@ -203,7 +193,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
           approval.priceSource === 'live' ? 'live' : 'static snapshot'
         } prices).`,
         impact: 10,
-        severity: 'medium',
         evidence: 'estimated',
       });
     }
@@ -218,7 +207,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
         idleDays,
       )} days, yet the permission is still live. Dormant permissions are the ones people forget.`,
       impact: 10,
-      severity: 'low',
       evidence: 'estimated',
     });
   }
@@ -242,7 +230,6 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
       name: 'Recognised protocol',
       description: `${approval.spenderLabel} is on Anchrion's bundled protocol allowlist, matched by contract address rather than by name.`,
       impact: -20,
-      severity: 'low',
       evidence: 'detected',
     });
   }

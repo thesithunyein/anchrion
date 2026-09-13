@@ -335,13 +335,30 @@ If you want one command instead of a browser:
 ./scripts/verify-discovery.sh 0xYourAddress 1
 ```
 
-## Deployment note
+## Routes
 
-The landing page is a static file at `public/index.html`, served at `/` by the
-rewrite in `next.config.ts`. A hosting platform that already has a stale build will
-keep serving the old app until it is redeployed, so after pulling changes, rebuild
-and redeploy before pointing anyone at the live URL — `/method` and the read-only
-inspection flow on `/dashboard` only exist in the current build.
+Two static pages live in `public/` alongside the Next.js app, and the rewrites in
+`next.config.ts` are what connect them. The map is:
+
+| Path | Serves | Source |
+|---|---|---|
+| `/dashboard` | the app — paste an address, revoke, reconstruct an incident | `src/app/dashboard` |
+| `/method` | the published risk model and its limits | `src/app/method` |
+| `/anchrion` | the project landing page | `public/anchrion.html` |
+| `/` | a separate design study, not part of Anchrion | `public/chestly/index.html` |
+| `/index.html` | alias for `/anchrion` | — |
+| `/chestly` | alias for `/` | — |
+
+Two wrinkles worth knowing before you change this:
+
+1. Next.js serves files in `public/` by exact path and will **not** resolve a
+   folder's `index.html`, which is why `/chestly` needs its own rewrite.
+2. Vercel serves `public/index.html` at `/` by itself, and that beats any Next
+   rewrite. There is deliberately no `public/index.html` for exactly that reason.
+
+The route that matters to a reviewer is `/dashboard`; if a hosting platform has a
+stale build it will keep serving the old app until it is redeployed, so rebuild and
+redeploy after pulling changes.
 
 ## License
 
