@@ -91,6 +91,11 @@ export default function MethodPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <div style={{ maxWidth: 900, margin: '0 auto', padding: 'clamp(32px,6vh,72px) clamp(20px,5vw,48px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
+          <img src="/logo.svg" alt="" width={22} height={22} style={{ display: 'block' }} />
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: 15 }}>Anchrion</span>
+        </div>
+
         <a href="/dashboard" style={{ fontSize: 13, color: 'var(--blue-light)' }}>
           ← Back to dashboard
         </a>

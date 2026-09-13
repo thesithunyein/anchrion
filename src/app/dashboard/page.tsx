@@ -522,7 +522,7 @@ export default function Dashboard() {
       <div style={{ minHeight: '100vh', position: 'relative' }}>
         <Backdrop />
         <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24, padding: 32, textAlign: 'center' }}>
-          <img src="/logo.png" alt="Anchrion" style={{ width: 56, height: 56, borderRadius: 14 }} />
+          <img src="/logo.svg" alt="Anchrion" style={{ width: 56, height: 56 }} />
           <div>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px,3vw,32px)', fontWeight: 400, marginBottom: 10 }}>
               See how a drain happened
@@ -678,7 +678,7 @@ export default function Dashboard() {
       <div style={{ position: 'relative', zIndex: 1 }}>
         <header className="dash-header" style={{ position: 'sticky', top: 0, zIndex: 50, height: 56, display: 'flex', alignItems: 'center', padding: '0 clamp(20px,4vw,48px)', justifyContent: 'space-between', backdropFilter: 'blur(40px) saturate(1.4)', WebkitBackdropFilter: 'blur(40px) saturate(1.4)', background: 'rgba(8,9,13,0.6)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img src="/logo.png" alt="Anchrion" style={{ width: 28, height: 28, borderRadius: 7 }} />
+            <img src="/logo.svg" alt="Anchrion" style={{ width: 28, height: 28, display: 'block' }} />
             <span style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 400 }}>Anchrion</span>
           </a>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1121,7 +1121,7 @@ export default function Dashboard() {
         <footer style={{ backdropFilter: 'blur(40px) saturate(1.4)', background: 'rgba(8,9,13,0.75)', borderTop: '1px solid rgba(255,255,255,0.06)', padding: 'clamp(24px,3vh,32px) clamp(20px,4vw,48px)' }}>
           <div style={{ maxWidth: 1120, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <img src="/logo.png" alt="Anchrion" style={{ width: 22, height: 22, borderRadius: 5 }} />
+              <img src="/logo.svg" alt="Anchrion" style={{ width: 22, height: 22, display: 'block' }} />
               <span style={{ fontFamily: 'var(--font-display)', fontSize: 15 }}>© 2026 Anchrion</span>
             </div>
             <div style={{ display: 'flex', gap: 20 }}>

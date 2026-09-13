@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Anchrion">
+  <title>Anchrion</title>
+  <!--
+    A dial with a piece missing: the permission, and the wedge that was taken out
+    of it. Same language as the vault dial in the hero artwork, reduced to what
+    survives the size it is actually used at — 22px in the dashboard footer.
+
+    Three versions were built and looked at at 22, 28 and 56px before this one:
+
+      1. a shaded dial with cross-hairs and a keyhole hub — a yellow smear;
+      2. a ring with a gap at 12 o'clock and a dot in the middle — the universal
+         power symbol, which says exactly the wrong thing;
+      3. a keyhole — legible, but circle-plus-stem is how a person icon is drawn,
+         so at 28px it read as "account", not "permission".
+
+    This one has one glyph, one accent colour, and no collision with a glyph the
+    viewer already knows.
+
+    Geometry, reproduced exactly rather than eyeballed: canvas 64, tile radius
+    16, dial centre (32,32) radius 19, wedge removed from 315 to 360 degrees
+    measured clockwise from 12 o'clock, so the remaining 315-degree arc runs from
+    (32,13) clockwise to (18.56,18.56).
+
+    The wedge is 45 degrees and not 75: at 75 the dial reads as a face with an
+    open mouth, which is not what a permission scanner should look like.
+  -->
+  <rect width="64" height="64" rx="16" fill="#3c56f0"/>
+  <path d="M32 13A19 19 0 1 1 18.56 18.56L32 32Z" fill="#fbbf24"/>
+</svg>
