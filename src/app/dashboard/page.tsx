@@ -445,9 +445,8 @@ export default function Dashboard() {
               See how a drain happened
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 470, lineHeight: 1.6 }}>
-              Paste any address below and Anchrion reconstructs the incident: the transfer that took
-              the tokens, the permission that allowed it, and what the same address can still reach.
-              Connect a wallet only when you want to revoke.
+              Paste any address to see the permission that took the funds — and what is still
+              reachable.
             </p>
           </div>
           {connectError && (
@@ -493,8 +492,8 @@ export default function Dashboard() {
             <p style={{ fontSize: 13, color: '#fca5a5', maxWidth: 470 }}>{watchError}</p>
           )}
           <p style={{ fontSize: 12, color: 'var(--text-tertiary)', maxWidth: 470, lineHeight: 1.6 }}>
-            Read-only mode reads public chain data only. It cannot sign anything: revoking requires
-            connecting the wallet that owns the address.
+            Read-only. Anchrion cannot sign anything — revoking needs the wallet that owns the
+            address.
           </p>
 
           <div style={{ width: '100%', maxWidth: 470, display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-tertiary)', fontSize: 12 }}>
