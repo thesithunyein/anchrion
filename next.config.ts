@@ -11,7 +11,14 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return {
       beforeFiles: [],
-      afterFiles: [{ source: '/', destination: '/index.html' }],
+      afterFiles: [
+        { source: '/', destination: '/index.html' },
+        // The Chestly design study is a standalone static page under public/.
+        // Next serves public files by their exact path, so a folder URL needs
+        // its index resolving explicitly, same as the landing page above.
+        { source: '/chestly', destination: '/chestly/index.html' },
+        { source: '/chestly/', destination: '/chestly/index.html' },
+      ],
       fallback: [],
     };
   },
