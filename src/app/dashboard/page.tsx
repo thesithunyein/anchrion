@@ -23,9 +23,14 @@ import {
 
 const CHAIN_IDS = [11155111, 1, 8453, 42161, 10] as const;
 const WALLETS = [
-  { name: 'MetaMask', id: 'metamask', url: 'https://metamask.io' },
-  { name: 'Coinbase Wallet', id: 'coinbase', url: 'https://www.coinbase.com/wallet' },
-  { name: 'Phantom', id: 'phantom', url: 'https://phantom.app' },
+  { name: 'MetaMask', id: 'metamask', icon: '/metamask.png', url: 'https://metamask.io' },
+  {
+    name: 'Coinbase Wallet',
+    id: 'coinbase',
+    icon: '/coinbase.png',
+    url: 'https://www.coinbase.com/wallet',
+  },
+  { name: 'Phantom', id: 'phantom', icon: '/phantom.png', url: 'https://phantom.app' },
 ];
 
 function chainBadge(chainId: number) {
@@ -510,6 +515,13 @@ export default function Dashboard() {
                 disabled={isPending}
                 style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--text)', fontSize: 14, fontWeight: 500, cursor: isPending ? 'wait' : 'pointer', textAlign: 'left' }}
               >
+                <img
+                  src={wallet.icon}
+                  alt=""
+                  width={24}
+                  height={24}
+                  style={{ display: 'block', objectFit: 'contain', flexShrink: 0 }}
+                />
                 {wallet.name}
                 <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-tertiary)' }}>
                   {isPending ? 'Connecting…' : '→'}
