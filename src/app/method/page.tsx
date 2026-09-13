@@ -77,6 +77,7 @@ const WEIGHTS: Weight[] = [
 ];
 
 const LIMITS = [
+  'Money and score are separate numbers, and a low score is not a statement that you have nothing to revoke. The dollar figure is what a permission can move today; the score is the sum of the danger weights that fired. A $540,000 permission to an old, verified, non-flagged contract scores 15 — correctly, because no danger signal fired. Read the two together.',
   'Scores are not probabilities and not a ranking of danger. A score of 45 and a score of 50 sit next to each other on one number line, but the difference between them is one weight firing, not a difference in measured outcome. Read the factors, not only the total.',
   'ERC-20 allowance approvals only. ERC-721 (NFT) approvals and off-chain permits such as Permit2 and ERC-2612 are not covered.',
   'Approvals granted inside a contract call are only found within a bounded recent log window, because public RPC endpoints reject deep log ranges. That window is measured per scan rather than assumed: the scan probes the endpoint, validates each range against a narrower read, and reports the window it actually reached, or reports it as unmeasured.',
