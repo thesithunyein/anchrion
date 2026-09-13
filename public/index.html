@@ -117,6 +117,9 @@ tr.ours td.tool{color:var(--text);font-weight:600}
 .yes{color:var(--safe)}
 .no{color:var(--dim)}
 td.center{text-align:center}
+td.why{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:270px}
+.tool-sub{display:block;font-size:11px;color:var(--dim);font-weight:400;margin-top:2px}
+.table-note{margin-top:16px;font-size:12.5px;color:var(--dim);line-height:1.65;max-width:820px}
 
 /* Three steps */
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:32px}
@@ -247,44 +250,48 @@ td.center{text-align:center}
     <section class="section">
       <p class="section-kicker">What no other tool answers</p>
       <h2>Prevention is solved. The hour after a drain is not.</h2>
-      <p class="lead">Transaction simulation and approval inventories are good products that already exist. None of them answers which permission was used against you, or whether the same spender can still reach you. That is the only question Anchrion was built for — and the last row of this table is where it loses.</p>
+      <p class="lead">Simulation and approval dashboards are good, mature products. Read what each one is built to answer — and where Anchrion is the one that fails.</p>
       <div class="table-scroll">
         <table>
           <thead>
             <tr>
               <th>Tool</th>
+              <th>Built to answer</th>
               <th class="center">Warns before you sign</th>
-              <th class="center">Lists permissions</th>
               <th class="center">Revokes</th>
-              <th class="center">Names the permission that was used</th>
-              <th class="center">Shows what is still reachable</th>
+              <th class="center">Names the permission that was used against you</th>
+              <th class="center">Reconstructs a past incident</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="tool">Rabby · MetaMask simulation</td>
-              <td class="center yes">yes</td><td class="center no">no</td><td class="center no">no</td>
+              <td class="tool">Wallet simulation<br><span class="tool-sub">Rabby · MetaMask · Blockaid</span></td>
+              <td class="why">“Is what I am about to sign dangerous?”</td>
+              <td class="center yes">yes</td><td class="center no">no</td>
               <td class="center no">no</td><td class="center no">no</td>
             </tr>
             <tr>
-              <td class="tool">Revoke.cash</td>
-              <td class="center no">no</td><td class="center yes">yes</td><td class="center yes">yes</td>
+              <td class="tool">Revoke.cash<br><span class="tool-sub">inventory + exploit checker</span></td>
+              <td class="why">“What have I approved, and is any of it on a known-exploit list?”</td>
+              <td class="center no">no</td><td class="center yes">yes</td>
               <td class="center no">no</td><td class="center no">no</td>
             </tr>
             <tr>
               <td class="tool">Etherscan</td>
-              <td class="center no">no</td><td class="center no">no</td><td class="center no">no</td>
+              <td class="why">“What did this transaction do?”</td>
+              <td class="center no">no</td><td class="center no">no</td>
               <td class="center no">no</td><td class="center no">no</td>
             </tr>
             <tr class="ours">
               <td class="tool">Anchrion</td>
-              <td class="center no">no — it is not preventive</td>
-              <td class="center yes">yes</td><td class="center yes">yes</td>
+              <td class="why">“Which permission was used against me, and can it still reach me?”</td>
+              <td class="center no">no —<br>it is not preventive</td><td class="center yes">yes</td>
               <td class="center yes">yes</td><td class="center yes">yes</td>
             </tr>
           </tbody>
         </table>
       </div>
+      <p class="table-note">Each row states what the tool is built to answer, taken from its own published description — not a feature audit, and not a claim that these products are bad. They are not: simulation is why drainer losses fell 83% between 2024 and 2025. The distinction is the one Revoke.cash makes about itself: it is preventative, it cannot recover funds, and it tells you to revoke the approvals that were used to take them — without naming which.</p>
     </section>
 
     <section class="section">
