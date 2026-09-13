@@ -38,8 +38,12 @@ function short(address: string): string {
   return `${address.slice(0, 10)}…${address.slice(-6)}`;
 }
 
-function days(seconds: number): string {
-  return `${Math.floor(seconds / 86_400)} days`;
+/** Relative age in words, so no row ever reads "Deployed 0 days". */
+function ago(seconds: number): string {
+  const whole = Math.floor(seconds / 86_400);
+  if (whole <= 0) return 'today';
+  if (whole === 1) return '1 day ago';
+  return `${whole} days ago`;
 }
 
 function Signal({
@@ -276,7 +280,7 @@ export function ApprovalRow({
                   value={
                     approval.signals.contractAgeDays === null
                       ? null
-                      : days(approval.signals.contractAgeDays * 86_400)
+                      : ago(approval.signals.contractAgeDays * 86_400)
                   }
                 />
                 <Signal
@@ -286,11 +290,11 @@ export function ApprovalRow({
                   }
                 />
                 <Signal
-                  label="Token idle for"
+                  label="Token last moved"
                   value={
                     approval.signals.lastTokenActivityDays === null
                       ? null
-                      : days(approval.signals.lastTokenActivityDays * 86_400)
+                      : ago(approval.signals.lastTokenActivityDays * 86_400)
                   }
                 />
                 <Signal
@@ -347,7 +351,7 @@ export function ApprovalRow({
               }}
             >
               {!canRevoke
-                ? 'Revoke needs the wallet'
+                ? 'Connect wallet to revoke'
                 : revoked
                   ? 'Revoked'
                   : unverified

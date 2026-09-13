@@ -33,6 +33,19 @@ const WALLETS = [
   { name: 'Phantom', id: 'phantom', icon: '/phantom.png', url: 'https://phantom.app' },
 ];
 
+const FILTER_LABELS: Record<'all' | 'critical' | 'high' | 'medium' | 'low', string> = {
+  all: 'All',
+  critical: 'Critical',
+  high: 'High',
+  medium: 'Medium',
+  /** The bucket is everything under 30, which is the Low band and the Safe band. */
+  low: 'Low or safe',
+};
+
+function shortAddress(address: string): string {
+  return `${address.slice(0, 6)}…${address.slice(-4)}`;
+}
+
 function chainBadge(chainId: number) {
   return chainId === 11155111
     ? { label: 'Testnet', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' }
@@ -94,7 +107,7 @@ function CoveragePanel({ coverage }: { coverage: ScanCoverage }) {
         <span>approve() calls decoded: {coverage.approveCallsParsed}</span>
         <span>Approval events decoded: {coverage.approvalLogsParsed}</span>
         <span>Tokens history-scanned: {coverage.tokensScanned}</span>
-        <span>Permissions checked on chain: {coverage.pairsChecked}</span>
+        <span>Allowance pairs read on chain: {coverage.pairsChecked}</span>
         <span>Granted then revoked: {coverage.revokedFound}</span>
         {coverage.notGrantedFound ? (
           <span>Candidate pairs never granted: {coverage.notGrantedFound}</span>
@@ -165,6 +178,32 @@ export default function Dashboard() {
       supported,
   );
   const readOnly = activeAddress !== null && !canRevoke;
+
+  /*
+   * Connecting silently changes which address is being scanned: the header changes
+   * and a button becomes clickable, but the list a person was already reading stays
+   * where it was. That is invisible enough that it reads as "nothing happened". So
+   * the transition is stated once, in the slot the read-only banner occupies, and
+   * only for a connection made while this page was open.
+   */
+  const [connectionNotice, setConnectionNotice] = useState<{
+    address: string;
+    replaced: string | null;
+  } | null>(null);
+  const previousConnected = useRef<string | null>(null);
+  const firstConnectionCheck = useRef(true);
+  useEffect(() => {
+    const current = isConnected && connectedSupported ? connectedAddress : null;
+    const before = previousConnected.current;
+    previousConnected.current = current;
+    if (firstConnectionCheck.current) {
+      firstConnectionCheck.current = false;
+      return;
+    }
+    if (current === null || before !== null) return;
+    const replaced = watchAddress && watchAddress !== current ? watchAddress : null;
+    setConnectionNotice({ address: current, replaced });
+  }, [isConnected, connectedSupported, connectedAddress, watchAddress]);
 
   const startReadOnly = useCallback((raw: string, network: number) => {
     const candidate = raw.trim().toLowerCase();
@@ -356,12 +395,27 @@ export default function Dashboard() {
     const total = approvals.length;
     const risky = approvals.filter((approval) => approval.riskScore >= 50).length;
     const critical = approvals.filter((approval) => approval.riskScore >= 70).length;
+    const unlimited = approvals.filter((approval) => approval.isUnlimited).length;
     const valueAtRisk = approvals
       .filter((approval) => approval.riskScore >= 50)
       .reduce((sum, approval) => sum + approval.valueAtRiskUsd, 0);
     const healthScore = total === 0 ? 100 : Math.round(((total - risky) / total) * 100);
-    return { total, risky, critical, valueAtRisk, healthScore };
+    return { total, risky, critical, unlimited, valueAtRisk, healthScore };
   }, [approvals]);
+
+  /*
+   * The value-at-risk figure has two limits of its own and a card has no room to
+   * hide them: it prices capped permissions only, because an unlimited permission
+   * has no dollar cap, and it counts only permissions scoring 50 or more.
+   */
+  const valueAtRiskHint =
+    stats.total === 0
+      ? 'nothing measured yet'
+      : stats.unlimited > 0
+        ? stats.valueAtRisk > 0
+          ? `capped permissions scoring 50+ · plus ${stats.unlimited} unlimited`
+          : `${stats.unlimited} unlimited permission${stats.unlimited === 1 ? '' : 's'} — no cap to price`
+        : 'capped permissions scoring 50 or more';
 
   const filtered = useMemo(
     () =>
@@ -636,14 +690,15 @@ export default function Dashboard() {
               {loading ? 'Scanning…' : 'Rescan'}
             </button>
             <span style={{ padding: '5px 14px', borderRadius: 20, fontSize: 13, fontFamily: 'monospace', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              {activeAddress.slice(0, 6)}…{activeAddress.slice(-4)}
+              {shortAddress(activeAddress)}
             </span>
             {readOnly ? (
               <button
                 onClick={stopReadOnly}
+                title="Connect the wallet that owns this address to revoke"
                 style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 16px', borderRadius: 8, fontSize: 13, color: '#fbbf24', border: '1px solid rgba(245,158,11,0.25)', background: 'rgba(245,158,11,0.08)', cursor: 'pointer' }}
               >
-                Read-only · connect wallet
+                Connect wallet
               </button>
             ) : (
               <button onClick={() => disconnect()} style={{ padding: '7px 16px', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.08)', background: 'transparent' }}>
@@ -670,6 +725,32 @@ export default function Dashboard() {
                 connect a wallet
               </button>
               .
+            </div>
+          )}
+
+          {!readOnly && connectionNotice && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 20, padding: '12px 16px', borderRadius: 10, background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 13, color: '#86efac', lineHeight: 1.55 }}>
+              <span>
+                <strong>Connected.</strong>{' '}
+                {connectionNotice.replaced ? (
+                  <>
+                    Switched from{' '}
+                    <span style={{ fontFamily: 'monospace' }}>
+                      {shortAddress(connectionNotice.replaced)}
+                    </span>{' '}
+                    to your connected wallet.{' '}
+                  </>
+                ) : null}
+                Scanning <span style={{ fontFamily: 'monospace' }}>{connectionNotice.address}</span> on{' '}
+                {NETWORK_NAMES[chainId ?? 1]}. Revoking is enabled for this address.
+              </span>
+              <button
+                onClick={() => setConnectionNotice(null)}
+                aria-label="Dismiss"
+                style={{ background: 'none', border: 'none', color: '#86efac', fontSize: 16, lineHeight: 1, cursor: 'pointer', padding: 0 }}
+              >
+                ×
+              </button>
             </div>
           )}
 
@@ -700,18 +781,57 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="dash-enter-delay-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 16, marginBottom: 24 }}>
+          <div className="dash-enter-delay-1 stat-grid" style={{ marginBottom: 24 }}>
             {[
-              { label: 'Live permissions', value: String(stats.total) },
-              { label: 'Risky (≥50)', value: String(stats.risky), color: 'var(--risk-high)' },
-              { label: 'Value at risk', value: `$${stats.valueAtRisk.toLocaleString()}`, color: 'var(--risk-medium)' },
-              { label: 'Health score', value: `${stats.healthScore}%`, color: stats.healthScore >= 70 ? 'var(--risk-safe)' : 'var(--risk-high)' },
+              {
+                label: 'Live permissions',
+                value: String(stats.total),
+                hint: stats.total === 0 ? 'nothing live to revoke' : undefined,
+              },
+              {
+                label: 'Risky (≥50)',
+                value: String(stats.risky),
+                color: 'var(--risk-high)',
+                hint:
+                  stats.critical > 0
+                    ? `${stats.critical} critical`
+                    : stats.total === 0
+                      ? 'nothing measured yet'
+                      : undefined,
+              },
+              {
+                label: 'Value at risk',
+                value: `$${stats.valueAtRisk.toLocaleString()}`,
+                color: 'var(--risk-medium)',
+                hint: valueAtRiskHint,
+              },
+              {
+                /*
+                 * With nothing measured there is no health to report. Printing 100%
+                 * there would read as a clean bill of health for a wallet nobody
+                 * looked at, which is the one thing this score must never imply.
+                 */
+                label: 'Health score',
+                value: stats.total === 0 ? '—' : `${stats.healthScore}%`,
+                color:
+                  stats.total === 0
+                    ? 'var(--text-tertiary)'
+                    : stats.healthScore >= 70
+                      ? 'var(--risk-safe)'
+                      : 'var(--risk-high)',
+                hint: stats.total === 0 ? 'no permissions to measure' : undefined,
+              },
             ].map((item) => (
               <div key={item.label} style={{ padding: '18px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <p style={{ fontSize: 11, fontWeight: 500, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-tertiary)' }}>
                   {item.label}
                 </p>
                 <p style={{ fontSize: 24, fontWeight: 600, color: item.color ?? 'var(--text)' }}>{item.value}</p>
+                {item.hint && (
+                  <p style={{ marginTop: 6, fontSize: 12, lineHeight: 1.5, color: 'var(--text-tertiary)' }}>
+                    {item.hint}
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -775,7 +895,7 @@ export default function Dashboard() {
                     onClick={() => setFilter(entry)}
                     style={{ padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500, ...(filter === entry ? { background: 'var(--blue)', color: 'white' } : { background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.06)' }) }}
                   >
-                    {entry.charAt(0).toUpperCase() + entry.slice(1)}
+                    {FILTER_LABELS[entry]}
                   </button>
                 ))}
               </div>
@@ -820,15 +940,49 @@ export default function Dashboard() {
                 ) : filtered.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '56px 20px', color: 'var(--text-secondary)' }}>
                     <p style={{ fontSize: 16, marginBottom: 12, color: 'var(--text)' }}>
-                      {approvals.length === 0 ? 'No live permissions found' : 'Nothing matches this filter'}
-                    </p>
-                    <p style={{ fontSize: 14, maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
                       {approvals.length === 0
-                        ? coverage && coverage.revokedFound > 0
-                          ? `Nothing is live right now. ${coverage.revokedFound} permission(s) this address granted have been revoked, and ${coverage.pairsChecked} candidate permissions were read on chain. The coverage panel below names exactly what was inspected and what could not be.`
-                          : 'Permissions appear here once this address approves a token to a contract. If you expected to see something, read the coverage panel below — it names what the scan could not see.'
-                        : 'Try clearing the search or switching back to the All filter.'}
+                        ? 'No live permissions on this address'
+                        : 'Nothing matches this filter'}
                     </p>
+                    {approvals.length === 0 ? (
+                      <>
+                        <p style={{ fontSize: 14, maxWidth: 560, margin: '0 auto', lineHeight: 1.6 }}>
+                          {coverage && coverage.revokedFound > 0
+                            ? `${coverage.pairsChecked} allowance pairs were read on chain and none of them are still granted. ${coverage.revokedFound} permission${coverage.revokedFound === 1 ? '' : 's'} this address granted ${coverage.revokedFound === 1 ? 'has' : 'have'} since been revoked, so nothing is spendable right now.`
+                            : 'Permissions appear here once this address approves a token to a contract. Anchrion found no approval from this address on this network.'}
+                        </p>
+                        <p style={{ fontSize: 13, maxWidth: 560, margin: '12px auto 0', lineHeight: 1.6, color: 'var(--text-tertiary)' }}>
+                          An empty list is a measurement, not a failure — the coverage panel below names every
+                          check that ran and everything it could not see.
+                        </p>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginTop: 22 }}>
+                          <button
+                            onClick={() => setTab('incident')}
+                            style={{ padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, color: 'white', background: 'var(--blue)', border: 'none', cursor: 'pointer' }}
+                          >
+                            Reconstruct its history
+                          </button>
+                          {readOnly && (
+                            <button
+                              onClick={stopReadOnly}
+                              style={{ padding: '9px 18px', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}
+                            >
+                              Inspect another address
+                            </button>
+                          )}
+                          <a
+                            href="/method"
+                            style={{ padding: '9px 18px', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.08)' }}
+                          >
+                            What this cannot see
+                          </a>
+                        </div>
+                      </>
+                    ) : (
+                      <p style={{ fontSize: 14, maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
+                        Try clearing the search or switching back to the All filter.
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

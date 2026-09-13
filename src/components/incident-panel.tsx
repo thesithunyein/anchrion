@@ -225,7 +225,7 @@ export function IncidentPanel({
               }}
             >
               {!canRevoke
-                ? 'Read-only — connect wallet'
+                ? 'Connect wallet to revoke'
                 : revocable.length === 0
                   ? 'All revoked'
                   : batch && batch.done < batch.total
@@ -297,7 +297,7 @@ export function IncidentPanel({
                       }}
                     >
                       {!canRevoke
-                        ? 'Read-only'
+                        ? 'Connect wallet to revoke'
                         : done
                           ? 'Revoked'
                           : status === 'signing'

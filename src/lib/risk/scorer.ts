@@ -16,6 +16,14 @@
 
 import type { Approval, RiskFactor, RiskLevel } from '@/types/approval';
 
+/** Relative deployment age, so a description never reads "Deployed 0 day(s) ago". */
+function deployedAgo(days: number): string {
+  const whole = Math.max(0, Math.floor(days));
+  if (whole === 0) return 'Deployed today';
+  if (whole === 1) return 'Deployed 1 day ago';
+  return `Deployed ${whole} days ago`;
+}
+
 /** Protocols users deliberately approve. Recognised labels reduce score. */
 const KNOWN_PROTOCOLS = [
   'uniswap',
@@ -130,7 +138,7 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
     if (age < 7) {
       add({
         name: 'Very new contract',
-        description: `Deployed ${Math.max(0, Math.floor(age))} day(s) ago. A newly deployed spender with an unlimited permission has had no time to build a track record.`,
+        description: `${deployedAgo(age)}. A newly deployed spender with an unlimited permission has had no time to build a track record.`,
         impact: 25,
         severity: 'high',
         evidence: 'detected',
@@ -138,7 +146,7 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
     } else if (age < 30) {
       add({
         name: 'Recent contract',
-        description: `Deployed ${Math.floor(age)} days ago.`,
+        description: `${deployedAgo(age)}.`,
         impact: 15,
         severity: 'medium',
         evidence: 'detected',
@@ -146,7 +154,7 @@ export function calculateRiskScore(approval: Approval): RiskAssessment {
     } else if (age < 90) {
       add({
         name: 'Somewhat new contract',
-        description: `Deployed ${Math.floor(age)} days ago.`,
+        description: `${deployedAgo(age)}.`,
         impact: 5,
         severity: 'low',
         evidence: 'detected',

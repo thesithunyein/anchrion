@@ -21,10 +21,22 @@ const WEIGHTS: Weight[] = [
     why: 'Read from the token contract: allowance is at or above 2^255. No cap means the whole balance of that token is reachable.',
   },
   {
+    name: 'Allowance above one million tokens',
+    points: '+20',
+    evidence: 'detected',
+    why: 'A cap exists, but it is larger than one million units of the token. Capped does not mean small.',
+  },
+  {
     name: 'Spender has no contract code',
     points: '+40',
     evidence: 'detected',
     why: '`eth_getCode` returned nothing. The spender is an externally-owned account or a self-destructed contract. A permission granted to a non-contract is not a normal protocol permission.',
+  },
+  {
+    name: 'Explorer flags the address as a scam',
+    points: '+45',
+    evidence: 'detected',
+    why: 'The block explorer publishes its own scam flag for this address. Anchrion is not the source: it ships no threat intel, it only reads the flag the explorer already shows. Where the explorer reports nothing, this weight adds nothing and the UI says not reported.',
   },
   {
     name: 'Unverified contract source',
@@ -65,6 +77,7 @@ const WEIGHTS: Weight[] = [
 ];
 
 const LIMITS = [
+  'Scores are not probabilities and not a ranking of danger. A score of 45 and a score of 50 sit next to each other on one number line, but the difference between them is one weight firing, not a difference in measured outcome. Read the factors, not only the total.',
   'ERC-20 allowance approvals only. ERC-721 (NFT) approvals and off-chain permits such as Permit2 and ERC-2612 are not covered.',
   'Approvals granted inside a contract call are only found within a bounded recent log window, because public RPC endpoints reject deep log ranges. That window is measured per scan rather than assumed: the scan probes the endpoint, validates each range against a narrower read, and reports the window it actually reached, or reports it as unmeasured.',
   'Discovery reads the wallet’s recent transaction history and token transfers. Wallets with thousands of approvals will not have all of them enumerated in a single scan.',
