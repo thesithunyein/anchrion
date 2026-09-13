@@ -5,108 +5,339 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Anchrion — See how a drain happened, and what is still reachable</title>
 <meta name="description" content="Paste any wallet address to see the permission that moved the funds, and what the same address can still reach. No wallet connection, no API keys."/>
+<meta property="og:title" content="Anchrion — See how a drain happened, and what is still reachable"/>
+<meta property="og:description" content="Paste any wallet address to see the permission that moved the funds, and what the same address can still reach."/>
+<meta property="og:type" content="website"/>
 <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--font-display:'Instrument Serif',Georgia,serif;--font-body:'Plus Jakarta Sans',system-ui,sans-serif;--blue:#1a73e8}
-html,body{min-height:100vh;background:#08090d;font-family:var(--font-body);-webkit-font-smoothing:antialiased;color:#fff;overflow-x:hidden}
+:root{
+  --font-display:'Instrument Serif',Georgia,serif;
+  --font-body:'Plus Jakarta Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --ink:#07080c;--surface:#0d1017;--surface-2:#12161f;
+  --line:rgba(255,255,255,0.08);--line-strong:rgba(255,255,255,0.14);
+  --blue:#2f7df6;--blue-soft:rgba(47,125,246,0.14);
+  --safe:#35d07f;--amber:#f5a623;
+  --text:#f2f5fa;--muted:rgba(242,245,250,0.64);--dim:rgba(242,245,250,0.38);
+  --spot:clamp(24px,4vw,72px);
+}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--text);font-family:var(--font-body);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.5}
 a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
 
-/* Background video */
-.bg{position:fixed;inset:0;z-index:0}
-.bg video{width:100%;height:100%;object-fit:cover;object-position:right bottom;filter:saturate(0.86)}
-.bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,20,32,0.3) 0%,rgba(4,20,32,0.5) 40%,rgba(8,9,13,0.85) 100%)}
+/* ── Background: a composed canvas, not a stock loop ─────────────────────── */
+.canvas{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.canvas::before{content:'';position:absolute;inset:-20% -10% auto -10%;height:120vh;
+  background:
+    radial-gradient(60% 50% at 78% 8%,rgba(47,125,246,0.20),transparent 62%),
+    radial-gradient(45% 40% at 12% 4%,rgba(53,208,127,0.09),transparent 60%),
+    linear-gradient(180deg,#080a10 0%,#07080c 55%,#06070a 100%)}
+.canvas::after{content:'';position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,0.028) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,0.028) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(120% 90% at 50% 0%,#000 20%,transparent 78%);
+  -webkit-mask-image:radial-gradient(120% 90% at 50% 0%,#000 20%,transparent 78%)}
 
-/* Layout */
-.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.shell{position:relative;z-index:1}
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--spot)}
 
-/* Hero */
-.hero{flex:1;display:flex;flex-direction:column;justify-content:center;padding:clamp(80px,14vh,160px) clamp(32px,6vw,80px) clamp(100px,16vh,200px);max-width:900px}
-.eyebrow{font-size:clamp(11px,1.2vw,14px);font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.8);margin-bottom:16px}
-.headline{font-family:var(--font-display);font-weight:400;font-size:clamp(36px,5.5vw,68px);line-height:1.08;letter-spacing:-0.02em;margin-bottom:16px}
-.headline span{color:var(--blue)}
-.lede{font-size:clamp(14px,1.6vw,17px);color:rgba(255,255,255,0.68);line-height:1.6;max-width:520px;margin-bottom:20px;font-weight:400}
-.proof{font-size:clamp(12px,1.3vw,13px);color:rgba(255,255,255,0.45);line-height:1.6;max-width:520px;margin-bottom:28px}
+/* ── Nav ────────────────────────────────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);
+  background:rgba(7,8,12,0.72);border-bottom:1px solid var(--line)}
+.nav-inner{display:flex;align-items:center;gap:28px;padding:14px var(--spot);max-width:1180px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;letter-spacing:-0.01em}
+.brand img{width:26px;height:26px;border-radius:7px}
+.nav-links{display:flex;gap:22px;margin-left:auto;font-size:13.5px;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{padding:9px 18px;border-radius:7px;background:#fff;color:#000;font-size:13.5px;font-weight:600}
+.nav-cta:hover{background:#e8eef7}
+
+/* ── Hero ───────────────────────────────────────────────────────────────── */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(32px,5vw,72px);align-items:center;
+  padding:clamp(56px,9vh,104px) 0 clamp(40px,6vh,64px)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:rgba(242,245,250,0.72);border:1px solid var(--line-strong);
+  padding:6px 12px;border-radius:999px;margin-bottom:22px}
+.eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--safe);display:block}
+.headline{font-family:var(--font-display);font-weight:400;font-size:clamp(38px,5.4vw,66px);line-height:1.05;letter-spacing:-0.02em;margin-bottom:20px}
+.headline em{font-style:italic;color:var(--blue)}
+.lede{font-size:clamp(15px,1.5vw,18px);color:var(--muted);line-height:1.6;max-width:520px;margin-bottom:14px}
+.sub{font-size:13.5px;color:var(--dim);line-height:1.6;max-width:520px;margin-bottom:30px}
 .cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.cta{display:inline-flex;align-items:center;justify-content:center;padding:12px 28px;background:#fff;color:#000;font-size:clamp(13px,1.4vw,15px);font-weight:500;border-radius:6px;transition:all .25s ease;width:fit-content}
-.cta:hover{background:#eef2f3;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.25)}
-.cta-ghost{display:inline-flex;align-items:center;justify-content:center;padding:12px 24px;font-size:clamp(13px,1.4vw,15px);font-weight:500;border-radius:6px;border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.85);transition:all .25s ease;width:fit-content}
-.cta-ghost:hover{border-color:rgba(255,255,255,0.4);transform:translateY(-2px)}
+.cta{display:inline-flex;align-items:center;gap:9px;padding:13px 24px;background:#fff;color:#000;font-size:14.5px;
+  font-weight:600;border-radius:8px;transition:transform .2s ease,background .2s ease}
+.cta:hover{background:#e8eef7;transform:translateY(-1px)}
+.cta-ghost{display:inline-flex;align-items:center;padding:13px 22px;font-size:14.5px;font-weight:500;border-radius:8px;
+  border:1px solid var(--line-strong);color:rgba(242,245,250,0.9);transition:border-color .2s ease,transform .2s ease}
+.cta-ghost:hover{border-color:rgba(255,255,255,0.32);transform:translateY(-1px)}
 
-/* Footer */
-.footer{backdrop-filter:blur(40px) saturate(1.4);-webkit-backdrop-filter:blur(40px) saturate(1.4);background:linear-gradient(180deg,rgba(8,9,13,0.6) 0%,rgba(8,9,13,0.85) 100%);border-top:1px solid rgba(255,255,255,0.06);padding:clamp(24px,3vh,40px) clamp(24px,4vw,64px)}
-.footer-inner{max-width:1200px;margin:0 auto}
-.footer-top{display:flex;justify-content:space-between;gap:40px;margin-bottom:24px}
-.footer-brand{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.footer-brand img{width:clamp(20px,2.5vw,28px);height:clamp(20px,2.5vw,28px);border-radius:6px}
-.footer-brand span{font-size:clamp(14px,1.6vw,16px);font-weight:500}
-.footer-tagline{font-size:clamp(11px,1.2vw,13px);color:rgba(255,255,255,0.5);max-width:300px;line-height:1.5}
-.footer-nav{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(24px,4vw,56px)}
-.footer-col h4{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:12px}
-.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
-.footer-col a{font-size:clamp(11px,1.2vw,13px);color:rgba(255,255,255,0.6);transition:opacity .2s}
-.footer-col a:hover{opacity:.5}
-.footer-rule{height:1px;background:rgba(255,255,255,0.15);margin:20px 0 16px}
+/* ── Product visual: the reconstruction, drawn from the real panel ─────── */
+.showcase{border:1px solid var(--line-strong);border-radius:14px;background:linear-gradient(180deg,var(--surface-2),var(--surface));
+  box-shadow:0 30px 80px -30px rgba(0,0,0,0.9);overflow:hidden}
+.showcase-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,0.02)}
+.showcase-bar span{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.14)}
+.showcase-url{margin-left:10px;font-family:var(--font-mono);font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.showcase-body{padding:18px}
+.step{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
+.step:last-of-type{border-bottom:0}
+.step-n{flex:0 0 24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:11.5px;font-weight:700;background:var(--blue-soft);color:var(--blue);border:1px solid rgba(47,125,246,0.28)}
+.step-n.green{background:rgba(53,208,127,0.12);color:var(--safe);border-color:rgba(53,208,127,0.3)}
+.step-h{font-size:13.5px;font-weight:600;margin-bottom:3px}
+.step-p{font-size:12.5px;color:var(--muted);line-height:1.5}
+.mono{font-family:var(--font-mono);font-size:11.5px;color:var(--dim)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.chip{font-size:11px;font-weight:600;letter-spacing:0.02em;padding:5px 10px;border-radius:999px;border:1px solid var(--line-strong);color:var(--muted)}
+.chip.crit{color:#ff8f8f;border-color:rgba(255,143,143,0.3);background:rgba(255,143,143,0.08)}
+.chip.ok{color:var(--safe);border-color:rgba(53,208,127,0.3);background:rgba(53,208,127,0.08)}
+.showcase-note{padding:12px 18px;border-top:1px solid var(--line);background:rgba(255,255,255,0.015);
+  font-size:11.5px;color:var(--dim);line-height:1.55}
+
+/* ── Sections ───────────────────────────────────────────────────────────── */
+.section{padding:clamp(48px,7vh,88px) 0;border-top:1px solid var(--line)}
+.section-kicker{font-size:11.5px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--blue);margin-bottom:14px}
+.section h2{font-family:var(--font-display);font-weight:400;font-size:clamp(26px,3.4vw,40px);line-height:1.12;letter-spacing:-0.015em;margin-bottom:14px;max-width:720px}
+.section p.lead{font-size:15px;color:var(--muted);max-width:660px;line-height:1.65}
+
+/* Comparison table */
+.table-scroll{overflow-x:auto;margin-top:32px;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line)}
+thead th{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);font-weight:600;background:rgba(255,255,255,0.02)}
+tbody tr:last-child td{border-bottom:0}
+td.tool{color:var(--muted);font-weight:500}
+tr.ours td{background:rgba(47,125,246,0.06)}
+tr.ours td.tool{color:var(--text);font-weight:600}
+.yes{color:var(--safe)}
+.no{color:var(--dim)}
+td.center{text-align:center}
+
+/* Three steps */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:32px}
+.card{border:1px solid var(--line);border-radius:12px;padding:22px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+.card-n{font-family:var(--font-mono);font-size:11.5px;color:var(--blue);margin-bottom:12px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:8px}
+.card p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* Honest limits */
+.limits{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 32px;margin-top:28px;max-width:860px}
+.limit{display:flex;gap:10px;font-size:13px;color:var(--muted);line-height:1.6}
+.limit b{color:var(--text);font-weight:600}
+.limit i{flex:0 0 6px;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-top:7px}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.footer{border-top:1px solid var(--line);padding:clamp(36px,5vh,56px) 0 28px;background:rgba(255,255,255,0.012)}
+.footer-top{display:flex;justify-content:space-between;gap:48px;margin-bottom:28px}
+.footer-brand{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-weight:600;font-size:15px}
+.footer-brand img{width:24px;height:24px;border-radius:7px}
+.footer-tagline{font-size:12.5px;color:var(--dim);max-width:320px;line-height:1.6}
+.footer-nav{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(28px,5vw,72px)}
+.footer-col h4{font-size:10.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.footer-col a{font-size:12.5px;color:var(--muted)}
+.footer-col a:hover{color:var(--text)}
+.footer-rule{height:1px;background:var(--line);margin:0 0 18px}
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
-.footer-legal{font-size:clamp(10px,1.1vw,12px);color:rgba(255,255,255,0.35);max-width:640px;line-height:1.6}
+.footer-legal{font-size:11.5px;color:var(--dim);max-width:680px;line-height:1.65}
 .footer-socials{display:flex;gap:16px}
-.footer-socials a{width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);transition:opacity .2s}
-.footer-socials a:hover{opacity:.4}
+.footer-socials a{width:22px;height:22px;color:var(--dim)}
+.footer-socials a:hover{color:var(--text)}
 
-/* Entrance animation */
-.anim-init{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
-.anim-init.show{opacity:1;transform:translateY(0)}
-@media(prefers-reduced-motion:reduce){.anim-init{opacity:1!important;transform:none!important;transition:none!important}}
+/* ── Entrance ───────────────────────────────────────────────────────────── */
+.anim{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
+.anim.show{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.anim{opacity:1!important;transform:none!important;transition:none!important}}
 
-/* Responsive */
-@media(max-width:768px){
-  .footer-top{flex-direction:column;gap:24px}
-  .footer-nav{grid-template-columns:repeat(2,1fr)}
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media(max-width:980px){
+  .hero{grid-template-columns:1fr;gap:40px;padding-top:clamp(40px,7vh,72px)}
+  .cards{grid-template-columns:1fr}
+  .limits{grid-template-columns:1fr}
+  .footer-top{flex-direction:column;gap:28px}
+}
+@media(max-width:640px){
+  .nav-links{display:none}
+  .nav-inner{gap:14px}
+  .cta,.cta-ghost{width:100%;justify-content:center}
+  .footer-nav{grid-template-columns:1fr 1fr}
+  .footer-bottom{flex-direction:column;align-items:flex-start}
 }
 </style>
 </head>
 <body>
-<div class="bg">
-  <video autoplay muted loop playsinline aria-label="Animated dark background">
-    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260826_123836_11a3c5e0-713f-4bef-a8e9-7dd93bdea3b0.mp4" type="video/mp4"/>
-  </video>
-</div>
+<div class="canvas" aria-hidden="true"></div>
 
-<div class="page">
-  <main class="hero">
-    <p class="eyebrow anim-init">Wallet permission reconstruction</p>
-    <h1 class="headline anim-init">See how a drain happened.<br><span>Then close what is still open.</span></h1>
-    <p class="lede anim-init">Paste any address to see the permission that took the funds — and what is still reachable.</p>
-    <p class="proof anim-init">No wallet connection. Ethereum, Base, Arbitrum, Optimism and Sepolia.</p>
-    <div class="cta-row anim-init">
-      <a href="/dashboard" class="cta">Inspect an address</a>
-      <a href="/method" class="cta-ghost">Read the risk model</a>
+<div class="shell">
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="/"><img src="/logo.png" alt=""/><span>Anchrion</span></a>
+      <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/method">Risk model</a>
+        <a href="https://github.com/thesithunyein/anchrion" target="_blank" rel="noopener noreferrer">Source</a>
+      </div>
+      <a class="nav-cta" href="/dashboard">Inspect an address</a>
     </div>
+  </nav>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <p class="eyebrow anim"><i></i>Wallet permission reconstruction</p>
+        <h1 class="headline anim">See how a drain happened.<br><em>Then close what is still open.</em></h1>
+        <p class="lede anim">Paste any address to see the permission that moved the funds — and what the same address can still reach.</p>
+        <p class="sub anim">Reads public chain data only. No wallet connection, no API keys, five networks.</p>
+        <div class="cta-row anim">
+          <a href="/dashboard" class="cta">Inspect an address</a>
+          <a href="/method" class="cta-ghost">Read the risk model</a>
+        </div>
+      </div>
+
+      <!--
+        A drawn preview of the reconstruction panel — the same three-step
+        structure the dashboard produces, hand-built rather than screenshotted so
+        it stays sharp at every width. No figures are claimed here.
+      -->
+      <div class="showcase anim" role="img" aria-label="Preview of the incident reconstruction panel">
+        <div class="showcase-bar">
+          <span></span><span></span><span></span>
+          <div class="showcase-url">anchrion.sithunyein.com/dashboard?view=incident</div>
+        </div>
+        <div class="showcase-body">
+          <div class="step">
+            <div class="step-n">1</div>
+            <div>
+              <p class="step-h">Permission granted</p>
+              <p class="step-p">A token approval to a contract, read live from the token itself.</p>
+              <p class="mono">USDC · spender 0x4c…76d6 · allowance unlimited</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-n">2</div>
+            <div>
+              <p class="step-h">Funds moved, and by whom</p>
+              <p class="step-p">Token outflows paired with the address that submitted each one.</p>
+              <p class="mono">outflow → 0x9b…41af · submitted by 0x5b…5f8a</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-n green">3</div>
+            <div>
+              <p class="step-h">Still reachable</p>
+              <p class="step-p">A permission counts as spent only while the spender still holds a live allowance on that wallet.</p>
+              <p class="mono">proved spent: 1 · unexplained and named as such: 2</p>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="chip crit">1 proved spent permission</span>
+            <span class="chip ok">allowance re-read after revoke</span>
+            <span class="chip">every number sourced</span>
+          </div>
+        </div>
+        <p class="showcase-note">The panel also prints what it could not see: NFT approvals, permit signatures, and how far back the history it read actually reaches.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="section-kicker">What no other tool answers</p>
+      <h2>Prevention is solved. The hour after a drain is not.</h2>
+      <p class="lead">Transaction simulation and approval inventories are good products that already exist. None of them answers which permission was used against you, or whether the same spender can still reach you. That is the only question Anchrion was built for — and the last row of this table is where it loses.</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Tool</th>
+              <th class="center">Warns before you sign</th>
+              <th class="center">Lists permissions</th>
+              <th class="center">Revokes</th>
+              <th class="center">Names the permission that was used</th>
+              <th class="center">Shows what is still reachable</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="tool">Rabby · MetaMask simulation</td>
+              <td class="center yes">yes</td><td class="center no">no</td><td class="center no">no</td>
+              <td class="center no">no</td><td class="center no">no</td>
+            </tr>
+            <tr>
+              <td class="tool">Revoke.cash</td>
+              <td class="center no">no</td><td class="center yes">yes</td><td class="center yes">yes</td>
+              <td class="center no">no</td><td class="center no">no</td>
+            </tr>
+            <tr>
+              <td class="tool">Etherscan</td>
+              <td class="center no">no</td><td class="center no">no</td><td class="center no">no</td>
+              <td class="center no">no</td><td class="center no">no</td>
+            </tr>
+            <tr class="ours">
+              <td class="tool">Anchrion</td>
+              <td class="center no">no — it is not preventive</td>
+              <td class="center yes">yes</td><td class="center yes">yes</td>
+              <td class="center yes">yes</td><td class="center yes">yes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="section-kicker">How it works</p>
+      <h2>Three steps, no setup.</h2>
+      <div class="cards">
+        <div class="card">
+          <p class="card-n">01</p>
+          <h3>Paste an address</h3>
+          <p>Any wallet or smart account, any of five networks. Nothing is installed and no wallet is connected, so you can inspect an address you do not own.</p>
+        </div>
+        <div class="card">
+          <p class="card-n">02</p>
+          <h3>Read the reconstruction</h3>
+          <p>Approvals are read live from each token contract, outflows are paired with their submitting address, and the coverage panel states exactly what was and was not read.</p>
+        </div>
+        <div class="card">
+          <p class="card-n">03</p>
+          <h3>Revoke, and verify</h3>
+          <p>Connect the wallet that owns the address and revoke any permission. After the receipt, the allowance is read back — a surviving allowance is reported as still allowed, never as a green tick.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-bottom:clamp(56px,8vh,96px)">
+      <p class="section-kicker">What this cannot see</p>
+      <h2>The limits are part of the product.</h2>
+      <div class="limits">
+        <div class="limit"><i></i><span><b>ERC-20 allowances only.</b> ERC-721 and ERC-1155 approvals are not covered.</span></div>
+        <div class="limit"><i></i><span><b>Off-chain permits.</b> Permit2, ERC-2612 and Seaport signatures leave no trace on chain until they are redeemed.</span></div>
+        <div class="limit"><i></i><span><b>A bounded history.</b> Approval events are read over a validated block window; an older permission that never touched the wallet's readable history would be missed.</span></div>
+        <div class="limit"><i></i><span><b>No threat feed.</b> Anchrion ships no list of malicious addresses, and will not call an address an attacker without on-chain evidence.</span></div>
+      </div>
+    </section>
   </main>
 
   <footer class="footer">
-    <div class="footer-inner">
+    <div class="wrap">
       <div class="footer-top">
         <div>
-          <div class="footer-brand anim-init">
-            <img src="/logo.png" alt="Anchrion"/>
-            <span>Anchrion</span>
-          </div>
-          <p class="footer-tagline anim-init">Understand what happened, and what can still be taken.</p>
+          <div class="footer-brand"><img src="/logo.png" alt=""/><span>Anchrion</span></div>
+          <p class="footer-tagline">Understand what happened, and what can still be taken.</p>
         </div>
         <nav class="footer-nav">
-          <div class="footer-col anim-init">
+          <div class="footer-col">
             <h4>Product</h4>
             <ul>
               <li><a href="/dashboard">Approvals dashboard</a></li>
-              <li><a href="/dashboard">Incident reconstruction</a></li>
+              <li><a href="/dashboard?view=incident">Incident reconstruction</a></li>
               <li><a href="/method">Risk model and limits</a></li>
             </ul>
           </div>
-          <div class="footer-col anim-init">
+          <div class="footer-col">
             <h4>Source</h4>
             <ul>
               <li><a href="https://github.com/thesithunyein/anchrion" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
@@ -118,12 +349,12 @@ a{color:inherit;text-decoration:none}
       </div>
       <div class="footer-rule"></div>
       <div class="footer-bottom">
-        <p class="footer-legal anim-init">&copy; 2026 Anchrion — MIT licensed. Reads public chain data only. It never asks for a private key and cannot move your funds; revoking sends a transaction your own wallet signs.</p>
+        <p class="footer-legal">&copy; 2026 Anchrion — MIT licensed. Reads public chain data only. It never asks for a private key and cannot move your funds; revoking sends a transaction your own wallet signs.</p>
         <div class="footer-socials">
-          <a href="https://github.com/thesithunyein/anchrion" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="anim-init">
+          <a href="https://github.com/thesithunyein/anchrion" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
             <svg width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
           </a>
-          <a href="https://x.com/thesithunyein" target="_blank" rel="noopener noreferrer" aria-label="X" class="anim-init">
+          <a href="https://x.com/thesithunyein" target="_blank" rel="noopener noreferrer" aria-label="X">
             <svg width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
         </div>
@@ -134,25 +365,13 @@ a{color:inherit;text-decoration:none}
 
 <script>
 (function(){
-  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  function show(sel,delay){
-    setTimeout(function(){
-      var el=document.querySelector(sel);
-      if(el)el.classList.add('show');
-    },delay);
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+    document.querySelectorAll('.anim').forEach(function(el){el.classList.add('show')});
+    return;
   }
-  show('.eyebrow',100);
-  show('.headline',250);
-  show('.lede',450);
-  show('.proof',600);
-  show('.cta-row',750);
-  show('.footer-brand',800);
-  show('.footer-tagline',850);
-  show('.footer-col:nth-child(1)',900);
-  show('.footer-col:nth-child(2)',960);
-  show('.footer-legal',1000);
-  show('.footer-socials a:nth-child(1)',1050);
-  show('.footer-socials a:nth-child(2)',1100);
+  document.querySelectorAll('.anim').forEach(function(el,i){
+    setTimeout(function(){el.classList.add('show')}, 90 + i * 70);
+  });
 })();
 </script>
 </body>

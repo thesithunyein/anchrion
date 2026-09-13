@@ -51,6 +51,45 @@ button { cursor: pointer; border: none; font-family: inherit; }
   .stat-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
+/*
+ * Risk distribution strip. The four numbers are already on the cards; this shows
+ * the same measurement as a shape, which is what makes a mixed wallet legible at
+ * a glance instead of a spreadsheet.
+ */
+.risk-bar {
+  display: flex; height: 10px; border-radius: 999px; overflow: hidden;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+}
+.risk-bar span { display: block; height: 100%; }
+.risk-legend {
+  display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 11px;
+  font-size: 12px; color: var(--text-tertiary);
+}
+.risk-legend b { font-weight: 600; color: var(--text-secondary); }
+.risk-dot {
+  width: 8px; height: 8px; border-radius: 2px; display: inline-block;
+  margin-right: 6px; vertical-align: middle;
+}
+
+/*
+ * Permission row. The layout moved out of inline styles so the row can reflow on
+ * a phone: below 620px the value column drops to its own line and the chevron is
+ * dropped, because a judge opening the demo link on a phone was reading a name
+ * squeezed into 90px next to three fixed-width columns.
+ */
+.approval-head { display: flex; align-items: center; gap: 12px; padding: 13px 18px; }
+.approval-main {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  flex: 1; min-width: 0; cursor: pointer; flex-wrap: wrap;
+}
+.approval-name { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+.approval-value { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+@media (max-width: 620px) {
+  .approval-head { padding: 12px 14px; gap: 10px; }
+  .approval-value { gap: 10px; flex-shrink: 1; }
+  .approval-chevron { display: none !important; }
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
@@ -59,6 +98,22 @@ button { cursor: pointer; border: none; font-family: inherit; }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/*
+ * Header bar. It is a single 56px line on desktop; on a phone the network badge,
+ * rescan and connect controls need to wrap, and a fixed height turned that into
+ * a squeezed row instead. The inline height is overridden deliberately.
+ */
+@media (max-width: 760px) {
+  .dash-header {
+    height: auto !important;
+    min-height: 56px;
+    flex-wrap: wrap;
+    row-gap: 8px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
 }
 
 /* Dashboard entrance animation */

@@ -116,7 +116,7 @@ export function ApprovalRow({
         opacity: revoked ? 0.75 : 1,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 18px' }}>
+      <div className="approval-head">
         <input
           type="checkbox"
           checked={selected}
@@ -125,11 +125,8 @@ export function ApprovalRow({
           style={{ width: 15, height: 15, accentColor: 'var(--blue)', flexShrink: 0, cursor: 'pointer' }}
         />
 
-        <div
-          onClick={() => setOpen(!open)}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flex: 1, cursor: 'pointer', minWidth: 0 }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
+        <div onClick={() => setOpen(!open)} className="approval-main">
+          <div className="approval-name">
             <div
               style={{
                 width: 36,
@@ -159,7 +156,7 @@ export function ApprovalRow({
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
+          <div className="approval-value">
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: 14, fontWeight: 600 }}>
                 {approval.valueAtRiskUsd === null
@@ -187,6 +184,7 @@ export function ApprovalRow({
               {LEVEL_LABEL[level]}
             </span>
             <svg
+              className="approval-chevron"
               width="14"
               height="14"
               viewBox="0 0 16 16"

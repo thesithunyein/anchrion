@@ -409,7 +409,22 @@ export default function Dashboard() {
       )
       .reduce((sum, approval) => sum + (approval.valueAtRiskUsd ?? 0), 0);
     const healthScore = total === 0 ? 100 : Math.round(((total - risky) / total) * 100);
-    return { total, risky, critical, unlimited, valueAtRisk, healthScore };
+    /*
+     * Band counts for the distribution strip. They are derived from the same score
+     * the filters and the published model use, so the strip and the list below it
+     * cannot disagree.
+     */
+    const bands = {
+      critical: approvals.filter((approval) => approval.riskScore >= 70).length,
+      high: approvals.filter(
+        (approval) => approval.riskScore >= 50 && approval.riskScore < 70,
+      ).length,
+      medium: approvals.filter(
+        (approval) => approval.riskScore >= 30 && approval.riskScore < 50,
+      ).length,
+      low: approvals.filter((approval) => approval.riskScore < 30).length,
+    };
+    return { total, risky, critical, unlimited, valueAtRisk, healthScore, bands };
   }, [approvals]);
 
   /*
@@ -661,7 +676,7 @@ export default function Dashboard() {
       <Backdrop />
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <header style={{ position: 'sticky', top: 0, zIndex: 50, height: 56, display: 'flex', alignItems: 'center', padding: '0 clamp(20px,4vw,48px)', justifyContent: 'space-between', backdropFilter: 'blur(40px) saturate(1.4)', WebkitBackdropFilter: 'blur(40px) saturate(1.4)', background: 'rgba(8,9,13,0.6)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <header className="dash-header" style={{ position: 'sticky', top: 0, zIndex: 50, height: 56, display: 'flex', alignItems: 'center', padding: '0 clamp(20px,4vw,48px)', justifyContent: 'space-between', backdropFilter: 'blur(40px) saturate(1.4)', WebkitBackdropFilter: 'blur(40px) saturate(1.4)', background: 'rgba(8,9,13,0.6)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <img src="/logo.png" alt="Anchrion" style={{ width: 28, height: 28, borderRadius: 7 }} />
             <span style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 400 }}>Anchrion</span>
@@ -857,6 +872,47 @@ export default function Dashboard() {
             ))}
           </div>
 
+          {stats.total > 0 && (
+            <div className="dash-enter-delay-1" style={{ marginBottom: 22 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 9 }}>
+                <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
+                  Risk distribution
+                </p>
+                <p style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
+                  {stats.total} live permission{stats.total === 1 ? '' : 's'}
+                </p>
+              </div>
+              <div className="risk-bar" role="img" aria-label={`${stats.total} live permissions: ${stats.bands.critical} critical, ${stats.bands.high} high, ${stats.bands.medium} medium, ${stats.bands.low} low or safe`}>
+                {([
+                  ['critical', 'var(--risk-critical)'],
+                  ['high', 'var(--risk-high)'],
+                  ['medium', 'var(--risk-medium)'],
+                  ['low', 'var(--risk-safe)'],
+                ] as const).map(([band, color]) =>
+                  stats.bands[band] > 0 ? (
+                    <span
+                      key={band}
+                      style={{ width: `${(stats.bands[band] / stats.total) * 100}%`, background: color }}
+                    />
+                  ) : null,
+                )}
+              </div>
+              <div className="risk-legend">
+                {([
+                  ['Critical ≥70', stats.bands.critical, 'var(--risk-critical)'],
+                  ['High 50–69', stats.bands.high, 'var(--risk-high)'],
+                  ['Medium 30–49', stats.bands.medium, 'var(--risk-medium)'],
+                  ['Low or safe <30', stats.bands.low, 'var(--risk-safe)'],
+                ] as const).map(([label, count, color]) => (
+                  <span key={label}>
+                    <i className="risk-dot" style={{ background: color }} />
+                    {label} <b>{count}</b>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
           {(revokedSinceLastScan.length > 0 || degraded) && (
             <div style={{ marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {revokedSinceLastScan.length > 0 && (
@@ -880,7 +936,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
             {(['approvals', 'incident'] as const).map((entry) => (
               <button
                 key={entry}
