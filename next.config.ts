@@ -12,12 +12,15 @@ const nextConfig: NextConfig = {
     return {
       beforeFiles: [],
       afterFiles: [
-        { source: '/', destination: '/index.html' },
-        // The Chestly design study is a standalone static page under public/.
-        // Next serves public files by their exact path, so a folder URL needs
-        // its index resolving explicitly, same as the landing page above.
+        // Static pages in public/ need their index resolving explicitly: Next
+        // serves public files by exact path and will not resolve a folder's.
+        // The root serves the Chestly design; the Anchrion project page moved
+        // to /anchrion, and /chestly stays as an alias so shared links hold.
+        { source: '/', destination: '/chestly/index.html' },
         { source: '/chestly', destination: '/chestly/index.html' },
         { source: '/chestly/', destination: '/chestly/index.html' },
+        { source: '/anchrion', destination: '/index.html' },
+        { source: '/anchrion/', destination: '/index.html' },
       ],
       fallback: [],
     };
