@@ -11,6 +11,11 @@
   [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
   [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
   [![No API keys required](https://img.shields.io/badge/API%20keys-not%20required-success)](.env.example)
+
+  <br />
+
+  <!-- docs/landing.png, not public/: GitHub caches images by URL, the same reason as the logo above. -->
+  <img src="docs/landing.png" alt="Anchrion landing page: See how a drain happened. Then close what is still open." width="820" />
 </div>
 
 ---
