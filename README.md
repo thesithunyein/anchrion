@@ -5,7 +5,7 @@
 
   # Anchrion
 
-  **See how a drain happened. Find every permission your wallet granted.**
+  **See how a drain happened. Then close what is still open.**
 
   [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
@@ -201,6 +201,7 @@ Weights are published on `/method` and in `src/lib/risk/scorer.ts`. Summary:
 | Signal | Points | Evidence |
 |---|---|---|
 | Unlimited permission (≥ 2^255) | +30 | detected |
+| Allowance above one million tokens | +20 | detected |
 | Spender has no contract code | +40 | detected |
 | Explorer flags the spender as a scam address | +45 | detected |
 | Unverified contract source | +20 | detected |
@@ -332,9 +333,10 @@ and a coverage panel naming what the scan could not see. Revoking is enabled onl
 when the connected wallet owns that address on that network.
 
 Every scan is also a link. The address, network and view are written into the URL as you
-go, so `/dashboard?address=0x…&chain=11155111&view=incident` opens straight onto that
-wallet's reconstruction and starts the scan on load — which is how a finding is meant to be
-handed to somebody else.
+go, so `/dashboard?address=0x…&chain=11155111&view=incident` opens on that wallet's
+reconstruction tab and starts the allowance scan on load. The reconstruction itself runs on
+one click, so the transfers are rebuilt on demand rather than assumed — which is how a
+finding is meant to be handed to somebody else.
 
 If you want one command instead of a browser:
 
