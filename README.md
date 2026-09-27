@@ -123,66 +123,75 @@ Optimism.
 Two route handlers, two engines, and keyless public data. Nothing in the path holds a key, a
 signing capability, or a database.
 
-```mermaid
-flowchart TB
-  User["Reviewer or wallet owner"] --> Dash["Dashboard /dashboard"]
+<img src="docs/architecture.png" alt="Anchrion architecture: the dashboard calls two route handlers, which drive the scan and reconstruction engines. Both engines read only keyless public data, and a revoke is signed by your own wallet." width="880" />
 
-  subgraph routes["Next.js route handlers"]
-    ApiA["POST /api/approvals"]
-    ApiI["POST /api/incident"]
-  end
-
-  subgraph engines["src/lib - the engines"]
-    Scan["approvals/scan.ts - discovery"]
-    Recon["incident/reconstruct.ts - post-drain reconstruction"]
-    Scorer["risk/scorer.ts - published weights"]
-    Prices["prices.ts - live USD, dated fallback"]
-  end
-
-  subgraph sources["Keyless public data"]
-    Explorer["Blockscout - transfers, txs, verification, age"]
-    Rpc["JSON-RPC - failover, probed log window"]
-  end
-
-  Dash -->|"scan request"| ApiA
-  Dash -->|"incident request"| ApiI
-  ApiA --> Scan
-  ApiI --> Recon
-  Scan --> Explorer
-  Scan --> Rpc
-  Scan --> Prices
-  Recon --> Explorer
-  Recon --> Rpc
-  Scan --> Scorer
-  Recon --> Scorer
-  Scorer --> Coverage["Coverage panel + score band, reported in the UI"]
-  Recon --> Family["Attacker-family grouping by deployer"]
-  Dash -->|"approve(spender, 0)"| Wallet["Your own wallet - signs the revoke"]
-  Wallet --> Chain[("The chain")]
-```
+<sub>Rendered from [`docs/architecture.mmd`](docs/architecture.mmd) — edit that and re-render to change this
+</sub>
 
 ```
-src/
-  app/
-    api/approvals/route.ts    POST { walletAddress, chainId } → permissions + coverage
-    api/incident/route.ts     POST { walletAddress, chainId } → reconstructed incident
-    dashboard/page.tsx        the app: scan, explain, revoke, reconstruct
-    method/page.tsx           published risk model, weights, and limits
-  components/
-    approval-row.tsx          one permission: evidence, signals, revoke, explorer links
-    incident-panel.tsx        the reconstruction: narrative, transfers, family revoke
-  lib/
-    approvals/scan.ts         discovery engine (history + logs + live allowance reads)
-    approvals/client.ts       browser client + honest local observation history
-    incident/reconstruct.ts   post-drain reconstruction and attacker-family grouping
-    risk/scorer.ts            the published scoring model
-    abi/erc20.ts              minimal ERC-20 surface + approval-selector decoding
-    chain/rpc.ts              JSON-RPC with endpoint failover
-    explorer/blockscout.ts    keyless explorer client (history, verification, age)
-    prices.ts                 live USD prices with a dated static fallback
-    hooks/use-revoke.ts       revoke + sequential batch revoke with per-row status
-contracts/DemoDrainer.sol     TESTNET-ONLY drainer used to stage a reproducible incident
-scripts/stage-drain.sh        stages that incident on Sepolia
+anchrion/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── approvals/route.ts     POST { walletAddress, chainId } → permissions + coverage
+│   │   │   └── incident/route.ts      POST { walletAddress, chainId } → reconstructed incident
+│   │   ├── dashboard/page.tsx         the app: scan, explain, revoke, reconstruct
+│   │   ├── method/page.tsx            published risk model, weights, and limits
+│   │   ├── layout.tsx                 root layout
+│   │   ├── providers.tsx              wagmi + react-query providers
+│   │   ├── globals.css                Tailwind entry
+│   │   ├── not-found.tsx              404
+│   │   └── favicon.ico
+│   ├── components/
+│   │   ├── approval-row.tsx           one permission: evidence, signals, revoke, explorer links
+│   │   └── incident-panel.tsx         the reconstruction: narrative, transfers, family revoke
+│   ├── lib/
+│   │   ├── approvals/
+│   │   │   ├── scan.ts                discovery engine (history + logs + live allowance reads)
+│   │   │   └── client.ts              browser client + honest local observation history
+│   │   ├── incident/reconstruct.ts    post-drain reconstruction and attacker-family grouping
+│   │   ├── risk/scorer.ts             the published scoring model
+│   │   ├── abi/erc20.ts               minimal ERC-20 surface + approval-selector decoding
+│   │   ├── chain/rpc.ts               JSON-RPC with endpoint failover
+│   │   ├── explorer/blockscout.ts     keyless explorer client (history, verification, age)
+│   │   ├── hooks/use-revoke.ts        revoke + sequential batch revoke with per-row status
+│   │   ├── prices.ts                  live USD prices with a dated static fallback
+│   │   └── wagmi.ts                   chains, transports and connectors
+│   └── types/
+│       └── approval.ts                shared permission types
+├── contracts/
+│   └── DemoDrainer.sol                TESTNET-ONLY drainer used to stage a reproducible incident
+├── scripts/
+│   ├── stage-drain.sh                 stages that incident on Sepolia, refuses any other chain
+│   ├── verify-coverage.mjs            re-derives the coverage panel without importing app code
+│   └── verify-discovery.sh            proves discovery finds a spender on no bundled list
+├── public/
+│   ├── anchrion.html                  the landing page served at /
+│   ├── deck.html                      the pitch deck served at /deck
+│   ├── anchrion-pitch-deck.pdf        the same deck as a committed 12-page landscape PDF
+│   ├── logo.svg  logo.png  favicon.png
+│   ├── coinbase.png  metamask.png  phantom.png  walletconnect.png
+│   └── chestly/                       a separate design study, shares no code with Anchrion
+│       ├── index.html
+│       └── README.md
+├── docs/
+│   ├── landing.png                    landing page screenshot used at the top of this file
+│   ├── logo.png                       the mark, kept out of public/ so its URL stays cacheable
+│   ├── architecture.mmd               source for the diagram above
+│   └── architecture.png               the rendered diagram
+├── .env.example                       every variable is optional; keys only raise rate limits
+├── next.config.ts                     the rewrites that connect public/ to the app
+├── vercel.json
+├── tsconfig.json
+├── eslint.config.mjs
+├── postcss.config.mjs
+├── package.json
+├── package-lock.json
+├── README.md
+├── SECURITY.md                        disclosure policy and the design guarantees
+├── CONTRIBUTING.md                    setup, the checks, and the doc-drift rule
+├── CODE_OF_CONDUCT.md                 Contributor Covenant 2.1
+└── LICENSE                            MIT
 ```
 
 ### How a scan flows
