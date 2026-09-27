@@ -120,6 +120,47 @@ Optimism.
 
 ## Architecture
 
+Two route handlers, two engines, and keyless public data. Nothing in the path holds a key, a
+signing capability, or a database.
+
+```mermaid
+flowchart TB
+  User["Reviewer or wallet owner"] --> Dash["Dashboard /dashboard"]
+
+  subgraph routes["Next.js route handlers"]
+    ApiA["POST /api/approvals"]
+    ApiI["POST /api/incident"]
+  end
+
+  subgraph engines["src/lib - the engines"]
+    Scan["approvals/scan.ts - discovery"]
+    Recon["incident/reconstruct.ts - post-drain reconstruction"]
+    Scorer["risk/scorer.ts - published weights"]
+    Prices["prices.ts - live USD, dated fallback"]
+  end
+
+  subgraph sources["Keyless public data"]
+    Explorer["Blockscout - transfers, txs, verification, age"]
+    Rpc["JSON-RPC - failover, probed log window"]
+  end
+
+  Dash -->|"scan request"| ApiA
+  Dash -->|"incident request"| ApiI
+  ApiA --> Scan
+  ApiI --> Recon
+  Scan --> Explorer
+  Scan --> Rpc
+  Scan --> Prices
+  Recon --> Explorer
+  Recon --> Rpc
+  Scan --> Scorer
+  Recon --> Scorer
+  Scorer --> Coverage["Coverage panel + score band, reported in the UI"]
+  Recon --> Family["Attacker-family grouping by deployer"]
+  Dash -->|"approve(spender, 0)"| Wallet["Your own wallet - signs the revoke"]
+  Wallet --> Chain[("The chain")]
+```
+
 ```
 src/
   app/
