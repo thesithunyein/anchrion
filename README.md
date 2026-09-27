@@ -412,6 +412,15 @@ The route that matters to a reviewer is `/dashboard`; if a hosting platform has 
 stale build it will keep serving the old app until it is redeployed, so rebuild and
 redeploy after pulling changes.
 
+## Security and community
+
+- **[SECURITY.md](SECURITY.md)** — how to report a vulnerability, what is in scope, and the
+  design guarantees that must not regress. A wrong number is treated as a security bug.
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — setup, the four checks to run before a pull
+  request, and the rule about keeping `/method`, `scorer.ts` and this README in agreement.
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** — Contributor Covenant 2.1, with a note about
+  not shaming the people behind an address a scan surfaces.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
